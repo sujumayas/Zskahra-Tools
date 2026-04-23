@@ -248,7 +248,10 @@
     overflow: hidden;
     border: 0.5px solid var(--border);
     background: var(--bg-card);
+    cursor: pointer;
+    transition: border-color 0.15s;
   }
+  .zk-illustration:hover { border-color: var(--border-strong); }
   .zk-illustration img {
     width: 100%;
     height: auto;
@@ -272,6 +275,45 @@
   @media (max-width: 640px) {
     .zk-illustrations-row { grid-template-columns: 1fr; }
   }
+  .zk-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.88);
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    cursor: zoom-out;
+  }
+  .zk-lightbox.open { display: flex; }
+  .zk-lightbox img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 8px 60px rgba(0,0,0,0.5);
+  }
+  .zk-lightbox-close {
+    position: fixed;
+    top: 16px;
+    right: 20px;
+    z-index: 10000;
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: #fff;
+    font-size: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    line-height: 1;
+  }
+  .zk-lightbox-close:hover { background: rgba(255,255,255,0.25); }
   .zk-footer {
     margin-top: 3rem;
     padding-top: 1.5rem;
@@ -308,6 +350,12 @@
       <div class="zk-metric"><p class="zk-metric-label">Año</p><p class="zk-metric-value">288 Pasos</p></div>
       <div class="zk-metric"><p class="zk-metric-label">Villas</p><p class="zk-metric-value">12</p></div>
     </div>
+    <p class="zk-section-title">Elementos clave del mundo</p>
+    <div class="zk-grid" id="world-grid"></div>
+    <div class="zk-detail" id="world-detail">
+      <p class="tag">Selecciona un elemento</p>
+      <p>Haz clic en cualquier tarjeta para leer el detalle.</p>
+    </div>
     <div class="zk-illustrations-row">
       <figure class="zk-illustration">
         <img src="Las Razas.png" alt="Las dos razas de Zskahra" loading="lazy">
@@ -318,48 +366,24 @@
         <figcaption>Obelisk-Pylonis — sistema de protección</figcaption>
       </figure>
     </div>
-    <p class="zk-section-title">Elementos clave del mundo</p>
-    <div class="zk-grid" id="world-grid"></div>
-    <div class="zk-detail" id="world-detail">
-      <p class="tag">Selecciona un elemento</p>
-      <p>Haz clic en cualquier tarjeta para leer el detalle.</p>
-    </div>
   </section>
 
   <!-- VILLAGES -->
   <section id="panel-villages" class="zk-panel">
-    <figure class="zk-illustration">
-      <img src="Las doce villas.png" alt="Las doce villas de Zskahra" loading="lazy">
-      <figcaption>Las doce villas de Zskahra — mapa general</figcaption>
-    </figure>
-    <div class="zk-illustrations-row">
-      <figure class="zk-illustration">
-        <img src="Villas del lago.png" alt="Villas del Lago: Halvar e Ikhmar" loading="lazy">
-        <figcaption>Villas del Lago — Halvar e Ikhmar</figcaption>
-      </figure>
-      <figure class="zk-illustration">
-        <img src="Villas centrales.png" alt="Villas Centrales" loading="lazy">
-        <figcaption>Villas Centrales — el corazón del sistema</figcaption>
-      </figure>
-    </div>
-    <figure class="zk-illustration" style="max-width:400px;margin-left:auto;margin-right:auto;">
-      <img src="Vila sola - Halvar.png" alt="Halvar, Villa de la Sal" loading="lazy">
-      <figcaption>Halvar — ejemplo de ficha de villa</figcaption>
-    </figure>
     <div class="zk-filters" id="village-filters"></div>
     <div class="zk-grid" id="village-grid"></div>
     <div class="zk-detail" id="village-detail">
       <p class="tag">Selecciona una villa</p>
       <p>Cada villa gestiona un recurso único dentro de la red.</p>
     </div>
+    <figure class="zk-illustration">
+      <img src="Las doce villas.png" alt="Las doce villas de Zskahra" loading="lazy">
+      <figcaption>Las doce villas de Zskahra — mapa general</figcaption>
+    </figure>
   </section>
 
   <!-- NAMES -->
   <section id="panel-names" class="zk-panel">
-    <figure class="zk-illustration" style="max-width:500px;margin-left:auto;margin-right:auto;">
-      <img src="Los nombres.png" alt="Ejemplos de nombres con sufijos" loading="lazy">
-      <figcaption>Ejemplos de nombres con sufijos de hito social</figcaption>
-    </figure>
     <div class="zk-struct">
       <p class="label">Estructura</p>
       <p class="zk-mono">[nombre] + [sufijo de hito] + "de" + [villa]</p>
@@ -373,6 +397,10 @@
       <p class="tag">Selecciona un sufijo</p>
       <p>Cada sufijo codifica un hito vital reconocido por la villa.</p>
     </div>
+    <figure class="zk-illustration" style="max-width:500px;margin-left:auto;margin-right:auto;">
+      <img src="Los nombres.png" alt="Ejemplos de nombres con sufijos" loading="lazy">
+      <figcaption>Ejemplos de nombres con sufijos de hito social</figcaption>
+    </figure>
   </section>
 
   <!-- TRADE -->
@@ -411,6 +439,11 @@
     ZSKAHRA · HARP Homebrew
   </footer>
 </main>
+
+<div class="zk-lightbox" id="zk-lightbox">
+  <button class="zk-lightbox-close" id="zk-lightbox-close">&times;</button>
+  <img id="zk-lightbox-img" src="" alt="">
+</div>
 
 <script>
 (function() {
@@ -728,6 +761,29 @@
     selectIn(seasonGrid, card);
     setDetail(seasonDetail, item.detail.title, item.detail.tag, item.detail.body);
   });
+  // ===== LIGHTBOX =====
+  const lb = document.getElementById('zk-lightbox');
+  const lbImg = document.getElementById('zk-lightbox-img');
+  const lbClose = document.getElementById('zk-lightbox-close');
+
+  document.querySelectorAll('.zk-illustration').forEach(fig => {
+    fig.addEventListener('click', () => {
+      const img = fig.querySelector('img');
+      if (!img) return;
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  function closeLightbox() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  lbClose.addEventListener('click', closeLightbox);
+  lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && lb.classList.contains('open')) closeLightbox(); });
 })();
 </script>
 </body>

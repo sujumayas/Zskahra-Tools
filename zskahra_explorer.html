@@ -242,6 +242,36 @@
     border-radius: 50%;
     flex-shrink: 0;
   }
+  .zk-illustration {
+    margin: 1.5rem 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 0.5px solid var(--border);
+    background: var(--bg-card);
+  }
+  .zk-illustration img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .zk-illustration figcaption {
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-style: italic;
+    text-align: center;
+    letter-spacing: 0.03em;
+  }
+  .zk-illustrations-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 1.5rem 0;
+  }
+  .zk-illustrations-row .zk-illustration { margin: 0; }
+  @media (max-width: 640px) {
+    .zk-illustrations-row { grid-template-columns: 1fr; }
+  }
   .zk-footer {
     margin-top: 3rem;
     padding-top: 1.5rem;
@@ -278,6 +308,16 @@
       <div class="zk-metric"><p class="zk-metric-label">Año</p><p class="zk-metric-value">288 Pasos</p></div>
       <div class="zk-metric"><p class="zk-metric-label">Villas</p><p class="zk-metric-value">12</p></div>
     </div>
+    <div class="zk-illustrations-row">
+      <figure class="zk-illustration">
+        <img src="Las Razas.png" alt="Las dos razas de Zskahra" loading="lazy">
+        <figcaption>Raza Nueva y Raza Antigua — comparativa</figcaption>
+      </figure>
+      <figure class="zk-illustration">
+        <img src="Los Pilones.png" alt="Obelisk-Pylonis de Zskahra" loading="lazy">
+        <figcaption>Obelisk-Pylonis — sistema de protección</figcaption>
+      </figure>
+    </div>
     <p class="zk-section-title">Elementos clave del mundo</p>
     <div class="zk-grid" id="world-grid"></div>
     <div class="zk-detail" id="world-detail">
@@ -288,6 +328,24 @@
 
   <!-- VILLAGES -->
   <section id="panel-villages" class="zk-panel">
+    <figure class="zk-illustration">
+      <img src="Las doce villas.png" alt="Las doce villas de Zskahra" loading="lazy">
+      <figcaption>Las doce villas de Zskahra — mapa general</figcaption>
+    </figure>
+    <div class="zk-illustrations-row">
+      <figure class="zk-illustration">
+        <img src="Villas del lago.png" alt="Villas del Lago: Halvar e Ikhmar" loading="lazy">
+        <figcaption>Villas del Lago — Halvar e Ikhmar</figcaption>
+      </figure>
+      <figure class="zk-illustration">
+        <img src="Villas centrales.png" alt="Villas Centrales" loading="lazy">
+        <figcaption>Villas Centrales — el corazón del sistema</figcaption>
+      </figure>
+    </div>
+    <figure class="zk-illustration" style="max-width:400px;margin-left:auto;margin-right:auto;">
+      <img src="Vila sola - Halvar.png" alt="Halvar, Villa de la Sal" loading="lazy">
+      <figcaption>Halvar — ejemplo de ficha de villa</figcaption>
+    </figure>
     <div class="zk-filters" id="village-filters"></div>
     <div class="zk-grid" id="village-grid"></div>
     <div class="zk-detail" id="village-detail">
@@ -298,6 +356,10 @@
 
   <!-- NAMES -->
   <section id="panel-names" class="zk-panel">
+    <figure class="zk-illustration" style="max-width:500px;margin-left:auto;margin-right:auto;">
+      <img src="Los nombres.png" alt="Ejemplos de nombres con sufijos" loading="lazy">
+      <figcaption>Ejemplos de nombres con sufijos de hito social</figcaption>
+    </figure>
     <div class="zk-struct">
       <p class="label">Estructura</p>
       <p class="zk-mono">[nombre] + [sufijo de hito] + "de" + [villa]</p>

@@ -48,9 +48,18 @@
     min-height: 100vh;
   }
   .app {
-    max-width: 680px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 4rem 1.5rem 5rem;
+  }
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 640px) {
+    .columns { grid-template-columns: 1fr; }
   }
   .header {
     text-align: center;
@@ -132,7 +141,7 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-weight: 500;
-    margin: 2.5rem 0 0.75rem;
+    margin: 0 0 0.75rem;
   }
   .footer {
     text-align: center;
@@ -151,49 +160,56 @@
     <div class="divider"></div>
   </header>
 
-  <div class="tools">
-    <a class="tool-card" href="zskahra_explorer.html">
-      <div class="tool-top">
-        <div class="tool-icon">&#x1F5FA;</div>
-        <div class="tool-name">Explorador del mundo</div>
-      </div>
-      <div class="tool-desc">Villas, sistema social, sufijos de hito y estructura del mundo.</div>
-    </a>
+  <div class="columns">
+    <div>
+      <p class="section-title">Herramientas</p>
+      <div class="tools">
+        <a class="tool-card" href="zskahra_explorer.html">
+          <div class="tool-top">
+            <div class="tool-icon">&#x1F5FA;</div>
+            <div class="tool-name">Explorador del mundo</div>
+          </div>
+          <div class="tool-desc">Villas, sistema social, sufijos de hito y estructura del mundo.</div>
+        </a>
 
-    <a class="tool-card" href="zskahra_generador_de_nombres_para_villagers.html">
-      <div class="tool-top">
-        <div class="tool-icon">&#x270D;</div>
-        <div class="tool-name">Generador de nombres</div>
-      </div>
-      <div class="tool-desc">Nombres para villagers con raza, villa, sufijo de hito social, edad y trasfondo.</div>
-    </a>
+        <a class="tool-card" href="zskahra_generador_de_nombres_para_villagers.html">
+          <div class="tool-top">
+            <div class="tool-icon">&#x270D;</div>
+            <div class="tool-name">Generador de nombres</div>
+          </div>
+          <div class="tool-desc">Nombres para villagers con raza, villa, sufijo de hito social, edad y trasfondo.</div>
+        </a>
 
-    <a class="tool-card" href="zskahra_clima_generador.html">
-      <div class="tool-top">
-        <div class="tool-icon">&#x2601;</div>
-        <div class="tool-name">Oráculo de Clima</div>
-      </div>
-      <div class="tool-desc">Genera el clima por khar para cualquier bioma del mundo.</div>
-    </a>
+        <a class="tool-card" href="zskahra_clima_generador.html">
+          <div class="tool-top">
+            <div class="tool-icon">&#x2601;</div>
+            <div class="tool-name">Oráculo de Clima</div>
+          </div>
+          <div class="tool-desc">Genera el clima por khar para cualquier bioma del mundo.</div>
+        </a>
 
-    <a class="tool-card" href="zskahra_herbalist_generador.html">
-      <div class="tool-top">
-        <div class="tool-icon">&#x1F33F;</div>
-        <div class="tool-name">Guía del Herbalista</div>
+        <a class="tool-card" href="zskahra_herbalist_generador.html">
+          <div class="tool-top">
+            <div class="tool-icon">&#x1F33F;</div>
+            <div class="tool-name">Guía del Herbalista</div>
+          </div>
+          <div class="tool-desc">Sistema de recolección de hierbas, ingredientes y preparaciones.</div>
+        </a>
       </div>
-      <div class="tool-desc">Sistema de recolección de hierbas, ingredientes y preparaciones.</div>
-    </a>
-  </div>
+    </div>
 
-  <p class="section-title">Documentos</p>
-  <div class="tools">
-    <a class="tool-card" href="https://drive.google.com/drive/u/0/folders/1rKpMlWanw-3y0x_-mCMpseu5hVSkm_zT" target="_blank" rel="noopener">
-      <div class="tool-top">
-        <div class="tool-icon">&#x1F4C1;</div>
-        <div class="tool-name">Google Drive</div>
+    <div>
+      <p class="section-title">Documentos</p>
+      <div class="tools">
+        <a class="tool-card" href="https://drive.google.com/drive/u/0/folders/1rKpMlWanw-3y0x_-mCMpseu5hVSkm_zT" target="_blank" rel="noopener">
+          <div class="tool-top">
+            <div class="tool-icon">&#x1F4C1;</div>
+            <div class="tool-name">Google Drive</div>
+          </div>
+          <div class="tool-desc">Carpeta compartida con documentos del proyecto.</div>
+        </a>
       </div>
-      <div class="tool-desc">Carpeta compartida con documentos del proyecto.</div>
-    </a>
+    </div>
   </div>
 
   <div class="footer">HARP Homebrew &middot; Suplemento de Campaña</div>

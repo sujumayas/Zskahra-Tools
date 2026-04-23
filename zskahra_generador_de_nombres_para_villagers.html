@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra — Generador de nombres</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f7f6f2;
+  --bg-card: #ffffff;
+  --bg-secondary: #f0ede6;
+  --bg-info: #e6f1fb;
+  --bg-input: #ffffff;
+  --text: #1a1a1a;
+  --text-muted: #6b6860;
+  --text-hint: #999590;
+  --text-info: #185fa5;
+  --border: rgba(0,0,0,0.12);
+  --border-med: rgba(0,0,0,0.22);
+  --border-info: #185fa5;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --btn-bg: #2C3E50;
+  --btn-text: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a18;
+    --bg-card: #242422;
+    --bg-secondary: #2c2c2a;
+    --bg-info: #0c2d4a;
+    --bg-input: #2c2c2a;
+    --text: #e8e6e0;
+    --text-muted: #a8a49c;
+    --text-hint: #6b6860;
+    --text-info: #85b7eb;
+    --border: rgba(255,255,255,0.1);
+    --border-med: rgba(255,255,255,0.2);
+    --border-info: #378add;
+    --btn-bg: #4a6fa5;
+    --btn-text: #ffffff;
+  }
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem 5rem;
+}
+.container { width: 100%; max-width: 680px; }
+
+header { margin-bottom: 2rem; }
+header h1 { font-size: 20px; font-weight: 500; letter-spacing: 0.03em; }
+header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+.section-label {
+  font-size: 11px; color: var(--text-hint);
+  text-transform: uppercase; letter-spacing: 0.07em;
+  font-weight: 500; margin-bottom: 8px;
+}
+.block { margin-bottom: 1.5rem; }
+
+select, input[type=number] {
+  width: 100%; padding: 9px 12px;
+  background: var(--bg-input); color: var(--text);
+  border: 0.5px solid var(--border-med);
+  border-radius: var(--radius-md);
+  font-size: 14px; font-family: inherit;
+}
+select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 12px; padding-right: 32px; cursor: pointer; }
+select:focus, input[type=number]:focus { outline: none; border-color: var(--border-info); }
+
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+.toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+.toggle-row input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--border-info); flex-shrink: 0; }
+.toggle-row label { font-size: 13px; color: var(--text-muted); cursor: pointer; }
+
+.cat-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--text-hint); font-weight: 500; margin: 1.1rem 0 6px;
+}
+.suffix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 6px; }
+
+.suffix-btn {
+  background: var(--bg-secondary); border: 0.5px solid var(--border);
+  border-radius: var(--radius-md); padding: 7px 9px; cursor: pointer;
+  text-align: left; transition: border-color 0.12s, background 0.12s; color: var(--text);
+}
+.suffix-btn:hover { border-color: var(--border-med); }
+.suffix-btn.selected { border: 1.5px solid var(--border-info); background: var(--bg-info); }
+.suffix-code { font-size: 13px; font-weight: 500; color: var(--text-info); }
+.suffix-meaning { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.3; }
+.suffix-btn.selected .suffix-meaning { color: var(--text-info); opacity: 0.85; }
+
+.btn-row { display: flex; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap; align-items: center; }
+
+button.primary {
+  background: var(--btn-bg); color: var(--btn-text);
+  border: none; border-radius: var(--radius-md);
+  padding: 11px 24px; font-size: 15px; font-weight: 500;
+  cursor: pointer; transition: opacity 0.15s; font-family: inherit;
+}
+button.primary:hover { opacity: 0.82; }
+button.secondary {
+  background: var(--bg-card); color: var(--text);
+  border: 0.5px solid var(--border-med); border-radius: var(--radius-md);
+  padding: 11px 20px; font-size: 14px; cursor: pointer;
+  transition: background 0.15s; font-family: inherit;
+}
+button.secondary:hover { background: var(--bg-secondary); }
+
+.results-wrap { margin-top: 2rem; }
+.results-header {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--text-hint); font-weight: 500; margin-bottom: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.result-item {
+  background: var(--bg-card); border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 1.1rem 1.3rem; margin-bottom: 10px;
+}
+.result-name { font-size: 24px; font-weight: 500; color: var(--text); letter-spacing: 0.01em; }
+.result-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.pill {
+  font-size: 11px; padding: 3px 9px; border-radius: 20px;
+  border: 0.5px solid var(--border); background: var(--bg-secondary);
+  color: var(--text-muted);
+}
+.pill.accent { background: var(--bg-info); color: var(--text-info); border-color: var(--border-info); }
+.result-divider { border: none; border-top: 0.5px solid var(--border); margin: 10px 0; }
+.result-bg { font-size: 13px; color: var(--text-muted); line-height: 1.6; font-style: italic; }
+.result-cuando { font-size: 12px; color: var(--text-hint); line-height: 1.5; margin-top: 6px; }
+.result-cuando strong { color: var(--text-muted); font-weight: 500; }
+
+.suffix-panel { display: none; }
+.note { font-size: 12px; color: var(--text-hint); margin-top: 6px; line-height: 1.5; }
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Zskahra · Generador de nombres</h1>
+  <p>Raza nueva — villa, sufijo de hito social, edad y trasfondo</p>
+</header>
+
+<!-- VILLA Y CANTIDAD -->
+<div class="block">
+  <div class="section-label">Villa de origen</div>
+  <select id="villa-sel">
+    <option value="">— Sin villa (nómada / exiliado)</option>
+    <optgroup label="Villas del lago">
+      <option value="Halvar">Halvar — sal</option>
+      <option value="Ikhmar">Ikhmar — pescado y algas</option>
+    </optgroup>
+    <optgroup label="Villas centrales">
+      <option value="Siteth">Siteth — grano</option>
+      <option value="Karven">Karven — huertos</option>
+      <option value="Poymel">Poymel — ganado</option>
+      <option value="Ydral">Ydral — agua dulce</option>
+      <option value="Logven">Logven — archivo y memoria</option>
+    </optgroup>
+    <optgroup label="Villas de oficio">
+      <option value="Litor">Litor — piedra</option>
+      <option value="Kalvek">Kalvek — metal y forja</option>
+      <option value="Hisven">Hisven — textiles</option>
+    </optgroup>
+    <optgroup label="Villas de frontera">
+      <option value="Theriv">Theriv — caza</option>
+      <option value="Ksilnar">Ksilnar — madera</option>
+    </optgroup>
+  </select>
+</div>
+
+<div class="block row-3">
+  <div>
+    <div class="section-label">Cantidad</div>
+    <input type="number" id="cantidad" min="1" max="15" value="1">
+  </div>
+  <div>
+    <div class="section-label">Incluir edad</div>
+    <select id="edad-opt">
+      <option value="si">Sí, con rangos realistas</option>
+      <option value="no">No</option>
+    </select>
+  </div>
+  <div>
+    <div class="section-label">Incluir trasfondo</div>
+    <select id="bg-opt">
+      <option value="si">Sí, frase corta</option>
+      <option value="no">No</option>
+    </select>
+  </div>
+</div>
+
+<!-- SUFIJO -->
+<div class="block">
+  <div class="section-label">Sufijo de hito social</div>
+  <div class="toggle-row">
+    <input type="checkbox" id="no-suffix">
+    <label for="no-suffix">Sin sufijo (personaje joven o sin hitos reconocidos aún)</label>
+  </div>
+  <div id="suffix-controls">
+  <div class="toggle-row">
+    <input type="checkbox" id="random-suffix" checked>
+    <label for="random-suffix">Al azar (según probabilidades de la villa seleccionada)</label>
+  </div>
+  <div class="toggle-row" id="multi-hint" style="display:none;">
+    <input type="checkbox" id="multi-suffix">
+    <label for="multi-suffix">Permitir selección múltiple (el generador elige entre los marcados)</label>
+  </div>
+  </div>
+
+  <div class="suffix-panel" id="suffix-panel">
+    <div class="cat-label">Supervivencia</div>
+    <div class="suffix-grid" id="grid-supervivencia"></div>
+    <div class="cat-label">Fertilidad y linaje</div>
+    <div class="suffix-grid" id="grid-linaje"></div>
+    <div class="cat-label">Conocimiento y cuidado</div>
+    <div class="suffix-grid" id="grid-conocimiento"></div>
+    <div class="cat-label">Autoridad y justicia</div>
+    <div class="suffix-grid" id="grid-autoridad"></div>
+    <div class="cat-label">Heridas y marcas</div>
+    <div class="suffix-grid" id="grid-heridas"></div>
+    <div class="cat-label">Movilidad</div>
+    <div class="suffix-grid" id="grid-movilidad"></div>
+    <p class="note" id="select-note">Haz clic en uno o varios sufijos. El generador elegirá entre los marcados al azar.</p>
+  </div>
+</div>
+
+<div class="btn-row">
+  <button class="primary" onclick="generar()">Generar nombres</button>
+  <button class="secondary" id="btn-copy" style="display:none;" onclick="copiarTodo()">Copiar todo</button>
+  <button class="secondary" id="btn-clear" style="display:none;" onclick="limpiar()">Limpiar</button>
+</div>
+
+<div class="results-wrap" id="results-wrap" style="display:none;">
+  <div class="results-header">
+    <span id="results-count"></span>
+  </div>
+  <div id="results-list"></div>
+</div>
+
+</div>
+<script>
+const sufijos = [
+  { s:"-dren",  cat:"supervivencia",  sig:"del Caos",      edadMin:14, edadMax:45,
+    cuando:"Mató su primera criatura del Caos. Rito de paso más común de niño a adulto útil.",
+    bgs:["creció cerca de la frontera, la selva le es familiar","perdió a un amigo en su primera caza","fue el último de su grupo en recibir el sufijo","el encuentro lo marcó más de lo que admite","lo celebraron en villa pero él no se sintió héroe"] },
+  { s:"-mork",  cat:"supervivencia",  sig:"del acecho",    edadMin:22, edadMax:55,
+    cuando:"Cazador consumado con múltiples criaturas abatidas. Entrena a los jóvenes, lidera expediciones.",
+    bgs:["ha perdido a más de un aprendiz en la selva","su puntería es proverbial en la villa","lleva cicatrices que no cuenta","entrena jóvenes con una dureza que pocos agradecen","salió a la selva más veces de las que recuerda"] },
+  { s:"-ruk",   cat:"supervivencia",  sig:"del cruce",     edadMin:20, edadMax:60,
+    cuando:"Sobrevivió heridas que debieron matarlo. Respetado y un poco temido.",
+    bgs:["los curanderos dijeron que no pasaría la noche","nunca habló de lo que vio mientras estuvo inconsciente","la villa lo mira diferente desde entonces","se recuperó en silencio y volvió al trabajo sin explicaciones","hay algo en su mirada que no estaba antes"] },
+  { s:"-skar",  cat:"supervivencia",  sig:"del escudo",    edadMin:25, edadMax:55,
+    cuando:"Lidera la defensa de la villa cuando hay ataque.",
+    bgs:["se quedó a defender mientras otros huyeron","conoce cada punto débil del perímetro","duerme con los oídos abiertos","nunca habla del ataque que lo hizo -skar","la villa lo respeta, él respeta la villa"] },
+  { s:"-thar",  cat:"linaje",         sig:"del hogar",     edadMin:18, edadMax:50,
+    cuando:"Unión reconocida públicamente. Puede perderse si la pareja muere o la unión se disuelve.",
+    bgs:["la unión fue por amor, no por conveniencia","su pareja viene de otra villa","la ceremonia fue pequeña pero significativa","se casó joven, antes de haber visto mucho mundo","aún se sorprende de haber encontrado a alguien en este mundo"] },
+  { s:"-neth",  cat:"linaje",         sig:"del linaje",    edadMin:20, edadMax:55,
+    cuando:"Tuvo un hijo sano que sobrevivió la infancia. Hito importante. No se pierde aunque el hijo muera después.",
+    bgs:["el parto fue difícil, tanto que nadie esperaba que sobrevivieran","su hijo tiene los ojos de alguien que ya no está","reza al orden cada noche por ese hijo","sabe lo raro que es lo que tiene","la villa lo trató diferente desde que nació el niño"] },
+  { s:"-velar", cat:"linaje",         sig:"del tronco",    edadMin:32, edadMax:65,
+    cuando:"Tuvo múltiples hijos sanos. El rango más codiciado. Patriarca o matriarca de facto.",
+    bgs:["su casa es siempre la más concurrida","tiene opinión sobre todo y la villa la escucha","carga el peso de sus hijos como un honor que pesa","fue el primero en su familia en llegar a -velar","ya no recuerda cómo era la vida antes de los hijos"] },
+  { s:"-val",   cat:"conocimiento",   sig:"del oficio",    edadMin:16, edadMax:60,
+    cuando:"Oficio técnico reconocido: artesano, herrero, forjador, agricultor, maestro.",
+    bgs:["aprendió el oficio de su madre antes de saber leer","hay algo en el trabajo manual que lo calma","su herramienta favorita tiene nombre propio","tardó el doble que los demás en que le reconocieran el sufijo","el trabajo es lo único que lo mantiene en tierra"] },
+  { s:"-sar",   cat:"conocimiento",   sig:"del saber",     edadMin:25, edadMax:70,
+    cuando:"Sabio reconocido, memoria de villa, custodio de historias y genealogías.",
+    bgs:["recuerda todo lo que escucha, aunque preferiría olvidar algo","la gente le cuenta secretos sin pedírselo","ha visto versiones distintas de la misma historia y ya no sabe cuál es verdad","su memoria es su carga y su orgullo","lleva décadas registrando cosas que nadie más nota"] },
+  { s:"-ion",   cat:"conocimiento",   sig:"del sanar",     edadMin:18, edadMax:60,
+    cuando:"Sanador, partera, quien trata heridas. Puede perder el sufijo si pierde muchos pacientes.",
+    bgs:["el primer paciente que perdió lo acompaña todavía","aprendió más de los errores que de los éxitos","tiene manos que la gente describe como frías pero seguras","trabaja con lo que hay, no con lo que quisiera tener","el Caos en las heridas le preocupa más de lo que muestra"] },
+  { s:"-mir",   cat:"conocimiento",   sig:"del cuidador",  edadMin:18, edadMax:65,
+    cuando:"Cuidador emocional: huérfanos, ancianos, enfermos crónicos, dolientes.",
+    bgs:["creció cuidando a alguien y nunca paró","sabe exactamente qué decir y cuándo callar","la villa lo llama cuando no sabe qué más hacer","carga con los duelos ajenos sin pedir nada a cambio","hay una tristeza tranquila en él que no explica"] },
+  { s:"-oth",   cat:"conocimiento",   sig:"del vidente",   edadMin:22, edadMax:65,
+    cuando:"Guía espiritual, intérprete de sueños, lector de presagios.",
+    bgs:["sus predicciones son siempre incómodas porque son vagas y correctas","duerme poco y sueña mucho","la villa no sabe si creerle o no, pero tampoco ignora lo que dice","habla en metáforas que tardan días en tener sentido","empezó a tener visiones después de un evento que no comenta"] },
+  { s:"-held",  cat:"autoridad",      sig:"del guardián",  edadMin:28, edadMax:65,
+    cuando:"Custodio público irreemplazable: pylon, archivo, cementerio. Solo uno o dos por villa.",
+    bgs:["asumió el rol porque nadie más quería la responsabilidad","sabe cosas del pylon que no ha contado a nadie","lleva el peso de la custodia como si fuera físico","la villa duerme tranquila en parte porque él no duerme","ha rechazado intentos de comprar su lealtad sin hacer ruido"] },
+  { s:"-tav",   cat:"autoridad",      sig:"del juicio",    edadMin:30, edadMax:65,
+    cuando:"Media disputas, decide castigos, arbitra entre familias. La ley viva de la villa.",
+    bgs:["ha tenido que juzgar a amigos y lo hizo igual que a extraños","guarda todos los veredictos en un registro que nadie más lee","alguien lo odia por cada decisión justa que tomó","no busca ser querido, busca ser respetado","la imparcialidad le ha costado relaciones"] },
+  { s:"-kron",  cat:"autoridad",      sig:"del líder",     edadMin:38, edadMax:70,
+    cuando:"Cabeza de villa, alcalde de facto. Solo uno o dos en toda la región. Requiere -velar o -held previo.",
+    bgs:["llegó al cargo sin buscarlo y no puede dejarlo","toma decisiones que afectan a gente que conoce por nombre","ha envejecido más desde que es -kron que en toda su vida anterior","hay cosas que hace por la villa que nadie sabrá jamás","la soledad del cargo es algo para lo que nadie te prepara"] },
+  { s:"-kel",   cat:"heridas",        sig:"del vacío",     edadMin:16, edadMax:65,
+    cuando:"Sufrió pérdida irreparable pública: huérfano, viudo, perdió hijos.",
+    bgs:["la pérdida no fue un evento, fue la mitad de su vida","la villa le dio el sufijo en una ceremonia que no recuerda bien","todavía habla de quien perdió como si estuviera","hay un hueco en su rutina que no ha sabido llenar","el duelo no terminó, aprendió a cargarlo"] },
+  { s:"-vran",  cat:"heridas",        sig:"del desastre",  edadMin:20, edadMax:65,
+    cuando:"Sobrevivió un evento catastrófico colectivo siendo joven. Testigo vivo.",
+    bgs:["era niño cuando ocurrió, recuerda fragmentos que no encajan","la gente le pregunta sobre el evento como si él tuviera respuestas","sobrevivir lo hizo responsable de algo que no eligió","hay cosas que vio ese día que no ha contado a nadie","su generación se reconoce en ese sufijo"] },
+  { s:"-nak",   cat:"heridas",        sig:"del destierro", edadMin:20, edadMax:55,
+    cuando:"Fue expulsado y readmitido, o carga una culpa pública.",
+    bgs:["volvió diferente de lo que se fue","la culpa que carga es pública pero los detalles son suyos","algunos lo tratan con cautela, otros con curiosidad","regresó cuando nadie esperaba que regresara","todavía no sabe si lo perdonaron de verdad o solo lo toleran"] },
+  { s:"-khrav", cat:"heridas",        sig:"del Caos",      edadMin:16, edadMax:55,
+    cuando:"Visiblemente tocado por el Caos. Se impone, nadie lo elige. Suele generar rechazo.",
+    bgs:["las marcas aparecieron de noche y no desaparecieron","la villa tardó una semana en decirle lo que todos ya habían notado","sigue siendo funcional pero sabe que lo miran diferente","hay días en que casi olvida las marcas, y días en que no puede","no sabe cuándo empezó el Caos a acumularse así"] },
+  { s:"-ior",   cat:"movilidad",      sig:"del viaje",     edadMin:16, edadMax:60,
+    cuando:"Cruzó fuera de su villa al menos una vez y regresó. Viajar en este mundo es una proeza.",
+    bgs:["salió por curiosidad y volvió por deber","ha visto villas que otros solo conocen de nombre","lleva un mapa mental que no ha compartido con nadie","el camino le cambió algo que no sabe nombrar","la primera vez que salió tuvo más miedo del que admite"] },
+];
+
+const villaProbs = {
+  "Halvar":  ["-val","-val","-val","-mork","-mork","-skar","-velar","-velar","-neth","-thar","-kel","-ruk","-ior","-dren","-held"],
+  "Ikhmar":  ["-ion","-ion","-ion","-val","-val","-val","-mir","-mir","-neth","-velar","-kel","-ior","-sar","-thar","-ruk"],
+  "Siteth":  ["-val","-val","-val","-val","-velar","-velar","-tav","-tav","-neth","-thar","-ior","-mir","-kel","-dren","-skar"],
+  "Karven":  ["-mir","-mir","-ion","-ion","-val","-val","-neth","-neth","-velar","-oth","-thar","-sar","-kel","-ior","-dren"],
+  "Poymel":  ["-dren","-dren","-mork","-mork","-ruk","-ruk","-ior","-ior","-val","-neth","-velar","-thar","-kel","-skar","-khrav"],
+  "Ydral":   ["-skar","-skar","-held","-held","-tav","-tav","-val","-neth","-velar","-sar","-ior","-thar","-ruk","-mir","-dren"],
+  "Logven":  ["-sar","-sar","-sar","-tav","-tav","-oth","-oth","-val","-mir","-neth","-velar","-held","-ior","-thar","-ion"],
+  "Litor":   ["-val","-val","-val","-ruk","-ruk","-held","-held","-mork","-neth","-velar","-thar","-kel","-dren","-ior","-skar"],
+  "Kalvek":  ["-val","-val","-val","-val","-ruk","-ruk","-khrav","-dren","-neth","-velar","-kel","-thar","-ior","-mork","-skar"],
+  "Hisven":  ["-val","-val","-val","-mir","-mir","-mir","-ion","-ion","-neth","-velar","-thar","-kel","-ior","-oth","-sar"],
+  "Theriv":  ["-dren","-dren","-mork","-mork","-mork","-skar","-skar","-ruk","-ior","-ior","-neth","-val","-thar","-kel","-vran"],
+  "Ksilnar": ["-kel","-kel","-vran","-vran","-dren","-mork","-ruk","-val","-ior","-ior","-neth","-thar","-skar","-mir","-khrav"],
+  "":        sufijos.map(s => s.s),
+};
+
+const raices = [
+  "Arnd","Bel","Dal","Drav","Dur","Eld","Fal","Garm","Hal","Hask",
+  "Ird","Kel","Lar","Lex","Mir","Nal","Orm","Pel","Pev","Rak",
+  "Rim","Sal","Sil","Skarn","Syl","Tal","Thal","Thor","Vel","Vim",
+  "Vir","Xal","Yim","Yx","Zal","Zer","Alv","Arv","Brak","Drel",
+  "Frek","Grel","Halk","Ilv","Keth","Lorn","Merv","Nalk","Omd","Pars",
+  "Reth","Serv","Tirn","Ulv","Vrex","Yeldh","Oren","Thelv","Sekh","Breld",
+  "Garl","Hemv","Inkh","Jorv","Kavel","Lidr","Meron","Nethk","Ovrel","Prend",
+  "Quelv","Rimath","Sordh","Talvek","Urvhan","Welkh","Xordh","Yarvn","Zekhal","Belgr"
+];
+
+const catMap = {
+  supervivencia:"grid-supervivencia", linaje:"grid-linaje",
+  conocimiento:"grid-conocimiento", autoridad:"grid-autoridad",
+  heridas:"grid-heridas", movilidad:"grid-movilidad"
+};
+
+let selectedSuffixes = new Set();
+
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function randInt(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
+
+function buildGrids() {
+  for (const [cat, gridId] of Object.entries(catMap)) {
+    const grid = document.getElementById(gridId);
+    sufijos.filter(s => s.cat === cat).forEach(s => {
+      const btn = document.createElement("button");
+      btn.className = "suffix-btn";
+      btn.dataset.s = s.s;
+      btn.innerHTML = `<div class="suffix-code">${s.s}</div><div class="suffix-meaning">${s.sig}</div>`;
+      btn.onclick = () => toggleSuffix(s.s, btn);
+      grid.appendChild(btn);
+    });
+  }
+}
+
+function toggleSuffix(s, btn) {
+  const multi = document.getElementById("multi-suffix").checked;
+  if (!multi) {
+    document.querySelectorAll(".suffix-btn").forEach(b => b.classList.remove("selected"));
+    selectedSuffixes.clear();
+    selectedSuffixes.add(s);
+    btn.classList.add("selected");
+  } else {
+    if (selectedSuffixes.has(s)) {
+      selectedSuffixes.delete(s);
+      btn.classList.remove("selected");
+    } else {
+      selectedSuffixes.add(s);
+      btn.classList.add("selected");
+    }
+  }
+}
+
+document.getElementById("random-suffix").addEventListener("change", function() {
+  const panel = document.getElementById("suffix-panel");
+  const hint = document.getElementById("multi-hint");
+  panel.style.display = this.checked ? "none" : "block";
+  hint.style.display = this.checked ? "none" : "flex";
+  if (this.checked) {
+    selectedSuffixes.clear();
+    document.querySelectorAll(".suffix-btn").forEach(b => b.classList.remove("selected"));
+  }
+});
+
+const sinSufijoData = {
+  edadMin: 10, edadMax: 18,
+  bgs: [
+    "aún no ha matado su primera criatura, pero ya ha visto lo que hacen",
+    "creció en la villa sin salir nunca más allá del perímetro",
+    "nadie le ha puesto un sufijo todavía, aunque él ya se siente listo",
+    "todavía aprende el oficio de su familia, sin certificar",
+    "es demasiado joven para la mayoría de cosas que ya ha visto",
+    "la villa lo conoce solo por su nombre, y eso por ahora le basta",
+    "está en ese punto en que el mundo aún no lo ha marcado formalmente"
+  ]
+};
+
+document.getElementById("no-suffix").addEventListener("change", function() {
+  document.getElementById("suffix-controls").style.display = this.checked ? "none" : "block";
+  document.getElementById("suffix-panel").style.display = this.checked ? "none" : (document.getElementById("random-suffix").checked ? "none" : "block");
+});
+
+function pickSufijo(villa) {
+  const isRandom = document.getElementById("random-suffix").checked;
+  if (isRandom) {
+    const pool = villaProbs[villa] || villaProbs[""];
+    return rand(pool);
+  } else {
+    if (selectedSuffixes.size === 0) return null;
+    const arr = [...selectedSuffixes];
+    return rand(arr);
+  }
+}
+
+function generar() {
+  const villa = document.getElementById("villa-sel").value;
+  const cantidad = Math.min(15, Math.max(1, parseInt(document.getElementById("cantidad").value) || 1));
+  const conEdad = document.getElementById("edad-opt").value === "si";
+  const conBg = document.getElementById("bg-opt").value === "si";
+  const sinSufijo = document.getElementById("no-suffix").checked;
+  const isRandom = document.getElementById("random-suffix").checked;
+
+  if (!sinSufijo && !isRandom && selectedSuffixes.size === 0) {
+    alert("Elige al menos un sufijo, activa la opción aleatoria, o marca 'sin sufijo'.");
+    return;
+  }
+
+  const resultados = [];
+  for (let i = 0; i < cantidad; i++) {
+    let sufKey, sufObj, nombre, nombreCompleto, edad, bg;
+    const base = rand(raices);
+
+    if (sinSufijo) {
+      sufKey = null;
+      sufObj = null;
+      nombre = base;
+      nombreCompleto = villa ? `${base} de ${villa}` : base;
+      edad = conEdad ? randInt(sinSufijoData.edadMin, sinSufijoData.edadMax) : null;
+      bg = conBg ? rand(sinSufijoData.bgs) : null;
+    } else {
+      sufKey = pickSufijo(villa);
+      if (!sufKey) break;
+      sufObj = sufijos.find(s => s.s === sufKey);
+      nombre = base + sufKey.slice(1);
+      nombreCompleto = villa ? `${nombre} de ${villa}` : nombre;
+      edad = conEdad ? randInt(sufObj.edadMin, sufObj.edadMax) : null;
+      bg = conBg ? rand(sufObj.bgs) : null;
+    }
+
+    resultados.push({ nombre: nombreCompleto, sufObj, sufKey, villa: villa || null, edad, bg });
+  }
+
+  const wrap = document.getElementById("results-wrap");
+  const list = document.getElementById("results-list");
+  const count = document.getElementById("results-count");
+
+  count.textContent = resultados.length === 1 ? "1 personaje generado" : `${resultados.length} personajes generados`;
+  list.innerHTML = resultados.map(r => {
+    let html = `<div class="result-item">`;
+    html += `<div class="result-name">${r.nombre}</div>`;
+    html += `<div class="result-pills">`;
+    if (r.sufObj) {
+      html += `<span class="pill accent">${r.sufObj.s} — ${r.sufObj.sig}</span>`;
+    } else {
+      html += `<span class="pill" style="font-style:italic;">sin sufijo</span>`;
+    }
+    if (r.villa) html += `<span class="pill">${r.villa}</span>`;
+    if (r.edad !== null) html += `<span class="pill">${r.edad} años</span>`;
+    html += `</div>`;
+    html += `<hr class="result-divider">`;
+    if (r.bg) html += `<div class="result-bg">${r.bg.charAt(0).toUpperCase() + r.bg.slice(1)}.</div>`;
+    if (r.sufObj) html += `<div class="result-cuando"><strong>Sufijo otorgado cuando:</strong> ${r.sufObj.cuando}</div>`;
+    else html += `<div class="result-cuando">La villa aún no ha reconocido ningún hito en este personaje.</div>`;
+    html += `</div>`;
+    return html;
+  }).join("");
+
+  wrap.style.display = "block";
+  document.getElementById("btn-copy").style.display = "inline-block";
+  document.getElementById("btn-clear").style.display = "inline-block";
+
+  window._resultados = resultados;
+  wrap.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function copiarTodo() {
+  if (!window._resultados) return;
+  const texto = window._resultados.map(r => {
+    let linea = r.nombre;
+    if (r.edad !== null) linea += ` · ${r.edad} años`;
+    if (r.sufObj) linea += ` · ${r.sufObj.s} (${r.sufObj.sig})`;
+    else linea += ` · sin sufijo`;
+    if (r.bg) linea += `\n  ${r.bg.charAt(0).toUpperCase() + r.bg.slice(1)}.`;
+    return linea;
+  }).join("\n\n");
+  navigator.clipboard.writeText(texto).catch(()=>{});
+  const btn = document.getElementById("btn-copy");
+  btn.textContent = "Copiado";
+  setTimeout(() => btn.textContent = "Copiar todo", 1600);
+}
+
+function limpiar() {
+  document.getElementById("results-wrap").style.display = "none";
+  document.getElementById("btn-copy").style.display = "none";
+  document.getElementById("btn-clear").style.display = "none";
+  window._resultados = null;
+}
+
+buildGrids();
+</script>
+</body>
+</html>

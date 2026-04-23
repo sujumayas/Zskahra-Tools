@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra — Explorador del mundo</title>
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --bg-surface: #fdfaf2;
+    --bg-muted: #ede7d5;
+    --bg-card: #fffdf7;
+    --text-primary: #2a241a;
+    --text-secondary: #6b6353;
+    --text-tertiary: #9a9080;
+    --border: rgba(60, 45, 25, 0.15);
+    --border-strong: rgba(60, 45, 25, 0.35);
+    --accent: #6b4a2b;
+    --accent-bg: #e8dcc4;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --font-mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1612;
+      --bg-surface: #23201a;
+      --bg-muted: #2d2921;
+      --bg-card: #2a2620;
+      --text-primary: #ede4d0;
+      --text-secondary: #a89e89;
+      --text-tertiary: #6e6655;
+      --border: rgba(237, 228, 208, 0.12);
+      --border-strong: rgba(237, 228, 208, 0.3);
+      --accent: #c9a876;
+      --accent-bg: #3a3428;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .zk-app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  .zk-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .zk-header h1 {
+    font-family: var(--font-serif);
+    font-size: 2.4rem;
+    font-weight: 500;
+    margin: 0 0 0.5rem;
+    letter-spacing: 0.04em;
+  }
+  .zk-header p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+  .zk-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .zk-tab {
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    margin-bottom: -0.5px;
+    font-family: inherit;
+    transition: color 0.15s;
+  }
+  .zk-tab:hover { color: var(--text-primary); }
+  .zk-tab.active {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent);
+  }
+  .zk-panel { display: none; }
+  .zk-panel.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .zk-card {
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .zk-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-1px);
+  }
+  .zk-card.selected {
+    border: 2px solid var(--accent);
+    padding: 13px 15px;
+  }
+  .zk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .zk-name {
+    font-weight: 500;
+    font-size: 14px;
+    margin: 0 0 3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .zk-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+  .zk-detail {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-top: 1.25rem;
+    font-size: 14px;
+    line-height: 1.7;
+    min-height: 80px;
+  }
+  .zk-detail h3 {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 8px;
+  }
+  .zk-detail p { margin: 0 0 8px; color: var(--text-secondary); }
+  .zk-detail .tag {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+  .zk-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+  .zk-metric {
+    background: var(--bg-muted);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+  }
+  .zk-metric-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .zk-metric-value {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+    font-family: var(--font-serif);
+  }
+  .zk-section-title {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin: 1.5rem 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .zk-filters {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .zk-filter {
+    padding: 6px 12px;
+    font-size: 13px;
+    background: transparent;
+    border: 0.5px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .zk-filter:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .zk-filter.active {
+    background: var(--accent-bg);
+    color: var(--text-primary);
+    border-color: var(--accent);
+  }
+  .zk-mono {
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .zk-struct {
+    background: var(--bg-muted);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    margin-bottom: 1.25rem;
+  }
+  .zk-struct p { margin: 0; }
+  .zk-struct .label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .zk-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .zk-footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 0.5px solid var(--border);
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<main class="zk-app">
+  <header class="zk-header">
+    <h1>Zskahra</h1>
+    <p>Explorador del mundo, las villas y su sistema social</p>
+  </header>
+
+  <nav class="zk-tabs" role="tablist">
+    <button class="zk-tab active" data-tab="world">El mundo</button>
+    <button class="zk-tab" data-tab="villages">Las 12 villas</button>
+    <button class="zk-tab" data-tab="names">Sistema de nombres</button>
+    <button class="zk-tab" data-tab="trade">Comercio y cuotas</button>
+    <button class="zk-tab" data-tab="calendar">Calendario</button>
+  </nav>
+
+  <!-- WORLD -->
+  <section id="panel-world" class="zk-panel active">
+    <div class="zk-metrics">
+      <div class="zk-metric"><p class="zk-metric-label">Soles</p><p class="zk-metric-value">2 — el Gemelo</p></div>
+      <div class="zk-metric"><p class="zk-metric-label">Día (Paso)</p><p class="zk-metric-value">42 horas</p></div>
+      <div class="zk-metric"><p class="zk-metric-label">Año</p><p class="zk-metric-value">288 Pasos</p></div>
+      <div class="zk-metric"><p class="zk-metric-label">Villas</p><p class="zk-metric-value">12</p></div>
+    </div>
+    <p class="zk-section-title">Elementos clave del mundo</p>
+    <div class="zk-grid" id="world-grid"></div>
+    <div class="zk-detail" id="world-detail">
+      <p class="tag">Selecciona un elemento</p>
+      <p>Haz clic en cualquier tarjeta para leer el detalle.</p>
+    </div>
+  </section>
+
+  <!-- VILLAGES -->
+  <section id="panel-villages" class="zk-panel">
+    <div class="zk-filters" id="village-filters"></div>
+    <div class="zk-grid" id="village-grid"></div>
+    <div class="zk-detail" id="village-detail">
+      <p class="tag">Selecciona una villa</p>
+      <p>Cada villa gestiona un recurso único dentro de la red.</p>
+    </div>
+  </section>
+
+  <!-- NAMES -->
+  <section id="panel-names" class="zk-panel">
+    <div class="zk-struct">
+      <p class="label">Estructura</p>
+      <p class="zk-mono">[nombre] + [sufijo de hito] + "de" + [villa]</p>
+      <p style="margin-top: 8px; font-size: 13px; color: var(--text-secondary);">
+        Ej.: <span class="zk-mono" style="color: var(--accent);">Miraneth de Karven</span> — tuvo un hijo sano, villa de huertos
+      </p>
+    </div>
+    <div class="zk-filters" id="suffix-filters"></div>
+    <div class="zk-grid" id="suffix-grid"></div>
+    <div class="zk-detail" id="suffix-detail">
+      <p class="tag">Selecciona un sufijo</p>
+      <p>Cada sufijo codifica un hito vital reconocido por la villa.</p>
+    </div>
+  </section>
+
+  <!-- TRADE -->
+  <section id="panel-trade" class="zk-panel">
+    <div class="zk-metrics">
+      <div class="zk-metric"><p class="zk-metric-label">Moneda</p><p class="zk-metric-value">Ninguna</p></div>
+      <div class="zk-metric"><p class="zk-metric-label">Base</p><p class="zk-metric-value">Cuotas + reputación</p></div>
+      <div class="zk-metric"><p class="zk-metric-label">Excepción</p><p class="zk-metric-value">Los artefactos</p></div>
+    </div>
+    <p class="zk-section-title">Conceptos del sistema</p>
+    <div class="zk-grid" id="trade-grid"></div>
+    <div class="zk-detail" id="trade-detail">
+      <p class="tag">Selecciona un concepto</p>
+      <p>El sistema económico funciona sin monedas. Explora cómo.</p>
+    </div>
+  </section>
+
+  <!-- CALENDAR -->
+  <section id="panel-calendar" class="zk-panel">
+    <p class="zk-section-title">Unidades de tiempo</p>
+    <div class="zk-metrics">
+      <div class="zk-metric"><p class="zk-metric-label">Paso (día)</p><p class="zk-metric-value">42 horas</p></div>
+      <div class="zk-metric"><p class="zk-metric-label">Pulso (semana)</p><p class="zk-metric-value">8 Pasos</p></div>
+      <div class="zk-metric"><p class="zk-metric-label">Ciclo (mes)</p><p class="zk-metric-value">4 Pulsos</p></div>
+      <div class="zk-metric"><p class="zk-metric-label">Año</p><p class="zk-metric-value">9 Ciclos</p></div>
+    </div>
+    <p class="zk-section-title">Las cinco estaciones</p>
+    <div class="zk-grid" id="season-grid"></div>
+    <div class="zk-detail" id="season-detail">
+      <p class="tag">Selecciona una estación</p>
+      <p>Las estaciones no duran lo mismo. Haz clic para descubrir cada una.</p>
+    </div>
+  </section>
+
+  <footer class="zk-footer">
+    ZSKAHRA · HARP Homebrew
+  </footer>
+</main>
+
+<script>
+(function() {
+  // ===== DATA =====
+  const COLORS = {
+    sun:     '#c9872e',
+    orb:     '#4a6da8',
+    nueva:   '#3d8b6c',
+    antigua: '#6a4a8e',
+    caos:    '#a84530',
+    stone:   '#6b6353',
+    artifact:'#a84c7a',
+    culture: '#5a7c3a',
+    lake:    '#4a6da8',
+    central: '#a37f2e',
+    craft:   '#6b6353',
+    frontier:'#a84530',
+    supervivencia: '#a84530',
+    linaje:  '#a84c7a',
+    conocimiento: '#3d8b6c',
+    autoridad: '#6a4a8e',
+    marcas:  '#6b6353',
+    movilidad: '#c9872e',
+    blue:    '#4a6da8',
+    amber:   '#c9872e',
+    purple:  '#6a4a8e',
+    coral:   '#a84530',
+    teal:    '#3d8b6c',
+    red:     '#b33838',
+    pink:    '#a84c7a',
+    gray:    '#6b6353',
+    green:   '#5a7c3a'
+  };
+
+  const worldItems = [
+    { id: 'suns', name: 'Los dos soles', sub: 'El Gemelo', color: COLORS.sun,
+      detail: { title: 'El Gemelo', tag: 'Cielo',
+        body: 'Dos soles que aparecen casi fusionados en el cielo, formando una figura alargada. Proyectan <em>sombras dobles</em> sobre todo objeto. Cada 8 Pasos se alinean y producen el Pulso Gemelo, un destello máximo visible que funciona como marcador de tiempo para toda la población. Algunos videntes interpretan las dos sombras como representación del Orden y el Caos que habitan en cada ser.' } },
+    { id: 'thlask', name: 'Thlask — el Orbe', sub: 'El Paraíso fijo', color: COLORS.orb,
+      detail: { title: 'Thlask', tag: 'Cielo · mitología',
+        body: 'Orbe enorme siempre fijo en el cielo del hemisferio habitado. No sale ni se pone. Los habitantes creen que es el destino al que van los muertos — un mundo perfecto sin Caos. Durante la Penumbra, su luz tenue baña el mundo y evita la oscuridad total. Más allá del territorio conocido existe una zona sin Orbe, inexplorada y temida.' } },
+    { id: 'nueva', name: 'Raza Nueva', sub: 'Habitantes de las villas', color: COLORS.nueva,
+      detail: { title: 'Raza Nueva', tag: 'Gentes',
+        body: 'Altos, de constitución ligera, con extremidades largas. Saltan 1.2 a 1.5 metros sin esfuerzo notable. Un atleta puede superar los dos metros. Huesos ligeros pero frágiles ante impactos fuertes. Pulmones grandes. Pigmentaciones claras. Son la población de las 12 villas.' } },
+    { id: 'antigua', name: 'Raza Antigua', sub: 'Menos del 5% de la población', color: COLORS.antigua,
+      detail: { title: 'Raza Antigua', tag: 'Gentes',
+        body: 'Compactos, densos, notablemente más fuertes que la Raza Nueva. Se mueven de forma deliberada — no lenta, sino como quien sabe cuánto pesa cada paso. Longevidad muy alta; nadie sabe cuánto viven. Son los nómadas de la frontera, los que rondan los bordes de las villas. Nunca hablan del Orbe. Estaban aquí antes.' } },
+    { id: 'caos', name: 'El Caos', sub: 'Lo que vive fuera', color: COLORS.caos,
+      detail: { title: 'El Caos', tag: 'Amenaza',
+        body: 'Criaturas y corrupción que viven fuera del territorio domado. Los genes corrompidos producen pérdidas frecuentes y nacimientos de bebés deformes o enfermos — por eso la fertilidad sana es el eje de estatus social. El sufijo -khrav marca a los visiblemente tocados por el Caos.' } },
+    { id: 'penumbra', name: 'La Penumbra', sub: '10-12 horas por Paso', color: COLORS.stone,
+      detail: { title: 'La Penumbra', tag: 'Ciclo diurno',
+        body: 'Cuando los soles se ponen, el Orbe toma el relevo. Su luz tenue baña el mundo con un resplandor suave que permite ver siluetas, caminar con cuidado y orientarse. Zskahra casi nunca tiene oscuridad total — solo durante los Días Ciegos. Por eso sus habitantes no temen a la noche como otros mundos: su miedo está en otra parte.' } },
+    { id: 'artefactos', name: 'Los artefactos', sub: 'Fuera del sistema', color: COLORS.artifact,
+      detail: { title: 'Los artefactos', tag: 'Excepción económica',
+        body: 'Objetos raros, variables en valor e impredecibles que escapan al sistema de cuotas. Su intercambio es negociación directa, libre y a veces tensa. Es el único espacio donde el poder económico personal puede acumularse fuera de la red. Muchos notan que responden con más intensidad durante el Pulso Gemelo; los más cautos los guardan ese día.' } },
+    { id: 'horabaja', name: 'La Hora Baja', sub: '~6 horas de ritmo lento', color: COLORS.culture,
+      detail: { title: 'La Hora Baja', tag: 'Cultura',
+        body: 'No es sueño — el cuerpo reduce su ritmo. Época de conversación, ritual, cocina e historias. Se toman las decisiones importantes y se resuelven conflictos. Interrumpir la Hora Baja con trabajo urgente es descortesía. Hacerlo sin razón es insultante.' } }
+  ];
+
+  const villages = [
+    { id: 'halvar',  name: 'Halvar',  group: 'Lago',     color: COLORS.lake,     resource: 'Sal',        func: 'Extrae y conserva sal del lago. Provee el conservante alimentario de todo el territorio. De Halvar depende la conservación de la carne, el pescado y buena parte de la dieta.' },
+    { id: 'ikhmar',  name: 'Ikhmar',  group: 'Lago',     color: COLORS.lake,     resource: 'Pescado',    func: 'Pesca y recolección de algas en el lago. Fuente de proteína acuática y medicina. Tradición vinculada al templo de la isla aunque no dependen organizativamente de él.' },
+    { id: 'siteth',  name: 'Siteth',  group: 'Central',  color: COLORS.central,  resource: 'Grano',      func: 'Gran proveedora calórica. Trigo, cebada, cereales base. Probablemente la villa más poblada de las 12.' },
+    { id: 'karven',  name: 'Karven',  group: 'Central',  color: COLORS.central,  resource: 'Huertos',    func: 'Frutales, verduras, hierbas culinarias y medicinales. Dieta variada complementaria al grano.' },
+    { id: 'poymel',  name: 'Poymel',  group: 'Central',  color: COLORS.central,  resource: 'Ganado',     func: 'Pastoreo de animales corrompidos pero utilizables. Cuero, lana, leche, carne. Semi-nómadas dentro de su territorio.' },
+    { id: 'ydral',   name: 'Ydral',   group: 'Central',  color: COLORS.central,  resource: 'Agua dulce', func: 'Gestiona el manantial o río que irriga la zona central. Pequeña pero críticamente estratégica. De Ydral dependen todas las villas cultivadoras.' },
+    { id: 'logven',  name: 'Logven',  group: 'Central',  color: COLORS.central,  resource: 'Archivo',    func: 'Memoria colectiva oral. Genealogías, historias, mapas, tradición. Alta concentración de -sar. Autoridad final en disputas económicas.' },
+    { id: 'litor',   name: 'Litor',   group: 'Oficio',   color: COLORS.craft,    resource: 'Piedra',     func: 'Cantera y trabajo de piedra. Construye y repara los pylons pequeños de las demás villas. Aliada estrecha de Kalvek.' },
+    { id: 'kalvek',  name: 'Kalvek',  group: 'Oficio',   color: COLORS.craft,    resource: 'Metal',      func: 'Forja. Repara artefactos domésticos, herramientas, puntas de caza. Los -val más prestigiados en trabajo técnico nacen aquí.' },
+    { id: 'hisven',  name: 'Hisven',  group: 'Oficio',   color: COLORS.craft,    resource: 'Tejido',     func: 'Textiles, cuerdas, cestería. Sin Hisven no hay caravanas posibles ni ropa para la selva. Tradición de cuidado colectivo — muchos -mir y -ion.' },
+    { id: 'theriv',  name: 'Theriv',  group: 'Frontera', color: COLORS.frontier, resource: 'Caza',       func: 'Controla rutas de caza en el borde sin lago. Primer contacto con antiguos que deambulan por la frontera. Concentración alta de -mork y -skar.' },
+    { id: 'ksilnar', name: 'Ksilnar', group: 'Frontera', color: COLORS.frontier, resource: 'Madera',     func: 'Extrae madera de la selva agreste en operaciones de riesgo. Pierde gente cada año. Relación casi ritualizada con los sufijos -kel y -vran: el duelo es parte cotidiana de su vida colectiva.' }
+  ];
+
+  const suffixes = [
+    { s: '-dren',  cat: 'Supervivencia', color: COLORS.supervivencia, mean: 'del Caos',     when: 'Mató su primera criatura del Caos en defensa. Raíz: drakon (bestia). Es el rito de paso más común de niño a adulto útil.' },
+    { s: '-mork',  cat: 'Supervivencia', color: COLORS.supervivencia, mean: 'del acecho',   when: 'Cazador consumado con múltiples criaturas abatidas. Evolución natural de -dren. Los -mork entrenan a los jóvenes y salen en expediciones.' },
+    { s: '-ruk',   cat: 'Supervivencia', color: COLORS.supervivencia, mean: 'del cruce',    when: 'Sobrevivió a heridas que debieron matarlo. Raíz: erebos (oscuridad cruzada). Respetado y un poco temido socialmente.' },
+    { s: '-skar',  cat: 'Supervivencia', color: COLORS.supervivencia, mean: 'del escudo',   when: 'Lidera la defensa de la villa cuando hay ataque. Distinto del -mork: el cazador sale a buscar, el -skar se queda a proteger.' },
+    { s: '-thar',  cat: 'Linaje',        color: COLORS.linaje,        mean: 'del hogar',    when: 'Unión reconocida públicamente. Raíz: thermaia (calor). Primer escalón de la categoría. Se puede perder si la pareja muere o se disuelve.' },
+    { s: '-neth',  cat: 'Linaje',        color: COLORS.linaje,        mean: 'del linaje',   when: 'Tuvo un hijo sano que sobrevivió la infancia. Raíz: pneuma (aliento que continúa). Hito importante — no todos lo logran. No se pierde aunque el hijo muera después.' },
+    { s: '-velar', cat: 'Linaje',        color: COLORS.linaje,        mean: 'del tronco',   when: 'Tuvo múltiples hijos sanos. El rango más codiciado del sistema. Los -velar son patriarcas o matriarcas de facto, pueden tener varias esposas o esposos, y su palabra pesa en decisiones de villa.' },
+    { s: '-val',   cat: 'Conocimiento',  color: COLORS.conocimiento,  mean: 'del oficio',   when: 'Oficio técnico reconocido. Absorbe artesanos, herreros, forjadores, proveedores agrícolas y maestros de enseñanza. Raíz: phylakos.' },
+    { s: '-sar',   cat: 'Conocimiento',  color: COLORS.conocimiento,  mean: 'del saber',    when: 'Sabio reconocido. Memoria de villa, custodio de historias y genealogías. Raíz: kairos. Puede ganarse sin otros sufijos previos.' },
+    { s: '-ion',   cat: 'Conocimiento',  color: COLORS.conocimiento,  mean: 'del sanar',    when: 'Sanador, partera, quien trata heridas y enfermedades. Raíz: oratio (invocación de orden). Muy respetados y muy expuestos: un -ion que pierde muchos pacientes puede perder el sufijo.' },
+    { s: '-mir',   cat: 'Conocimiento',  color: COLORS.conocimiento,  mean: 'del cuidador', when: 'Cuidador emocional: huérfanos, ancianos, enfermos crónicos, dolientes. Raíz: mira (espejo). Sufijo discreto pero muy valorado.' },
+    { s: '-oth',   cat: 'Conocimiento',  color: COLORS.conocimiento,  mean: 'del vidente',  when: 'Guía espiritual, intérprete de sueños, lector de presagios. Raíz: erebos (mirar dentro de la oscuridad). El sabio recuerda, el vidente interpreta.' },
+    { s: '-held',  cat: 'Autoridad',     color: COLORS.autoridad,     mean: 'del guardián', when: 'Asumió custodia pública irreemplazable: sacred-pylon-keeper, guardián del archivo, protector del cementerio. Raíz: phylakos. Uno o dos por villa.' },
+    { s: '-tav',   cat: 'Autoridad',     color: COLORS.autoridad,     mean: 'del juicio',   when: 'Media disputas, decide castigos menores, arbitra entre familias. Raíz: stavros (pilar). En villas pequeñas sin ley escrita, los -tav son la ley viva.' },
+    { s: '-kron',  cat: 'Autoridad',     color: COLORS.autoridad,     mean: 'del líder',    when: 'Cabeza de villa, alcalde de facto, quien toma decisiones colectivas. Raíz: kronael (tiempo antiguo). Típicamente requiere tener -velar o -held previamente.' },
+    { s: '-kel',   cat: 'Marcas',        color: COLORS.marcas,        mean: 'del vacío',    when: 'Sufrió pérdida irreparable reconocida públicamente. Huérfano, viudo, perdió hijos. Los -kel tienen licencia social para ciertos comportamientos durante el duelo.' },
+    { s: '-vran',  cat: 'Marcas',        color: COLORS.marcas,        mean: 'del desastre', when: 'Sobrevivió un evento catastrófico colectivo siendo joven. Raíz: eirevon. Testigo vivo de algo que marcó a su generación.' },
+    { s: '-nak',   cat: 'Marcas',        color: COLORS.marcas,        mean: 'del destierro',when: 'Fue expulsado de la villa y readmitido, o carga una culpa pública. Raíz: nekros. Estigma social, menos absoluto que -khrav.' },
+    { s: '-khrav', cat: 'Marcas',        color: COLORS.marcas,        mean: 'del Caos',     when: 'Visiblemente tocado por el Caos. Raíz: khaosion. El único sufijo que nadie elige poner y nadie puede quitar. Los -khrav suelen ser apartados, vigilados o expulsados.' },
+    { s: '-ior',   cat: 'Movilidad',     color: COLORS.movilidad,     mean: 'del viaje',    when: 'Cruzó fuera de su villa al menos una vez y regresó. Raíz: oracion. En un mundo rodeado de criaturas, viajar es proeza. Los -ior son los aventureros por definición.' }
+  ];
+
+  const tradeItems = [
+    { id: 'cuotas',       name: 'La red de cuotas',      sub: 'Obligación, no favor',   color: COLORS.blue,
+      detail: { title: 'La red de cuotas', tag: 'Estructura económica',
+        body: 'Cada villa tiene una cuota asignada: cantidad mínima del recurso que gestiona que debe entregar al sistema colectivo cada ciclo. Fueron establecidas en la fundación y se revisan raramente. El cumplimiento de cuotas es obligación, no favor. Fallar la cuota es un evento político y social, no solo económico.' } },
+    { id: 'deuda',        name: 'Deuda formal de villa', sub: 'Pérdida de voz',         color: COLORS.coral,
+      detail: { title: 'Deuda formal', tag: 'Consecuencias',
+        body: 'Cuando una villa no cumple su cuota entra en deuda formal. La villa deudora pierde voz en los consejos hasta saldar la deuda. Las demás villas no están obligadas a proveerle por encima de lo mínimo vital. El estigma social puede extenderse a los -ior de esa villa al viajar.' } },
+    { id: 'registrador',  name: 'El Registrador',        sub: 'Libros locales, casi -sar', color: COLORS.purple,
+      detail: { title: 'El Registrador', tag: 'Cargo social',
+        body: 'Cada villa tiene un Registrador (habitualmente con sufijo -sar) que lleva el libro local de cuotas, créditos y deudas. Cargo de enorme peso — no puede pertenecer a ninguna facción política. Logven centraliza todos los registros y es autoridad final en disputas. Un Registrador de Logven que viaja para auditar una villa es un evento grave.' } },
+    { id: 'cuenta',       name: 'La Cuenta',             sub: 'Festividad anual',       color: COLORS.amber,
+      detail: { title: 'La Cuenta', tag: 'Ritual anual',
+        body: 'La festividad de Logven donde todos los archivistas actualizan los registros maestros. La deuda se reconcilia anualmente. Una vez al año, todos los libros del territorio se sincronizan.' } },
+    { id: 'hospitalidad', name: 'Hospitalidad en ruta',  sub: 'Obligación cultural',    color: COLORS.teal,
+      detail: { title: 'Hospitalidad en ruta', tag: 'Individual',
+        body: 'Cualquier viajero puede solicitar techo y comida invocando la hospitalidad de la red. Dársela es casi una obligación cultural. A cambio, el viajero se registra: nombre, villa de origen, propósito del viaje. No es vigilancia — es el tejido social que hace funcionar la red. Un viajero que no se registra genera desconfianza inmediata.' } },
+    { id: 'credito',      name: 'Crédito personal',      sub: 'Reputación acumulada',   color: COLORS.green,
+      detail: { title: 'Crédito personal', tag: 'Individual',
+        body: 'Los intercambios entre individuos funcionan sobre reputación acumulada. Un artesano que entrega trabajo de calidad, un -ior que cumple sus encargos, un médico que no cobra cuando no puede — todos construyen un crédito social que circula de villa en villa por las conversaciones de caravana. Abusar de la hospitalidad sin reciprocidad es vergüenza pública.' } },
+    { id: 'artefactos',   name: 'Los artefactos',        sub: 'Única excepción',        color: COLORS.pink,
+      detail: { title: 'Los artefactos', tag: 'Fuera del sistema',
+        body: 'El único bien que escapa completamente al sistema de cuotas. Demasiado raros, demasiado variables e impredecibles para entrar en registro colectivo. Dos personas frente a frente decidiendo qué vale un objeto que ninguna de las dos entiende del todo. Es el único espacio donde el poder económico personal puede acumularse fuera de la red.' } },
+    { id: 'caravana',     name: 'Cuenta de caravana',    sub: 'Crédito colectivo',      color: COLORS.amber,
+      detail: { title: 'Cuenta de caravana', tag: 'Grupos de personajes',
+        body: 'Un grupo de personajes que trabaja regularmente para las villas puede desarrollar una cuenta colectiva. Si resuelven un problema para una villa, ésta registra un crédito a su nombre. Ese crédito es reconocido en otras villas porque Logven lo avala. La reputación reemplaza al oro.' } }
+  ];
+
+  const seasons = [
+    { id: 'calma',      name: 'La Calma Brillante', days: 72, color: COLORS.amber,
+      detail: { title: 'La Calma Brillante', tag: '72 Pasos',
+        body: 'Los soles en su punto más alto e intenso. Calor máximo, luz casi permanente. Los campos rinden al máximo. Las criaturas del Caos también son más activas. Temporada de cosecha, de celebración, y de conflictos.' } },
+    { id: 'velo',       name: 'El Velo', days: 48, color: COLORS.teal,
+      detail: { title: 'El Velo', tag: '48 Pasos',
+        body: 'Luz más suave, temperaturas moderadas. La estación favorita de los caravaneros. Las rutas entre villas se llenan. El clima es predecible y el viaje es relativamente seguro.' } },
+    { id: 'ciegos',     name: 'Los Días Ciegos', days: 36, color: COLORS.purple,
+      detail: { title: 'Los Días Ciegos', tag: '36 Pasos',
+        body: 'La estación más oscura. Los soles dan menos luz y hay periodos de casi-oscuridad real. La flora del Caos brilla más en la penumbra. Época de estar adentro, de historias, de rituales. Las villas refuerzan sus defensas.' } },
+    { id: 'despertar',  name: 'El Despertar Rojo', days: 54, color: COLORS.red,
+      detail: { title: 'El Despertar Rojo', tag: '54 Pasos',
+        body: 'La luz regresa con tono rojizo. Las plantas crecen rápido y agresivamente. Los monstruos dan crías — la temporada más peligrosa en las fronteras. Los cazadores trabajan al máximo.' } },
+    { id: 'conjuncion', name: 'La Conjunción', days: 78, color: COLORS.coral,
+      detail: { title: 'La Conjunción', tag: '78 Pasos · la más larga y la más temida',
+        body: 'Los dos soles se alinean en el mismo lado del cielo durante semanas. Luminosidad antinatural y sostenida — casi no hay noche. Los artefactos son impredecibles. Los ancianos dicen que esta estación trae cambios que no siempre son bienvenidos.' } }
+  ];
+
+  // ===== HELPERS =====
+  function el(tag, attrs, children) {
+    const node = document.createElement(tag);
+    if (attrs) {
+      for (const k in attrs) {
+        if (k === 'class') node.className = attrs[k];
+        else if (k === 'style') node.setAttribute('style', attrs[k]);
+        else if (k.startsWith('data-')) node.setAttribute(k, attrs[k]);
+        else node[k] = attrs[k];
+      }
+    }
+    if (children) {
+      (Array.isArray(children) ? children : [children]).forEach(c => {
+        if (c == null) return;
+        node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+      });
+    }
+    return node;
+  }
+
+  function makeCard(id, color, name, sub) {
+    const card = el('div', { class: 'zk-card', 'data-id': id });
+    card.appendChild(el('p', { class: 'zk-name' }, [
+      el('span', { class: 'zk-dot', style: 'background:' + color }),
+      name
+    ]));
+    card.appendChild(el('p', { class: 'zk-sub' }, sub));
+    return card;
+  }
+
+  function setDetail(detailEl, title, tag, body) {
+    detailEl.innerHTML = '';
+    detailEl.appendChild(el('p', { class: 'tag' }, tag));
+    detailEl.appendChild(el('h3', {}, title));
+    const p = el('p', {});
+    p.innerHTML = body;
+    detailEl.appendChild(p);
+  }
+
+  function selectIn(gridEl, cardEl) {
+    gridEl.querySelectorAll('.zk-card').forEach(c => c.classList.remove('selected'));
+    cardEl.classList.add('selected');
+  }
+
+  // ===== TABS =====
+  document.querySelectorAll('.zk-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.zk-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.zk-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ===== WORLD =====
+  const worldGrid = document.getElementById('world-grid');
+  const worldDetail = document.getElementById('world-detail');
+  worldItems.forEach(item => worldGrid.appendChild(makeCard(item.id, item.color, item.name, item.sub)));
+  worldGrid.addEventListener('click', e => {
+    const card = e.target.closest('.zk-card');
+    if (!card) return;
+    const item = worldItems.find(i => i.id === card.dataset.id);
+    if (!item) return;
+    selectIn(worldGrid, card);
+    setDetail(worldDetail, item.detail.title, item.detail.tag, item.detail.body);
+  });
+
+  // ===== VILLAGES =====
+  const villageGroups = ['Todas', 'Lago', 'Central', 'Oficio', 'Frontera'];
+  const vFilters = document.getElementById('village-filters');
+  const vGrid = document.getElementById('village-grid');
+  const vDetail = document.getElementById('village-detail');
+
+  villageGroups.forEach((g, i) => {
+    const btn = el('button', { class: 'zk-filter' + (i === 0 ? ' active' : ''), 'data-filter': g }, g);
+    vFilters.appendChild(btn);
+  });
+
+  function renderVillages(filter) {
+    vGrid.innerHTML = '';
+    const list = filter === 'Todas' ? villages : villages.filter(v => v.group === filter);
+    list.forEach(v => vGrid.appendChild(makeCard(v.id, v.color, v.name, v.resource + ' · ' + v.group)));
+  }
+  renderVillages('Todas');
+
+  vFilters.addEventListener('click', e => {
+    const b = e.target.closest('button[data-filter]');
+    if (!b) return;
+    vFilters.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderVillages(b.dataset.filter);
+  });
+
+  vGrid.addEventListener('click', e => {
+    const card = e.target.closest('.zk-card');
+    if (!card) return;
+    const v = villages.find(x => x.id === card.dataset.id);
+    if (!v) return;
+    selectIn(vGrid, card);
+    setDetail(vDetail, v.name, 'Recurso: ' + v.resource + ' · grupo: ' + v.group, v.func);
+  });
+
+  // ===== SUFFIXES =====
+  const categories = ['Todas', 'Supervivencia', 'Linaje', 'Conocimiento', 'Autoridad', 'Marcas', 'Movilidad'];
+  const sFilters = document.getElementById('suffix-filters');
+  const sGrid = document.getElementById('suffix-grid');
+  const sDetail = document.getElementById('suffix-detail');
+
+  categories.forEach((c, i) => {
+    const btn = el('button', { class: 'zk-filter' + (i === 0 ? ' active' : ''), 'data-filter': c }, c);
+    sFilters.appendChild(btn);
+  });
+
+  function renderSuffixes(filter) {
+    sGrid.innerHTML = '';
+    const list = filter === 'Todas' ? suffixes : suffixes.filter(s => s.cat === filter);
+    list.forEach(s => {
+      const card = el('div', { class: 'zk-card', 'data-id': s.s });
+      const name = el('p', { class: 'zk-name' });
+      name.appendChild(el('span', { class: 'zk-dot', style: 'background:' + s.color }));
+      const mono = el('span', { class: 'zk-mono', style: 'color:' + s.color + ';font-weight:500;' }, s.s);
+      const meaning = el('span', { style: 'color: var(--text-secondary); font-weight: 400;' }, ' ' + s.mean);
+      name.appendChild(mono);
+      name.appendChild(meaning);
+      card.appendChild(name);
+      card.appendChild(el('p', { class: 'zk-sub' }, s.cat));
+      sGrid.appendChild(card);
+    });
+  }
+  renderSuffixes('Todas');
+
+  sFilters.addEventListener('click', e => {
+    const b = e.target.closest('button[data-filter]');
+    if (!b) return;
+    sFilters.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    renderSuffixes(b.dataset.filter);
+  });
+
+  sGrid.addEventListener('click', e => {
+    const card = e.target.closest('.zk-card');
+    if (!card) return;
+    const s = suffixes.find(x => x.s === card.dataset.id);
+    if (!s) return;
+    selectIn(sGrid, card);
+    setDetail(sDetail, s.s + ' — ' + s.mean, 'Categoría: ' + s.cat, s.when);
+  });
+
+  // ===== TRADE =====
+  const tGrid = document.getElementById('trade-grid');
+  const tDetail = document.getElementById('trade-detail');
+  tradeItems.forEach(item => tGrid.appendChild(makeCard(item.id, item.color, item.name, item.sub)));
+  tGrid.addEventListener('click', e => {
+    const card = e.target.closest('.zk-card');
+    if (!card) return;
+    const item = tradeItems.find(i => i.id === card.dataset.id);
+    if (!item) return;
+    selectIn(tGrid, card);
+    setDetail(tDetail, item.detail.title, item.detail.tag, item.detail.body);
+  });
+
+  // ===== SEASONS =====
+  const seasonGrid = document.getElementById('season-grid');
+  const seasonDetail = document.getElementById('season-detail');
+  seasons.forEach(item => seasonGrid.appendChild(makeCard(item.id, item.color, item.name, item.days + ' Pasos')));
+  seasonGrid.addEventListener('click', e => {
+    const card = e.target.closest('.zk-card');
+    if (!card) return;
+    const item = seasons.find(i => i.id === card.dataset.id);
+    if (!item) return;
+    selectIn(seasonGrid, card);
+    setDetail(seasonDetail, item.detail.title, item.detail.tag, item.detail.body);
+  });
+})();
+</script>
+</body>
+</html>

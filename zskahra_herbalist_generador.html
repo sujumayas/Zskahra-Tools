@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZSKAHRA · Guía del Herbalista</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08090f;--bg2:#0e1018;--bg3:#13161f;--panel:#0c0e17;--border:#232840;--glow:#354070;--accent:#7eb8d4;--accent2:#4a8fa8;--gold:#c8a96e;--gold2:#7a5a20;--text:#d0dcf0;--text2:#7a8aaa;--text3:#445060;--villa-l:#48a870;--silver-l:#a0b0d0;--caos-l:#c03030;--orden-l:#48b048;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Crimson Text',serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 55% 35% at 15% 25%,rgba(50,70,120,.10) 0%,transparent 70%),radial-gradient(ellipse 35% 45% at 85% 75%,rgba(66,21,96,.07) 0%,transparent 70%);pointer-events:none;z-index:0;}
+.container{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:28px 18px 80px;}
+header{text-align:center;margin-bottom:36px;}
+.logo-top{font-family:'Cinzel Decorative',serif;font-size:10px;letter-spacing:6px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+h1{font-family:'Cinzel Decorative',serif;font-size:clamp(20px,4.5vw,38px);color:var(--gold);text-shadow:0 0 36px rgba(200,169,110,.3);letter-spacing:2px;margin-bottom:6px;animation:fd .7s ease both;}
+.subtitle{font-family:'Cinzel',serif;font-size:12px;letter-spacing:4px;color:var(--accent2);text-transform:uppercase;opacity:.8;}
+.hline{margin:16px auto;width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);}
+@keyframes fd{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+@keyframes cin{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+.form-panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:24px 28px 28px;margin-bottom:24px;box-shadow:0 4px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.03);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:560px){.form-grid{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field.full{grid-column:1/-1;}
+label.flabel{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);opacity:.9;}
+select,input[type=number]{background:var(--bg2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Crimson Text',serif;font-size:16px;padding:9px 13px;outline:none;transition:border-color .2s;width:100%;appearance:none;}
+select:focus,input[type=number]:focus{border-color:var(--accent2);}
+.sel-wrap{position:relative;}
+.sel-wrap::after{content:'▾';position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--accent2);pointer-events:none;font-size:13px;}
+.info-box{font-size:13px;color:var(--text2);font-style:italic;padding:7px 10px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:3px;margin-top:3px;line-height:1.5;}
+.checks{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px;}
+.chk{display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 11px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;font-size:13px;color:var(--text2);transition:background .18s,border-color .18s,color .18s;user-select:none;}
+.chk input{display:none;}
+.chk.on{background:rgba(50,70,120,.2);border-color:var(--accent2);color:var(--accent);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:background .18s;flex-shrink:0;}
+.chk.on .dot{background:var(--accent);box-shadow:0 0 5px var(--accent);}
+.note-line{font-size:12px;color:var(--text3);font-style:italic;margin-top:4px;line-height:1.5;}
+.btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent2),#286080);border:none;border-radius:3px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#fff;cursor:pointer;transition:filter .18s,transform .1s;margin-top:6px;box-shadow:0 2px 18px rgba(74,143,168,.28);}
+.btn:hover{filter:brightness(1.15);}
+.btn:active{transform:scale(.99);}
+.legend{margin-bottom:20px;}
+.ltitle{font-family:'Cinzel',serif;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--text3);margin-bottom:9px;display:flex;align-items:center;gap:10px;}
+.ltitle::after{content:'';flex:1;height:1px;background:var(--border);}
+.ldiffs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:7px;}
+.lq{display:flex;flex-wrap:wrap;gap:5px;}
+.ldiff,.lqitem{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:2px;border:1px solid currentColor;opacity:.75;}
+.dR{color:#60c890;}.dE{color:#88c8a0;}.dL{color:#80b0c0;}.dM{color:#7890b0;}.dH{color:#c0b060;}.dVH{color:#c09040;}.dXH{color:#c06030;}.dSF{color:#c03030;}.dAB{color:#d04040;}
+.qRas{color:#8888b8;}.qCom{color:#55b878;}.qAlt{color:#55a8e0;}.qInf{color:#a860e8;}.qMag{color:#e860e8;}.qLeg{color:#d8a040;}.qMal{color:#d82828;}.qFum{color:#707070;}
+.legend-note{font-size:12px;color:var(--text3);font-style:italic;}
+.sec{font-family:'Cinzel',serif;font-size:9px;letter-spacing:5px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--border);}
+.sep{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:20px 0;}
+.result-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:3px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--text2);}
+.rcount{font-size:20px;color:var(--gold);font-family:'Crimson Text',serif;font-weight:600;}
+.orb{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 7px var(--accent);display:inline-block;}
+.card{margin-bottom:10px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:transform .14s,border-color .14s;animation:cin .3s ease both;}
+.card:hover{transform:translateX(3px);border-color:var(--glow);}
+.card-top{display:flex;align-items:stretch;border-bottom:1px solid rgba(255,255,255,.04);}
+.cbar{width:4px;flex-shrink:0;}
+.cmain{flex:1;padding:12px 14px 10px;}
+.cname{font-family:'Cinzel',serif;font-size:14.5px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.ccol{font-size:12px;color:var(--text3);font-style:italic;margin-bottom:6px;}
+.ctags{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid currentColor;opacity:.8;}
+.cbadge{padding:7px 13px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:112px;text-align:center;flex-shrink:0;}
+.bqlabel{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:.55;margin-bottom:2px;}
+.bqname{font-family:'Cinzel',serif;font-size:13px;font-weight:700;letter-spacing:1px;}
+.bqroll{font-size:10px;opacity:.4;margin-top:2px;}
+.cbody{padding:9px 14px 12px 18px;}
+.ceffect{font-size:14px;color:var(--text2);line-height:1.5;}
+.ccaos{margin-top:6px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);}
+.cv{color:var(--caos-l);}.cvo{color:var(--orden-l);}.cvv{color:var(--villa-l);}
+.cnote{margin-top:7px;font-size:12px;color:var(--text3);font-style:italic;padding-left:9px;border-left:2px solid var(--border);line-height:1.5;}
+.tv{color:var(--villa-l);border-color:var(--villa-l);}
+.ts{color:var(--accent);border-color:var(--accent);}
+.tc{color:var(--caos-l);border-color:var(--caos-l);}
+.to{color:var(--orden-l);border-color:var(--orden-l);}
+.ti{color:var(--gold);border-color:var(--gold2);}
+.tl{color:var(--silver-l);border-color:#607090;}
+.tseas{color:#c0a0d8;border-color:#806090;}
+.tlock{color:#c06040;border-color:#804020;}
+.bv{background:var(--villa-l);}.bs{background:var(--accent);}.bc{background:var(--caos-l);}.bo{background:var(--orden-l);}.bf{background:#555;}
+.bq-raspada{background:rgba(70,70,110,.3);border-color:rgba(110,110,160,.35);}
+.bq-comun{background:rgba(35,70,50,.3);border-color:rgba(70,130,90,.35);}
+.bq-alta{background:rgba(18,55,90,.3);border-color:rgba(45,110,170,.35);}
+.bq-infundida{background:rgba(55,35,110,.3);border-color:rgba(110,70,190,.35);}
+.bq-magica{background:rgba(90,18,90,.3);border-color:rgba(165,55,165,.35);}
+.bq-legendaria{background:rgba(90,60,0,.35);border-color:rgba(185,135,40,.4);}
+.bq-maldita{background:rgba(75,0,0,.45);border-color:rgba(175,25,25,.5);}
+.bq-fumble{background:rgba(40,40,40,.4);border-color:rgba(80,80,80,.4);}
+.bqc-raspada{color:#8888b8;}.bqc-comun{color:#55b878;}.bqc-alta{color:#55a8e0;}.bqc-infundida{color:#a860e8;}.bqc-magica{color:#e860e8;}.bqc-legendaria{color:#d8a040;}.bqc-maldita{color:#d82828;}.bqc-fumble{color:#707070;}
+.nores{text-align:center;padding:44px 18px;color:var(--text3);font-style:italic;font-size:17px;}
+.nores span{display:block;font-size:26px;margin-bottom:10px;opacity:.35;}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div class="logo-top">HARP Homebrew · Suplemento de Campaña</div>
+  <h1>Guía del Herbalista</h1>
+  <div class="subtitle">Sistema de Recolección · Zskahra</div>
+  <div class="hline"></div>
+</header>
+
+<div class="form-panel">
+  <div class="form-grid">
+    <div class="field">
+      <label class="flabel">Zona de búsqueda</label>
+      <div class="sel-wrap"><select id="zona" onchange="syncInfo()">
+        <option value="interior">Interior de Villa</option>
+        <option value="borde">Borde de Villa</option>
+        <option value="cercana">Selva Cercana</option>
+        <option value="media" selected>Selva Media</option>
+        <option value="profunda">Selva Profunda</option>
+        <option value="criatura">Caminos de Criatura</option>
+      </select></div>
+      <div id="zona-info" class="info-box"></div>
+    </div>
+    <div class="field">
+      <label class="flabel">Estación</label>
+      <div class="sel-wrap"><select id="estacion" onchange="syncInfo()">
+        <option value="calma">La Calma Brillante</option>
+        <option value="velo">El Velo</option>
+        <option value="ciegos">Los Días Ciegos</option>
+        <option value="rojo">El Despertar Rojo</option>
+        <option value="conjuncion">La Conjunción</option>
+      </select></div>
+      <div id="est-info" class="info-box"></div>
+    </div>
+    <div class="field full">
+      <label class="flabel">Condiciones especiales</label>
+      <div class="checks">
+        <label class="chk" id="c-pulso"><input type="checkbox" id="chk-pulso" onchange="tog('c-pulso');syncInfo()"><span class="dot"></span>Es Pulso Gemelo (+20)</label>
+        <label class="chk" id="c-aman"><input type="checkbox" id="chk-aman" onchange="tog('c-aman');syncInfo()"><span class="dot"></span>Amanecer o crepúsculo (+10)</label>
+        <label class="chk" id="c-lluvia"><input type="checkbox" id="chk-lluvia" onchange="tog('c-lluvia');syncInfo()"><span class="dot"></span>Bruma caótica / lluvia</label>
+        <label class="chk" id="c-herb"><input type="checkbox" id="chk-herb" onchange="tog('c-herb');syncInfo()"><span class="dot"></span>TP Herbalist activo (+20)</label>
+      </div>
+    </div>
+    <div class="field full">
+      <label class="flabel">Tirada total — d100 open-ended + bonus Foraging / Botanics</label>
+      <input type="number" id="roll" value="80" min="1" max="500" placeholder="Ej: 95">
+      <div id="roll-note" class="note-line"></div>
+    </div>
+  </div>
+  <button class="btn" onclick="buscar()">⬡ &nbsp;Buscar hierbas</button>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="ltitle">Dificultades HARP — modificadores oficiales</div>
+  <div class="ldiffs">
+    <span class="ldiff dR">Rutinario +60</span><span class="ldiff dE">Fácil +40</span><span class="ldiff dL">Ligero +20</span><span class="ldiff dM">Medio +0</span><span class="ldiff dH">Difícil −20</span><span class="ldiff dVH">Muy Difícil −40</span><span class="ldiff dXH">Ext. Difícil −60</span><span class="ldiff dSF">Locura Total −80</span><span class="ldiff dAB">Absurdo −100</span>
+  </div>
+  <div class="ltitle" style="margin-top:12px">Calidades — umbral de resultado final</div>
+  <div class="lq">
+    <span class="lqitem qFum">Fumble (dado 01–05)</span><span class="lqitem qRas">Raspada 101–115</span><span class="lqitem qCom">Común 116–140</span><span class="lqitem qAlt">Alta 141–165</span><span class="lqitem qInf">Infundida 166–195</span><span class="lqitem qMag">Mágica 196–230</span><span class="lqitem qLeg">Legendaria 231+</span>
+  </div>
+  <div class="legend-note" style="margin-top:7px">Éxito (All-or-Nothing HARP): resultado final ≥ 101. Por debajo: no hallada. Las calidades miden cuánto superás ese umbral.</div>
+</div>
+
+<div id="output"></div>
+</div>
+
+<script>
+const DIFF={routine:60,easy:40,light:20,medium:0,hard:-20,vhard:-40,xhard:-60,folly:-80,absurd:-100};
+const QUAL=[
+  {key:'fumble',   label:'Fumble',    min:-999,max:5,   desc:'Dado sin modificar 01–05. Consecuencia narrativa — GM decide.'},
+  {key:'fallo',    label:'No hallada',min:6,   max:100, desc:'Tirada insuficiente.'},
+  {key:'raspada',  label:'Raspada',   min:101, max:115, desc:'Calidad mínima. Efecto reducido o planta en mal estado.'},
+  {key:'comun',    label:'Común',     min:116, max:140, desc:'Calidad estándar. Efecto completo de la variante base.'},
+  {key:'alta',     label:'Alta',      min:141, max:165, desc:'Ejemplar en buen estado. Efecto mejorado.'},
+  {key:'infundida',label:'Infundida', min:166, max:195, desc:'Concentración notable. Propiedades potenciadas.'},
+  {key:'magica',   label:'Mágica',    min:196, max:230, desc:'Excepcionalmente potente. Efecto máximo.'},
+  {key:'legendaria',label:'Legendaria',min:231,max:9999,desc:'Resultado extraordinario. Se recordará.'},
+];
+const ZONAS={
+  interior:{label:'Interior de Villa', mod:0,  tipos:['villa'],                       desc:'Dentro del radio del pylón. Flora purificada. Solo hierbas de villa. Sin riesgo.'},
+  borde:   {label:'Borde de Villa',    mod:-10,tipos:['villa','silvestre'],            desc:'Límite del campo del pylón. Villa y algunas silvestres de borde. Riesgo bajo.'},
+  cercana: {label:'Selva Cercana',     mod:-20,tipos:['silvestre'],                   desc:'Selva inmediata. Hierbas silvestres. Sin criaturas mayores normalmente.'},
+  media:   {label:'Selva Media',       mod:-30,tipos:['silvestre','caotica_menor'],   desc:'Caos ambiental moderado. Flora caótica menor posible. Peligro real.'},
+  profunda:{label:'Selva Profunda',    mod:-40,tipos:['silvestre','caotica'],         desc:'Alta concentración de Caos. Flora caótica disponible. Criaturas activas.'},
+  criatura:{label:'Caminos de Criatura',mod:-50,tipos:['silvestre','caotica','camino'],desc:'Senderos de criaturas del Caos. Concentración máxima. Peligro extremo. Therken solo aquí.'},
+};
+const ESTACIONES={
+  calma:     {label:'La Calma Brillante',mod:0,  extras:{},              desc:'Soles en su punto más alto. Flora activa. Criaturas del Caos también más activas.'},
+  velo:      {label:'El Velo',          mod:10,  extras:{},              desc:'Mejor estación para foraging. Clima predecible, rutas accesibles.'},
+  ciegos:    {label:'Los Días Ciegos',  mod:-5,  extras:{villa:-10,orden:30}, desc:'Flora ordinaria escasea. El Pendrael aparece. Criaturas menos activas.'},
+  rojo:      {label:'El Despertar Rojo',mod:5,   extras:{silvestre:10},  desc:'Crecimiento agresivo. Bonus a silvestre. Los monstruos dan crías — mayor peligro.'},
+  conjuncion:{label:'La Conjunción',    mod:-5,  extras:{caotica:20},    desc:'Luminosidad antinatural. La Conjunción Negra aparece. Flora caótica más accesible.'},
+};
+const HERBS=[
+  {id:'vethrak', nombre:'Vethrak',       col:'La Hoja Despierta',      tipo:'villa',   dif:'medium',zona:['interior','borde'],                                   ests:['calma','velo','ciegos','rojo','conjuncion'],pulso:false,aman:false,clase:'instant',efecto:'Despaviladora — Bonificador a resistance Stamina y resistencia automática a stun.',caos:'ninguno',nota:'Común en todos los botiquines de villa.'},
+  {id:'kalveth', nombre:'Kalveth',       col:'Brote del Lago',          tipo:'villa',   dif:'medium',zona:['interior','borde'],                                   ests:['calma','velo','rojo','conjuncion'],            pulso:false,aman:false,clase:'instant',efecto:'Levantamuertos — Recuperación de HP inmediata. Raíz acuática, abundante en villas lacustres.',caos:'ninguno',nota:'Escasa durante Los Días Ciegos.'},
+  {id:'grulsev', nombre:'Grulsev',       col:'Hierba del Olvido Corto', tipo:'villa',   dif:'light', zona:['interior','borde'],                                   ests:['calma','velo','ciegos','rojo','conjuncion'],pulso:false,aman:false,clase:'instant',efecto:'Matanervios — Elimina penalizadores a la actividad por minutos. Resaca proporcional a la calidad.',caos:'ninguno',nota:'Se inhala triturada. El gruñido involuntario al sentirla actuar le da el nombre.'},
+  {id:'tharvek', nombre:'Tharvek',       col:'Raíz de la Voluntad',     tipo:'villa',   dif:'hard',  zona:['interior','borde','cercana'],                          ests:['calma','velo','ciegos','rojo','conjuncion'],pulso:false,aman:true, clase:'instant',efecto:'Cabeza de Asno — Bonificador a Will (resistencia mental). Calidades altas añaden Lie Perception.',caos:'ninguno',nota:'Solo en la intersección de dos sombras superpuestas. Requiere amanecer o crepúsculo con los dos soles visibles.'},
+  {id:'velneth', nombre:'Velneth',       col:'Flor del Velo',           tipo:'villa',   dif:'hard',  zona:['interior','borde'],                                   ests:['velo'],                                      pulso:false,aman:false,clase:'instant',efecto:'Ángel Guardián — Bonificador a resistencia contra efectos mágicos y artefactos.',caos:'ninguno',nota:'SOLO durante El Velo. La flor dura pocos días pero se conserva bien seca.'},
+  {id:'sirnavel',nombre:'Sirnavel',      col:'Musgo Cosido',            tipo:'villa',   dif:'light', zona:['interior','borde'],                                   ests:['calma','velo','ciegos','rojo','conjuncion'],pulso:false,aman:false,clase:'largo', efecto:'Tejeheridas — Acelera recuperación de negativos por herida. El más común de los mosses medicinales.',caos:'ninguno',nota:'Muy fácil de reconocer. Presente en prácticamente todos los sotobosques de villa.'},
+  {id:'khorvath',nombre:'Khorvath',      col:'Sangreverde',             tipo:'villa',   dif:'medium',zona:['interior','borde'],                                   ests:['calma','velo','rojo','conjuncion'],            pulso:false,aman:false,clase:'largo', efecto:'Bolsa de Sangre — Aumenta recuperación natural de HP por día. Savia verde oscura con olor dulzón.',caos:'ninguno',nota:'Crece en el límite interior del radio del pylón.'},
+  {id:'drekthar',nombre:'Drekthar',      col:'Trompeta de Guerra',      tipo:'silvestre',dif:'vhard', zona:['borde','cercana','media','profunda','criatura'],      ests:['calma','velo','rojo','conjuncion'],            pulso:false,aman:false,clase:'largo', efecto:'Trompeta de Guerra — Elimina penalizadores a actividad 24 h. Adictiva. Los -mork de Theriv la usan con plena conciencia del precio.',caos:'Potencia 1',nota:'Flores naranja oscuro llamativas. Propiedades adictivas documentadas. Los médicos de villa la desaconsejan.'},
+  {id:'gemela',  nombre:'Gemela',        col:'Hierba de Dos Sombras',   tipo:'silvestre',dif:'xhard', zona:['cercana','media','profunda','criatura'],              ests:['calma','velo','rojo'],                        pulso:false,aman:true, clase:'instant',efecto:'Las Dos Sombras — La mente percibe dos lecturas de todo lo que ve. Bono a Lie Perception y detección de ilusiones. Deja inquietud residual.',caos:'Potencia 1',nota:'Hojas asimétricas: una más oscura que la otra. Solo cosechable al amanecer/crepúsculo bajo dos sombras superpuestas.'},
+  {id:'therken', nombre:'Therken',       col:'Raíz de Criatura',        tipo:'silvestre',dif:'folly',  zona:['criatura'],                                          ests:['calma','velo','ciegos','rojo','conjuncion'],pulso:false,aman:false,clase:'instant',efecto:'Raíz de Criatura — Estimulante de combate. +20 OB / 1 hr. Mejora Trompeta de Guerra un tier. Zumbido en los dientes.',caos:'Potencia 1',nota:'SOLO en caminos de criaturas del Caos. El acceso implica peligro extremo. Los médicos de villa la prohíben formalmente.'},
+  {id:'pulsoflor',nombre:'Flor del Pulso',col:'Pulso-flor',             tipo:'silvestre',dif:'vhard',  zona:['borde','cercana','media','profunda','criatura'],      ests:['calma','velo','ciegos','rojo','conjuncion'],pulso:true, aman:false,clase:'instant',efecto:'Reinicio de Estado — Limpia venenos lentos, penalizadores prolongados y efectos de Caos menores. No sana ni reduce Caos acumulado.',caos:'+1d10 (excepcionalmente bajo)',nota:'SOLO durante el Pulso Gemelo. La flor dura exactamente un Pulso y desaparece. Blanca con nervios dorados.'},
+  {id:'thlask',  nombre:'Thlask-raíz',   col:'La Raíz del Orbe',        tipo:'caotica',  dif:'folly',  zona:['profunda','criatura'],                                ests:['calma','velo','ciegos','rojo','conjuncion'],pulso:false,aman:false,clase:'instant',efecto:'Cáliz de Vida — Revivir. El porcentaje de éxito depende de la calidad. Solo funcional a partir de Infundida.',caos:'Potencia 2',nota:'Origen desconocido. Negra con vena luminosa pulsante. Comercio secreto. Los zelotes consideran su posesión una transgresión.'},
+  {id:'negra',   nombre:'Conjunción Negra',col:'Sin nombre estable',    tipo:'caotica',  dif:'xhard',  zona:['media','profunda','criatura'],                        ests:['conjuncion'],                                pulso:false,aman:false,clase:'instant',efecto:'Impredecible — El GM tira en tabla de Caos además del efecto herbal. Usarla es como usar un artefacto sin entenderlo.',caos:'Potencia 2 + tabla de Caos activada',nota:'SOLO durante La Conjunción. Aparece y desaparece sin patrón. Logven tiene registros de efectos en Conjunciones pasadas.'},
+  {id:'pendrael',nombre:'Pendrael',       col:'Luz de Penumbra',         tipo:'orden',    dif:'absurd', zona:['cercana','media','profunda','criatura'],              ests:['ciegos'],                                    pulso:false,aman:false,clase:'instant',efecto:'REDUCE CAOS — Única hierba que disminuye Caos acumulado. La planta muere al usarse. El usuario emite bioluminiscencia 1d6 horas.',caos:'REDUCE Caos (1d10 × calidad)',nota:'SOLO visible y recolectable durante Los Días Ciegos. Negra con bioluminiscencia azul-blanca. No vuelve a crecer en ese suelo por meses.'},
+];
+
+const TLAB={villa:'Flora de Villa',silvestre:'Silvestre',caotica:'Flora Caótica',orden:'Flora de Orden'};
+const TTAG={villa:'tv',silvestre:'ts',caotica:'tc',orden:'to'};
+const TBAR={villa:'bv',silvestre:'bs',caotica:'bc',orden:'bo'};
+const DLAB={routine:'Rutinario +60',easy:'Fácil +40',light:'Ligero +20',medium:'Medio +0',hard:'Difícil −20',vhard:'Muy Difícil −40',xhard:'Ext. Difícil −60',folly:'Locura Total −80',absurd:'Absurdo −100'};
+const DCLS={routine:'dR',easy:'dE',light:'dL',medium:'dM',hard:'dH',vhard:'dVH',xhard:'dXH',folly:'dSF',absurd:'dAB'};
+
+function getQual(r){for(const b of QUAL)if(r>=b.min&&r<=b.max)return b;return QUAL[QUAL.length-1];}
+
+function canFind(h,zona,est,pulso,aman){
+  if(!h.ests.includes(est))return{ok:false,why:'Fuera de estación'};
+  if(!h.zona.includes(zona))return{ok:false,why:'Zona incorrecta para esta especie'};
+  if(h.pulso&&!pulso)return{ok:false,why:'Solo durante el Pulso Gemelo'};
+  if(h.aman&&!aman)return{ok:false,why:'Solo al amanecer / crepúsculo (sombra doble)'};
+  return{ok:true};
+}
+
+function calcTotal(roll,h,zona,est,lluvia,pulso,aman,herbTP){
+  let m=DIFF[h.dif];
+  m+=ZONAS[zona].mod;
+  const e=ESTACIONES[est];
+  m+=e.mod;
+  if(e.extras[h.tipo])m+=e.extras[h.tipo];
+  if(pulso)m+=20;
+  if(aman)m+=10;
+  if(herbTP)m+=20;
+  if(lluvia){
+    if(h.tipo==='caotica'||h.tipo==='orden')m+=15;
+    else if(h.tipo==='silvestre')m+=5;
+    else m-=15;
+  }
+  return roll+m;
+}
+
+function tog(id){const el=document.getElementById(id);el.classList.toggle('on',el.querySelector('input').checked);}
+
+function syncInfo(){
+  const z=document.getElementById('zona').value;
+  const e=document.getElementById('estacion').value;
+  const roll=parseInt(document.getElementById('roll').value)||0;
+  document.getElementById('zona-info').textContent=ZONAS[z].desc;
+  document.getElementById('est-info').textContent=ESTACIONES[e].desc;
+  const base=ZONAS[z].mod+ESTACIONES[e].mod;
+  const pulso=document.getElementById('chk-pulso').checked?20:0;
+  const aman=document.getElementById('chk-aman').checked?10:0;
+  const herb=document.getElementById('chk-herb').checked?20:0;
+  const totalMod=base+pulso+aman+herb;
+  const needed=101-roll-totalMod;
+  const sign=totalMod>=0?'+':'';
+  const col=totalMod>=0?'#55b878':totalMod>=-30?'#c0b060':'#c06030';
+  document.getElementById('roll-note').innerHTML=
+    `Mod. acumulado (zona+estación+condiciones): <strong style="color:${col}">${sign}${totalMod}</strong> &nbsp;·&nbsp; `+
+    `Con dificultad Media (+0): necesitás tirada ≥ <strong style="color:#a0b8d0">${Math.max(1,needed)}</strong> para el umbral mínimo de éxito.`;
+}
+
+function caosHtml(h){
+  if(h.tipo==='villa')return`<div class="ccaos">Caos: <span class="cvv">Ninguno — campo del pylón</span></div>`;
+  if(h.tipo==='orden')return`<div class="ccaos">Caos: <span class="cvo">${h.caos}</span></div>`;
+  return`<div class="ccaos">Caos: <span class="cv">${h.caos}</span></div>`;
+}
+
+function renderCard(h,q,tot,delay){
+  const bc=TBAR[h.tipo]||'bf';
+  const tc=TTAG[h.tipo]||'';
+  return`<div class="card" style="animation-delay:${delay}ms">
+  <div class="card-top">
+    <div class="cbar ${bc}"></div>
+    <div class="cmain">
+      <div class="cname">${h.nombre}</div>
+      <div class="ccol">${h.col}</div>
+      <div class="ctags">
+        <span class="tag ${tc}">${TLAB[h.tipo]||h.tipo}</span>
+        <span class="tag ${h.clase==='instant'?'ti':'tl'}">${h.clase==='instant'?'Instantáneo':'Largo Plazo'}</span>
+        <span class="tag ldiff ${DCLS[h.dif]}">${DLAB[h.dif]}</span>
+        ${h.pulso?'<span class="tag tseas">Solo en Pulso</span>':''}
+        ${h.aman?'<span class="tag tseas">Amanecer/Crepúsculo</span>':''}
+        ${h.zona.length===1?`<span class="tag tlock">${ZONAS[h.zona[0]]?.label||h.zona[0]}</span>`:''}
+      </div>
+    </div>
+    <div class="cbadge bq-${q.key}">
+      <div class="bqlabel">Calidad</div>
+      <div class="bqname bqc-${q.key}">${q.label}</div>
+      <div class="bqroll">resultado ${tot}</div>
+    </div>
+  </div>
+  <div class="cbody">
+    <div class="ceffect">${h.efecto}</div>
+    ${caosHtml(h)}
+    ${h.nota?`<div class="cnote">${h.nota}</div>`:''}
+  </div>
+</div>`;
+}
+
+function renderMissed(h,why){
+  const tc=TTAG[h.tipo]||'';
+  return`<div class="card" style="opacity:.35">
+  <div class="card-top">
+    <div class="cbar bf"></div>
+    <div class="cmain">
+      <div class="cname" style="color:var(--text3)">${h.nombre}</div>
+      <div class="ccol">${h.col}</div>
+      <div class="ctags"><span class="tag ${tc}">${TLAB[h.tipo]||h.tipo}</span><span class="tag ldiff ${DCLS[h.dif]}">${DLAB[h.dif]}</span></div>
+    </div>
+    <div class="cbadge bq-fumble"><div class="bqlabel">Estado</div><div class="bqname bqc-fumble" style="font-size:10.5px;line-height:1.3">${why}</div></div>
+  </div>
+</div>`;
+}
+
+function buscar(){
+  const roll=parseInt(document.getElementById('roll').value)||0;
+  const zona=document.getElementById('zona').value;
+  const est=document.getElementById('estacion').value;
+  const pulso=document.getElementById('chk-pulso').checked;
+  const aman=document.getElementById('chk-aman').checked;
+  const lluvia=document.getElementById('chk-lluvia').checked;
+  const herbTP=document.getElementById('chk-herb').checked;
+  const found=[],missed=[];
+  for(const h of HERBS){
+    const ac=canFind(h,zona,est,pulso,aman);
+    if(!ac.ok){missed.push({h,why:ac.why});continue;}
+    const tot=calcTotal(roll,h,zona,est,lluvia,pulso,aman,herbTP);
+    const q=getQual(tot);
+    if(q.key==='fallo'){missed.push({h,why:`Tirada insuficiente (resultado ${tot} — necesita ≥101)`});continue;}
+    found.push({h,tot,q});
+  }
+  const order=['legendaria','magica','infundida','alta','comun','raspada','fumble'];
+  found.sort((a,b)=>order.indexOf(a.q.key)-order.indexOf(b.q.key));
+  let html='';
+  if(found.length===0){
+    html=`<div class="nores"><span>⬡</span>Ninguna hierba hallada en ${ZONAS[zona].label} durante ${ESTACIONES[est].label} con esta tirada.<br><br><small style="font-size:13px">Probá una tirada más alta, zona diferente o revisá las condiciones especiales requeridas.</small></div>`;
+  }else{
+    html+=`<div class="result-bar"><span class="orb"></span><span class="rcount">${found.length}</span><span>hierbas halladas &nbsp;·&nbsp; ${ZONAS[zona].label} &nbsp;·&nbsp; ${ESTACIONES[est].label} &nbsp;·&nbsp; Tirada ${roll}</span></div>`;
+    html+=`<div class="sec">Hierbas encontradas</div>`;
+    found.forEach(({h,tot,q},i)=>{html+=renderCard(h,q,tot,i*50);});
+  }
+  if(missed.length>0){
+    html+=`<div class="sep"></div>`;
+    html+=`<div class="sec" style="cursor:pointer" onclick="toggleMissed()"><span>No disponibles en esta búsqueda</span><span id="mtog" style="margin-left:8px;font-size:9.5px;color:var(--text3)">(${missed.length}) mostrar ▾</span></div>`;
+    html+=`<div id="mlist" style="display:none">`;
+    missed.forEach(({h,why})=>{html+=renderMissed(h,why);});
+    html+=`</div>`;
+  }
+  document.getElementById('output').innerHTML=html;
+}
+
+function toggleMissed(){
+  const l=document.getElementById('mlist');
+  const b=document.getElementById('mtog');
+  const n=l.querySelectorAll('.card').length;
+  const h=l.style.display==='none';
+  l.style.display=h?'block':'none';
+  b.textContent=h?'(ocultar ▴)':`(${n}) mostrar ▾`;
+}
+
+window.addEventListener('DOMContentLoaded',()=>{syncInfo();document.getElementById('roll').addEventListener('input',syncInfo);});
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra — Herramientas</title>
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --bg-surface: #fdfaf2;
+    --bg-card: #fffdf7;
+    --bg-card-hover: #faf6ec;
+    --text-primary: #2a241a;
+    --text-secondary: #6b6353;
+    --text-tertiary: #9a9080;
+    --border: rgba(60, 45, 25, 0.15);
+    --border-hover: rgba(60, 45, 25, 0.3);
+    --accent: #6b4a2b;
+    --accent-subtle: rgba(107, 74, 43, 0.08);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1612;
+      --bg-surface: #23201a;
+      --bg-card: #2a2620;
+      --bg-card-hover: #332e26;
+      --text-primary: #ede4d0;
+      --text-secondary: #a89e89;
+      --text-tertiary: #6e6655;
+      --border: rgba(237, 228, 208, 0.12);
+      --border-hover: rgba(237, 228, 208, 0.25);
+      --accent: #c9a876;
+      --accent-subtle: rgba(201, 168, 118, 0.08);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .app {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 5rem;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .header h1 {
+    font-family: var(--font-serif);
+    font-size: 2.6rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+  }
+  .header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+  .divider {
+    width: 60px;
+    height: 1px;
+    background: var(--border);
+    margin: 1rem auto 0;
+  }
+  .tools {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tool-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .tool-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-hover);
+    transform: translateX(3px);
+  }
+  .tool-card:active {
+    transform: translateX(1px);
+  }
+  .tool-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .tool-icon {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-subtle);
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+  }
+  .tool-name {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .tool-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding-left: 48px;
+    line-height: 1.5;
+  }
+  .footer {
+    text-align: center;
+    margin-top: 3.5rem;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <h1>Zskahra</h1>
+    <p>Herramientas para el mundo y sus villas</p>
+    <div class="divider"></div>
+  </header>
+
+  <div class="tools">
+    <a class="tool-card" href="zskahra_explorer.html">
+      <div class="tool-top">
+        <div class="tool-icon">&#x1F5FA;</div>
+        <div class="tool-name">Explorador del mundo</div>
+      </div>
+      <div class="tool-desc">Villas, sistema social, sufijos de hito y estructura del mundo.</div>
+    </a>
+
+    <a class="tool-card" href="zskahra_generador_de_nombres_para_villagers.html">
+      <div class="tool-top">
+        <div class="tool-icon">&#x270D;</div>
+        <div class="tool-name">Generador de nombres</div>
+      </div>
+      <div class="tool-desc">Nombres para villagers con raza, villa, sufijo de hito social, edad y trasfondo.</div>
+    </a>
+
+    <a class="tool-card" href="zskahra_clima_generador.html">
+      <div class="tool-top">
+        <div class="tool-icon">&#x2601;</div>
+        <div class="tool-name">Oráculo de Clima</div>
+      </div>
+      <div class="tool-desc">Genera el clima por khar para cualquier bioma del mundo.</div>
+    </a>
+
+    <a class="tool-card" href="zskahra_herbalist_generador.html">
+      <div class="tool-top">
+        <div class="tool-icon">&#x1F33F;</div>
+        <div class="tool-name">Guía del Herbalista</div>
+      </div>
+      <div class="tool-desc">Sistema de recolección de hierbas, ingredientes y preparaciones.</div>
+    </a>
+  </div>
+
+  <div class="footer">HARP Homebrew &middot; Suplemento de Campaña</div>
+</div>
+</body>
+</html>

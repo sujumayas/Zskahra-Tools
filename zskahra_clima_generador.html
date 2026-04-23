@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra — Oráculo de Clima</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: #0D0D1A;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: #E8E0D0;
+    overflow-x: hidden;
+  }
+
+  .bg-glow {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, #1A1A3E 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, #1A0D2E 0%, transparent 50%),
+      #0D0D1A;
+  }
+
+  .orbe {
+    position: fixed; top: -80px; right: -80px;
+    width: 280px; height: 280px; border-radius: 50%;
+    pointer-events: none; z-index: 0;
+    background: radial-gradient(circle at 40% 40%, rgba(74,144,217,0.15), rgba(74,144,217,0.03) 60%, transparent);
+    box-shadow: 0 0 80px rgba(74,144,217,0.1);
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 700px; margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* CABECERA */
+  .header { text-align: center; margin-bottom: 48px; }
+  .header-label {
+    font-size: 11px; letter-spacing: 4px; color: #4A90D9;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: clamp(32px, 6vw, 52px); font-weight: normal;
+    letter-spacing: 6px; color: #E8E0D0;
+    text-shadow: 0 0 40px rgba(74,144,217,0.3);
+    margin-bottom: 8px;
+  }
+  .divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, #4A90D9, transparent);
+    margin: 0 auto 16px;
+  }
+  .header p { font-size: 13px; color: #8A8070; letter-spacing: 1px; }
+
+  /* PANEL INPUT */
+  .panel {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 32px; margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+  }
+
+  .input-label {
+    display: block; font-size: 11px; letter-spacing: 3px;
+    color: #4A90D9; text-transform: uppercase; margin-bottom: 12px;
+  }
+
+  .input-row { display: flex; gap: 12px; align-items: stretch; margin-bottom: 20px; }
+
+  #khar-input {
+    flex: 1; padding: 14px 18px; font-size: 20px;
+    font-family: inherit; letter-spacing: 2px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px; color: #E8E0D0; outline: none;
+    transition: border-color 0.2s;
+  }
+  #khar-input:focus { border-color: #4A90D9; }
+  #khar-input::-webkit-inner-spin-button,
+  #khar-input::-webkit-outer-spin-button { opacity: 0.3; }
+
+  #btn-tirar {
+    padding: 14px 28px; font-size: 13px; letter-spacing: 2px;
+    font-family: inherit; text-transform: uppercase;
+    background: rgba(255,255,255,0.05);
+    border: none; border-radius: 10px;
+    color: #555; cursor: not-allowed;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  #btn-tirar.active {
+    background: linear-gradient(135deg, #4A90D9, #3570B0);
+    color: #fff; cursor: pointer;
+  }
+  #btn-tirar.active:hover { opacity: 0.85; }
+
+  /* CHIPS */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; min-height: 32px; }
+  .chip {
+    padding: 6px 12px; border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 11px; letter-spacing: 0.5px;
+  }
+  .chip span.val { font-weight: bold; }
+
+  /* TOGGLE */
+  .toggle-row { display: flex; align-items: center; gap: 10px; }
+  .toggle-btn {
+    width: 36px; height: 20px; border-radius: 10px; border: none;
+    background: rgba(255,255,255,0.1); cursor: pointer;
+    position: relative; transition: background 0.2s; flex-shrink: 0;
+  }
+  .toggle-btn.on { background: #4A90D9; }
+  .toggle-knob {
+    position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; transition: left 0.2s;
+  }
+  .toggle-btn.on .toggle-knob { left: 18px; }
+  .toggle-label { font-size: 11px; color: #666; letter-spacing: 1px; }
+
+  /* LOADING */
+  #loading {
+    display: none; text-align: center;
+    padding: 60px; color: #4A90D9;
+    font-size: 24px; letter-spacing: 8px;
+    animation: pulse 0.8s ease infinite alternate;
+  }
+  @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
+
+  /* RESULTADO */
+  #resultado { display: none; border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+  #resultado.visible { display: block; animation: fadeIn 0.4s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .res-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+  }
+  .res-est-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+  .res-meta { font-size: 11px; color: #555; letter-spacing: 1px; }
+  .res-dado { text-align: right; }
+  .res-dado-label { font-size: 11px; letter-spacing: 2px; color: #555; margin-bottom: 2px; }
+  .res-dado-num { font-size: 28px; font-weight: bold; line-height: 1; }
+  .res-dado-mod { font-size: 13px; color: #D4A017; margin-left: 6px; }
+
+  .res-nombre {
+    font-size: clamp(20px, 4vw, 28px); font-weight: normal;
+    letter-spacing: 1px; color: #E8E0D0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .badge-raro {
+    font-size: 10px; letter-spacing: 2px; padding: 3px 10px;
+    background: rgba(191,54,12,0.2); border: 1px solid rgba(191,54,12,0.4);
+    border-radius: 20px; color: #FF7043; text-transform: uppercase;
+  }
+
+  .res-desc {
+    font-size: 15px; line-height: 1.7; color: #B0A898;
+    margin-bottom: 20px; font-style: italic;
+  }
+
+  .res-efecto {
+    background: rgba(0,0,0,0.3); border-radius: 10px; padding: 16px 20px;
+  }
+  .res-efecto-label {
+    font-size: 10px; letter-spacing: 3px; color: #555;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .res-efecto-texto { font-size: 14px; color: #D0C8B8; line-height: 1.6; }
+  .res-rango { margin-top: 16px; font-size: 11px; color: #444; text-align: right; }
+
+  /* HISTORIAL */
+  #historial-panel {
+    display: none; background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 20px; margin-bottom: 24px;
+  }
+  #historial-panel.visible { display: block; }
+  .hist-label { font-size: 10px; letter-spacing: 3px; color: #444; text-transform: uppercase; margin-bottom: 14px; }
+  .hist-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    margin-bottom: 6px; flex-wrap: wrap; gap: 4px;
+  }
+  .hist-nombre { font-size: 12px; }
+  .hist-dado { font-size: 11px; color: #444; }
+
+  /* LEYENDA */
+  .leyenda { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 32px; }
+  .leyenda-chip {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 10px; letter-spacing: 0.5px;
+  }
+  .leyenda-rango { color: #666; margin: 0 4px; }
+  .leyenda-nombre { color: #888; }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="orbe"></div>
+
+<div class="container">
+
+  <!-- CABECERA -->
+  <div class="header">
+    <div class="header-label">Sistema de Clima</div>
+    <h1>ZSKAHRA</h1>
+    <div class="divider"></div>
+    <p>Oráculo de Clima · Año de 288 Khars</p>
+  </div>
+
+  <!-- PANEL INPUT -->
+  <div class="panel">
+    <label class="input-label" for="khar-input">Khar del año</label>
+    <div class="input-row">
+      <input type="number" id="khar-input" min="1" max="288" placeholder="1 – 288">
+      <button id="btn-tirar">Tirar d100</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="toggle-row">
+      <button class="toggle-btn on" id="toggle-pulso">
+        <div class="toggle-knob"></div>
+      </button>
+      <span class="toggle-label">Aplicar modificador +10 en días de Pulso Gemelo</span>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">✦ ✦ ✦</div>
+
+  <!-- RESULTADO -->
+  <div id="resultado"></div>
+
+  <!-- HISTORIAL -->
+  <div id="historial-panel">
+    <div class="hist-label">Khars anteriores</div>
+    <div id="historial-lista"></div>
+  </div>
+
+  <!-- LEYENDA -->
+  <div class="leyenda" id="leyenda"></div>
+
+</div>
+
+<script>
+// ── DATOS ─────────────────────────────────────────────────────────────────────
+const ESTACIONES = [
+  { nombre:"La Calma Brillante", inicio:1,   fin:72,  color:"#B8860B", bg:"#FFF3CD", dark:"#5D4200", emoji:"☀️" },
+  { nombre:"El Velo",            inicio:73,  fin:120, color:"#2E7D32", bg:"#D4EDDA", dark:"#1B4D20", emoji:"🌿" },
+  { nombre:"Los Días Ciegos",    inicio:121, fin:156, color:"#3F51B5", bg:"#D8D8EE", dark:"#1A237E", emoji:"🌑" },
+  { nombre:"El Despertar Rojo",  inicio:157, fin:210, color:"#BF360C", bg:"#FFE0D0", dark:"#7F2407", emoji:"🔴" },
+  { nombre:"La Conjunción",      inicio:211, fin:288, color:"#6A1B9A", bg:"#EDD8EE", dark:"#3E0063", emoji:"⚡" },
+];
+
+const TABLAS = {
+  "La Calma Brillante": [
+    { r:[1,10],   nombre:"Despejado intenso",         desc:"Ambos soles sin obstáculo. Luz cegadora al mediodía, sombras dobles muy marcadas.",                             efecto:"Viaje sin penalización. Las criaturas diurnas son más agresivas.", raro:false },
+    { r:[11,25],  nombre:"Calor extremo",              desc:"Temperatura sofocante. El suelo irradia calor. Los artefactos se calientan al tacto.",                          efecto:"Marcha prolongada requiere doble ración de agua. Artefactos: +1 dado de Caos por uso.", raro:false },
+    { r:[26,38],  nombre:"Despejado moderado",         desc:"Día típico de la estación. Caluroso pero tolerable. Brisa ocasional.",                                          efecto:"Sin modificadores. Condición base de la estación.", raro:false },
+    { r:[39,50],  nombre:"Nublado cálido",             desc:"Nubes altas y delgadas filtran la luz. El calor persiste. Las sombras se suavizan.",                            efecto:"Visibilidad reducida a media distancia. Las criaturas del Caos son levemente menos activas.", raro:false },
+    { r:[51,60],  nombre:"Lluvioso cálido",            desc:"Lluvia breve pero intensa. El suelo se convierte en barro rápido. Olor a tierra caliente.",                     efecto:"Terreno difícil tras la lluvia. Rastrear huellas: +10 durante 2 khars.", raro:false },
+    { r:[61,68],  nombre:"Tormenta eléctrica",         desc:"Rayos secos entre las nubes. Truenos sin lluvia. Los artefactos captan la descarga.",                           efecto:"Artefactos inactivos pueden dispararse: tirada RR Will o activación aleatoria.", raro:false },
+    { r:[69,76],  nombre:"Viento seco abrasador",      desc:"Viento caliente del interior. Reseca la piel, los ojos, la boca.",                                              efecto:"Percepción auditiva −15. Fuego se propaga tres veces más rápido.", raro:false },
+    { r:[77,83],  nombre:"Niebla caótica tenue",       desc:"Vapor de energía rosada-anaranjada asciende del suelo al amanecer. Desaparece a mediodía.",                    efecto:"Al amanecer: Caos ambiental +50 puntos durante 1d6 horas. Flora caótica activa.", raro:false },
+    { r:[84,90],  nombre:"Lluvia de ceniza",           desc:"Ceniza fina cae del cielo durante horas. Origen desconocido. Oscurece levemente la luz.",                      efecto:"Rastros cubiertos en 1 hora. La ceniza es tóxica: −5 a tiradas físicas sin protección.", raro:false },
+    { r:[91,95],  nombre:"Doble aurora al crepúsculo", desc:"Al atardecer, ambos soles producen auroras simétricas de color dorado y rojo.",                                 efecto:"Los habitantes lo consideran presagio. Los Guardianes salen a observar.", raro:false },
+    { r:[96,98],  nombre:"Tormenta caótica menor",     desc:"Tormenta eléctrica con lluvia de energía caótica visible. Rayos de colores.",                                   efecto:"Exterior: +1d10 Caos/hora. Criaturas con comportamiento impredecible.", raro:true },
+    { r:[99,100], nombre:"Tormenta caótica mayor",     desc:"El cielo se tiñe de rojo oscuro. Rayos de Caos puro golpean el suelo. Las estatuas vibran.",                   efecto:"⚠️ EVENTO. Fuera de villa: +3d10 Caos/hora. Dentro: pylones al 50%.", raro:true },
+  ],
+  "El Velo": [
+    { r:[1,12],   nombre:"Despejado fresco",           desc:"El aire es limpio y seco. La luz de los soles tiene una calidad dorada y suave.",                               efecto:"Viaje: +20% distancia diaria. Los caravaneros aprovechan estas ventanas.", raro:false },
+    { r:[13,26],  nombre:"Nublado suave",              desc:"Nubes blancas y altas. Temperatura agradable. Las sombras dobles casi desaparecen.",                            efecto:"Sin modificadores. La mayoría de los días del Velo son así.", raro:false },
+    { r:[27,40],  nombre:"Brisa constante",            desc:"Viento fresco y continuo del lago. Las hojas de los árboles suenan todo el día.",                               efecto:"A favor del viento: +10% velocidad. En contra: −10%. Los molinos trabajan solos.", raro:false },
+    { r:[41,52],  nombre:"Lluvia ligera y breve",      desc:"Llovizna de unas pocas horas. El suelo se humedece. El aire huele a tierra mojada.",                            efecto:"Criaturas del Caos reducen actividad 20%. Buen momento para explorar fronteras.", raro:false },
+    { r:[53,63],  nombre:"Niebla matinal",             desc:"Niebla densa al amanecer que se disipa en 3-4 horas. El mundo desaparece a 10 metros.",                        efecto:"Emboscadas más probables al amanecer. Viaje imposible hasta que la niebla se disipa.", raro:false },
+    { r:[64,72],  nombre:"Lluvia fuerte persistente",  desc:"Lluvia intensa durante todo el khar. Ríos suben. Los caminos entre villas se vuelven peligrosos.",              efecto:"Viaje a pie: −40% distancia. Criaturas: actividad mínima.", raro:false },
+    { r:[73,80],  nombre:"Tormenta lejana",            desc:"Truenos lejanos. La tormenta no llega pero la presión cambia. Los animales se inquietan.",                      efecto:"Artefactos: −5 a tiradas de uso. Las monturas se agitan.", raro:false },
+    { r:[81,88],  nombre:"Viento frío del norte",      desc:"Viento que baja la temperatura bruscamente. Anticipo de Los Días Ciegos.",                                      efecto:"Sin equipo de abrigo: −10 a tiradas físicas prolongadas.", raro:false },
+    { r:[89,94],  nombre:"Niebla caótica suave",       desc:"Niebla con leve brillo azulado. Los videntes dicen que trae mensajes del Caos.",                                efecto:"Percepción −20. Pero Intuition +10 — algo aguza los sentidos.", raro:false },
+    { r:[95,98],  nombre:"Lluvia con niebla caótica",  desc:"Lluvia normal mezclada con niebla caótica. El agua que cae tiene un leve brillo.",                              efecto:"Consumir esta agua sin filtrar: +1d6 Caos. Los animales la evitan.", raro:true },
+    { r:[99,100], nombre:"Tormenta repentina",         desc:"Tormenta violenta sin aviso. El Velo traiciona. Granizo, rayos, viento fuerte.",                                efecto:"⚠️ Daño por granizo en exterior: 1d6/hora. Los caravaneros que la ignoran pagan el precio.", raro:true },
+  ],
+  "Los Días Ciegos": [
+    { r:[1,10],   nombre:"Oscuridad plena",            desc:"Los dos soles apenas alcanzan el horizonte. El Orbe brilla fuerte en compensación.",                            efecto:"Sin luz artificial: −20 Percepción visual. Flora caótica brilla. Criaturas más activas.", raro:false },
+    { r:[11,22],  nombre:"Nublado oscuro",             desc:"Nubes densas bloquean hasta la luz tenue. La oscuridad es casi total durante horas.",                          efecto:"Visibilidad: 5 metros sin luz artificial. Los pylones trabajan al máximo.", raro:false },
+    { r:[23,35],  nombre:"Frío húmedo",                desc:"Temperatura baja y humedad alta. La ropa se empapa sin lluvia. El frío cala los huesos.",                      efecto:"Sin equipo adecuado: fatiga acumulada. −5 a tiradas físicas tras 4 horas.", raro:false },
+    { r:[36,47],  nombre:"Niebla espesa",              desc:"Niebla tan densa que reduce visibilidad a 3 metros. El mundo se convierte en siluetas.",                       efecto:"Combate: −30 a ataques a distancia. Los monstruos se mueven sin ser vistos.", raro:false },
+    { r:[48,57],  nombre:"Lluvia fría constante",      desc:"Lluvia que no para. Fría, molesta, implacable. El suelo se convierte en barro profundo.",                     efecto:"Movimiento reducido a la mitad. Las hogueras no duran sin refugio.", raro:false },
+    { r:[58,66],  nombre:"Helada",                     desc:"Temperatura bajo cero. Superficies de agua congeladas. El aliento se ve. El metal quema.",                    efecto:"Sin protección: −10 a todas las tiradas. Las criaturas acuáticas desaparecen.", raro:false },
+    { r:[67,74],  nombre:"Niebla caótica brillante",   desc:"La niebla brilla en colores fríos: azul, violeta, verde. Es hermosa. Es peligrosa.",                          efecto:"En niebla: +1d6 Caos/hora. Los videntes tienen visiones involuntarias.", raro:false },
+    { r:[75,81],  nombre:"Tormenta de nieve caótica",  desc:"Nieve que cae con color. Cristales que brillan. Hermosa desde la villa. Mortal fuera.",                       efecto:"Fuera de villa: +2d10 Caos/hora. Rastros imposibles. Monstruos invisibles.", raro:false },
+    { r:[82,87],  nombre:"Viento con aullidos",        desc:"Viento que produce sonidos parecidos a voces. Los habitantes lo llaman «el coro».",                           efecto:"RR Will (dif. fácil) o −10 a todas las tiradas por perturbación psicológica.", raro:false },
+    { r:[88,92],  nombre:"Eclipse parcial",            desc:"Uno de los soles desaparece brevemente detrás del Orbe. El cielo cambia de color.",                           efecto:"Duración: 1d6 horas. Caos ambiental +100. Los Guardianes salen y observan.", raro:true },
+    { r:[93,97],  nombre:"Tormenta caótica",           desc:"Tormenta eléctrica con energía caótica visible. En Los Días Ciegos los efectos son más intensos.",            efecto:"⚠️ Fuera de villa: +2d10 Caos/hora. Los pylones vibran. Las criaturas huyen hacia las villas.", raro:true },
+    { r:[98,100], nombre:"Eclipse total",              desc:"Los dos soles son bloqueados simultáneamente. Oscuridad absoluta durante 1d3 horas.",                         efecto:"⚠️ EVENTO MAYOR. Caos +200 a todos en exterior. Las puertas de la villa se cierran.", raro:true },
+  ],
+  "El Despertar Rojo": [
+    { r:[1,12],   nombre:"Cielo rojizo despejado",     desc:"La luz de los soles tiene un tono rojo-naranja constante. Las sombras dobles son rojizas.",                   efecto:"Sin modificadores. El tono rojo es la condición normal de la estación.", raro:false },
+    { r:[13,25],  nombre:"Calor húmedo",               desc:"Temperatura alta con humedad sofocante. El sudor no se evapora. La vegetación crece visiblemente.",            efecto:"Marcha: fatiga doble. Flora caótica crece 1d6 cm/hora fuera de pylón.", raro:false },
+    { r:[26,37],  nombre:"Lluvia cálida",              desc:"Lluvia a temperatura corporal. Extraña al principio, agradable después. Las plantas explotan.",                efecto:"Tras la lluvia: zonas sin pylón 20% más peligrosas por 48 horas.", raro:false },
+    { r:[38,48],  nombre:"Niebla rojiza al amanecer",  desc:"Al amanecer, niebla de color rojo sangre que dura 2-3 horas. Olor metálico y dulzón.",                       efecto:"En la niebla: +1d6 Caos. Criaturas con crías en su momento más territorial.", raro:false },
+    { r:[49,58],  nombre:"Tormenta tropical breve",    desc:"Tormenta violenta que dura poco. Lluvia torrencial, viento fuerte, relámpagos rojizos.",                      efecto:"Durante la tormenta: imposible viajar. Tras ella: 24 horas de calma perfecta.", raro:false },
+    { r:[59,67],  nombre:"Viento cargado de esporas",  desc:"Viento que trae esporas de la flora caótica en nubes visibles de color naranja.",                             efecto:"Expuestos sin protección: +1d6 Caos. Las esporas se adhieren a ropa y equipo.", raro:false },
+    { r:[68,75],  nombre:"Lluvia torrencial",          desc:"Lluvia extremadamente intensa. Inundaciones en zonas bajas. Los ríos se desbordan.",                          efecto:"Viaje imposible. Las villas en zonas bajas activan defensas de inundación.", raro:false },
+    { r:[76,83],  nombre:"Calor con viento seco",      desc:"La combinación más peligrosa: calor alto y viento que reseca todo. Riesgo de incendio.",                     efecto:"Fuego: se propaga 5× más rápido. Los incendios caóticos no se apagan solos.", raro:false },
+    { r:[84,90],  nombre:"Niebla caótica densa",       desc:"La niebla roja más densa de la estación. Se ve de noche como una nube luminosa.",                            efecto:"+2d6 Caos/hora fuera de villa. Los monstruos con crías huyen al exterior.", raro:true },
+    { r:[91,95],  nombre:"Lluvia ácida caótica",       desc:"Lluvia que quema levemente la piel expuesta. Mata plantas normales. Activa las caóticas.",                   efecto:"Daño 1 punto/hora de exposición. Ropa y armas de cuero se deterioran.", raro:true },
+    { r:[96,98],  nombre:"Tormenta caótica",           desc:"La flora caótica florece de forma explosiva durante la tormenta.",                                            efecto:"⚠️ Fuera de villa: +3d10 Caos/hora. Las criaturas recién nacidas son invocadas.", raro:true },
+    { r:[99,100], nombre:"Doble tormenta",             desc:"Dos tormentas simultáneas que se fusionan. El cielo se parte en dos sistemas caóticos.",                     efecto:"⚠️ EVENTO MAYOR. Los pylones pueden fallar temporalmente.", raro:true },
+  ],
+  "La Conjunción": [
+    { r:[1,15],   nombre:"Luz antinatural sostenida",  desc:"Los dos soles se alinean y la luz no cesa. No hay noche. La Penumbra desaparece durante días.",               efecto:"Sin oscuridad: criaturas nocturnas desaparecen. Sueño interrumpido: fatiga acumulada.", raro:false },
+    { r:[16,28],  nombre:"Cielo brillante sin nubes",  desc:"El cielo más despejado del año. La luz es intensa, casi sólida. Sombras dobles simétricas.",                  efecto:"Artefactos: +1 dado de Caos base durante toda la estación.", raro:false },
+    { r:[29,40],  nombre:"Calor extremo sostenido",    desc:"El calor de la Conjunción no baja ni de noche. Temperatura constante y alta.",                                efecto:"Sin descanso adecuado: −5 acumulativo/día a tiradas físicas. Artefactos se sobrecalientan.", raro:false },
+    { r:[41,50],  nombre:"Tormenta eléctrica seca",    desc:"Rayos sin lluvia. Continuos. El cielo zumba. Los artefactos se activan solos.",                               efecto:"Cada hora en exterior: tirada vs activación accidental de artefactos (RR Will dif. difícil).", raro:false },
+    { r:[51,59],  nombre:"Niebla luminosa dorada",     desc:"Niebla que brilla de color dorado. Hermosa e inquietante. Los Guardianes la llaman «el sudario».",            efecto:"+1d10 Caos/hora. Visibilidad 15m. Los videntes tienen visiones del planeta.", raro:false },
+    { r:[60,67],  nombre:"Vientos erráticos",          desc:"El viento cambia de dirección cada hora. Impredecible. Los árboles se doblan en todas.",                      efecto:"Proyectiles: −20 a ataque. Los caravaneros no pueden navegar por estrellas.", raro:false },
+    { r:[68,74],  nombre:"Lluvia cálida persistente",  desc:"Lluvia caliente que dura días. La combinación con el calor crea vapor constante.",                            efecto:"Artefactos no protegidos: −1 a potencia efectiva por la humedad extrema.", raro:false },
+    { r:[75,81],  nombre:"Doble aurora diurna",        desc:"Auroras visibles pese a la luz solar. Bandas de color en el cielo. Duran horas.",                             efecto:"Caos ambiental +50. Los Guardianes lo registran. Los aldeanos salen a mirar.", raro:false },
+    { r:[82,87],  nombre:"Tormenta caótica menor",     desc:"Tormenta de energía caótica visible incluso desde dentro de la villa. Pylones al límite.",                   efecto:"⚠️ Fuera de villa: +2d10 Caos/hora. Las criaturas más grandes son atraídas.", raro:true },
+    { r:[88,92],  nombre:"Eclipse parcial doble",      desc:"Los dos soles se eclipsan parcialmente al mismo tiempo. Cielo con penumbra doble extraña.",                   efecto:"⚠️ Duración: 1d6 horas. Caos +150. Silencio repentino en la fauna.", raro:true },
+    { r:[93,96],  nombre:"Tormenta caótica mayor",     desc:"La tormenta más intensa de La Conjunción. Rayos de Caos puro. Pylones al 50%.",                               efecto:"⚠️ Fuera de villa: +3d10 Caos/hora. Dentro: +1d6/hora.", raro:true },
+    { r:[97,99],  nombre:"Apagón de pylones",          desc:"La energía caótica satura los pylones temporalmente. Las estatuas se apagan durante horas.",                  efecto:"⚠️ EVENTO. La villa queda expuesta. Los Guardianes en modo de emergencia.", raro:true },
+    { r:[100,100],nombre:"La Gran Conjunción",         desc:"Todos los factores convergen: eclipse, tormenta, pylones al límite. Ocurre una vez por año.",                 efecto:"⚠️ EVENTO MAYOR DE CAMPAÑA. Este es el tipo de día en que ocurrieron los grandes cataclismos.", raro:true },
+  ],
+};
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function getEstacion(t) { return ESTACIONES.find(e => t >= e.inicio && t <= e.fin); }
+function getCiclo(t)    { return Math.ceil(t / 32); }
+function getPulso(t)    { return Math.floor(((t - 1) % 32) / 8) + 1; }
+function esDiaPulso(t)  { return t % 8 === 0; }
+
+function getClima(t, mod) {
+  const roll    = Math.floor(Math.random() * 100) + 1;
+  const rollMod = Math.min(100, Math.max(1, roll + mod));
+  const est     = getEstacion(t);
+  const tabla   = TABLAS[est.nombre];
+  const item    = tabla.find(x => rollMod >= x.r[0] && rollMod <= x.r[1]);
+  return { roll, rollMod, mod, item, est };
+}
+
+// ── ESTADO ────────────────────────────────────────────────────────────────────
+let modPulsoActivo = true;
+let historial = [];
+
+// ── LEYENDA ───────────────────────────────────────────────────────────────────
+const leyendaEl = document.getElementById('leyenda');
+ESTACIONES.forEach(e => {
+  const chip = document.createElement('div');
+  chip.className = 'leyenda-chip';
+  chip.style.background = e.color + '15';
+  chip.style.border = `1px solid ${e.color}40`;
+  chip.innerHTML = `<span>${e.emoji}</span><span class="leyenda-rango">${e.inicio}–${e.fin}</span><span class="leyenda-nombre">${e.nombre}</span>`;
+  leyendaEl.appendChild(chip);
+});
+
+// ── INPUT ─────────────────────────────────────────────────────────────────────
+const inputEl  = document.getElementById('khar-input');
+const btnEl    = document.getElementById('btn-tirar');
+const chipsEl  = document.getElementById('chips');
+const toggleEl = document.getElementById('toggle-pulso');
+
+toggleEl.addEventListener('click', () => {
+  modPulsoActivo = !modPulsoActivo;
+  toggleEl.classList.toggle('on', modPulsoActivo);
+  actualizarChips();
+});
+
+inputEl.addEventListener('input', actualizarChips);
+inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') tirar(); });
+btnEl.addEventListener('click', tirar);
+
+function actualizarChips() {
+  const t = parseInt(inputEl.value);
+  chipsEl.innerHTML = '';
+  if (!t || t < 1 || t > 288) {
+    btnEl.classList.remove('active');
+    return;
+  }
+  btnEl.classList.add('active');
+
+  const est    = getEstacion(t);
+  const ciclo  = getCiclo(t);
+  const pulso  = getPulso(t);
+  const esPulso = esDiaPulso(t);
+
+  const chips = [
+    { label: 'Estación', val: `${est.emoji} ${est.nombre}`, color: est.color },
+    { label: 'Ciclo',    val: `${ciclo} de 9` },
+    { label: 'Pulso',    val: `${pulso} del ciclo` },
+    ...(esPulso ? [{ label: '★ Pulso Gemelo', val: modPulsoActivo ? '+10 al d100' : 'activo (mod. desactivado)', color: '#D4A017' }] : []),
+  ];
+
+  chips.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'chip';
+    if (c.color) el.style.borderColor = c.color;
+    el.innerHTML = `<span style="color:#666;margin-right:6px">${c.label}</span><span class="val" style="color:${c.color || '#E8E0D0'}">${c.val}</span>`;
+    chipsEl.appendChild(el);
+  });
+}
+
+// ── TIRAR ─────────────────────────────────────────────────────────────────────
+function tirar() {
+  const t = parseInt(inputEl.value);
+  if (!t || t < 1 || t > 288) return;
+
+  const loadingEl   = document.getElementById('loading');
+  const resultadoEl = document.getElementById('resultado');
+
+  loadingEl.style.display = 'block';
+  resultadoEl.className   = '';
+  resultadoEl.style.display = 'none';
+
+  setTimeout(() => {
+    const esPulso = esDiaPulso(t);
+    const mod     = (modPulsoActivo && esPulso) ? 10 : 0;
+    const res     = getClima(t, mod);
+
+    loadingEl.style.display = 'none';
+    renderResultado(res, t);
+
+    historial.unshift({ turno: t, ...res });
+    if (historial.length > 5) historial.pop();
+    renderHistorial();
+  }, 380);
+}
+
+function renderResultado(res, t) {
+  const el  = document.getElementById('resultado');
+  const est = res.est;
+  const ciclo = getCiclo(t);
+  const pulso = getPulso(t);
+
+  el.style.cssText = `
+    display:block;
+    background: linear-gradient(135deg, ${est.bg}15, ${est.bg}08);
+    border: 1px solid ${est.color}40;
+    border-radius:16px; padding:32px; margin-bottom:24px;
+  `;
+
+  const modStr = res.mod !== 0
+    ? `<span class="res-dado-mod">(${res.roll}${res.mod > 0 ? '+' : ''}${res.mod})</span>`
+    : '';
+
+  const raroStr = res.item.raro
+    ? `<span class="badge-raro">Raro</span>`
+    : '';
+
+  el.innerHTML = `
+    <div class="res-top">
+      <div>
+        <div class="res-est-label" style="color:${est.color}">${est.emoji} ${est.nombre}</div>
+        <div class="res-meta">Khar ${t} · Ciclo ${ciclo} · Pulso ${pulso}</div>
+      </div>
+      <div class="res-dado">
+        <div class="res-dado-label">d100</div>
+        <div class="res-dado-num" style="color:${est.color}">${res.rollMod}${modStr}</div>
+      </div>
+    </div>
+    <div class="res-nombre">
+      ${res.item.nombre} ${raroStr}
+    </div>
+    <p class="res-desc">${res.item.desc}</p>
+    <div class="res-efecto" style="border-left:3px solid ${est.color}">
+      <div class="res-efecto-label">Efecto en juego</div>
+      <div class="res-efecto-texto">${res.item.efecto}</div>
+    </div>
+    <div class="res-rango">Rango: ${res.item.r[0]}–${res.item.r[1]}</div>
+  `;
+
+  el.className = 'visible';
+}
+
+function renderHistorial() {
+  const panel = document.getElementById('historial-panel');
+  const lista  = document.getElementById('historial-lista');
+
+  const anteriores = historial.slice(1);
+  if (anteriores.length === 0) {
+    panel.className = '';
+    return;
+  }
+
+  panel.className = 'visible';
+  lista.innerHTML = '';
+
+  anteriores.forEach((h, i) => {
+    const div = document.createElement('div');
+    div.className = 'hist-item';
+    div.style.opacity = 1 - i * 0.25;
+    div.innerHTML = `
+      <div class="hist-nombre">
+        <span style="color:${h.est.color};margin-right:8px">${h.est.emoji} Khar ${h.turno}</span>
+        <span style="color:#B0A898">${h.item.nombre}</span>
+      </div>
+      <span class="hist-dado">d100: ${h.rollMod}</span>
+    `;
+    lista.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>

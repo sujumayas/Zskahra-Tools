@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra — Simulador del Tiempo</title>
+<style>
+  :root {
+    --bg: #f3efe4;
+    --bg-surface: #fbf7ee;
+    --bg-muted: #e8dfcf;
+    --ink: #241f18;
+    --ink-soft: #645c4e;
+    --ink-faint: #948878;
+    --border: rgba(55, 42, 24, 0.16);
+    --border-strong: rgba(55, 42, 24, 0.32);
+    --accent: #76522f;
+    --amber: #c9852f;
+    --blue: #486f9f;
+    --green: #4e7c5d;
+    --violet: #6d538a;
+    --red: #a84a38;
+    --radius: 8px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --font-mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14130f;
+      --bg-surface: #211d17;
+      --bg-muted: #2c261d;
+      --ink: #efe5d1;
+      --ink-soft: #b4a891;
+      --ink-faint: #7f735f;
+      --border: rgba(239, 229, 209, 0.14);
+      --border-strong: rgba(239, 229, 209, 0.32);
+      --accent: #d0a46c;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button, input {
+    font: inherit;
+  }
+
+  .app {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 3rem;
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--ink-soft);
+    font-size: 13px;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+  }
+
+  .back:hover { color: var(--accent); }
+
+  .header {
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .header h1 {
+    margin: 0 0 0.25rem;
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .header p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+    max-width: 760px;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.9fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+
+  .sky-panel { padding: 0; overflow: hidden; }
+
+  .sky {
+    position: relative;
+    min-height: 430px;
+    overflow: hidden;
+    background:
+      linear-gradient(to bottom, rgba(255,255,255,0.16), transparent 34%),
+      linear-gradient(to bottom, #597fa4 0%, #d8a56a 62%, #4d4036 100%);
+    isolation: isolate;
+    transition: background 0.25s ease;
+  }
+
+  .sky::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+    background-size: 56px 56px;
+    opacity: 0.18;
+    z-index: 1;
+  }
+
+  .sky::after {
+    content: "";
+    position: absolute;
+    left: -5%;
+    right: -5%;
+    bottom: -10%;
+    height: 31%;
+    background:
+      linear-gradient(to bottom, rgba(49, 69, 45, 0.68), rgba(27, 35, 28, 0.92)),
+      repeating-linear-gradient(92deg, transparent 0 22px, rgba(255,255,255,0.04) 22px 23px);
+    clip-path: polygon(0 44%, 9% 38%, 18% 46%, 31% 32%, 47% 41%, 59% 29%, 74% 42%, 90% 35%, 100% 45%, 100% 100%, 0 100%);
+    z-index: 2;
+  }
+
+  .sun,
+  .thlask {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    transition: left 0.22s ease, top 0.22s ease, opacity 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .sun {
+    width: clamp(42px, 8vw, 70px);
+    height: clamp(42px, 8vw, 70px);
+    background: radial-gradient(circle at 34% 32%, #fff4b9 0 18%, #ffd071 35%, #d97928 68%, #8f3a23 100%);
+    box-shadow: 0 0 24px rgba(255, 195, 88, 0.72), 0 0 74px rgba(238, 117, 44, 0.34);
+  }
+
+  .sun.secondary {
+    background: radial-gradient(circle at 36% 34%, #fff8cc 0 16%, #ffc65d 34%, #c75f2e 68%, #76301f 100%);
+  }
+
+  .thlask {
+    left: 77%;
+    top: 21%;
+    width: clamp(92px, 16vw, 158px);
+    height: clamp(92px, 16vw, 158px);
+    background:
+      radial-gradient(circle at 36% 32%, rgba(255,255,255,0.82), rgba(150, 185, 217, 0.58) 28%, rgba(74, 104, 146, 0.5) 56%, rgba(22, 33, 58, 0.72) 100%);
+    box-shadow: 0 0 45px rgba(123, 169, 218, 0.34), inset -18px -20px 34px rgba(8, 14, 27, 0.34);
+    opacity: 0.82;
+    z-index: 3;
+  }
+
+  .thlask-label {
+    position: absolute;
+    left: 77%;
+    top: calc(21% + 88px);
+    transform: translateX(-50%);
+    z-index: 4;
+    color: rgba(255,255,255,0.78);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-shadow: 0 1px 12px rgba(0,0,0,0.45);
+  }
+
+  .pulse-flash {
+    position: absolute;
+    inset: -20%;
+    background: radial-gradient(circle at var(--pulse-x, 50%) var(--pulse-y, 40%), rgba(255,255,230,0.78), rgba(255,207,99,0.2) 18%, transparent 42%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 4;
+    transition: opacity 0.16s ease;
+  }
+
+  .pulse-flash.active { opacity: 1; }
+
+  .ground-marker {
+    position: absolute;
+    left: 50%;
+    bottom: 18%;
+    width: 15px;
+    height: 78px;
+    transform: translateX(-50%);
+    background: linear-gradient(to right, #22190f, #735437 45%, #1f160f);
+    border-radius: 8px 8px 4px 4px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.32);
+    z-index: 6;
+  }
+
+  .ground-marker::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -16px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    background: #684a2c;
+  }
+
+  .shadow {
+    position: absolute;
+    left: 50%;
+    bottom: calc(18% - 4px);
+    width: 12px;
+    height: 92px;
+    border-radius: 999px;
+    transform-origin: 50% 0%;
+    z-index: 3;
+    background: linear-gradient(to bottom, rgba(34, 25, 18, 0.42), rgba(34, 25, 18, 0.03));
+    filter: blur(1px);
+    transition: transform 0.22s ease, height 0.22s ease, opacity 0.22s ease;
+  }
+
+  .shadow.secondary {
+    background: linear-gradient(to bottom, rgba(38, 27, 47, 0.34), rgba(38, 27, 47, 0.02));
+  }
+
+  .sky-caption {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5px;
+    background: var(--border);
+    border-top: 0.5px solid var(--border);
+  }
+
+  @media (max-width: 680px) {
+    .sky { min-height: 350px; }
+    .sky-caption { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  .metric {
+    background: var(--bg-surface);
+    padding: 0.85rem 0.95rem;
+    min-height: 76px;
+  }
+
+  .metric-label {
+    margin: 0 0 0.18rem;
+    color: var(--ink-faint);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .metric-value {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-serif);
+    font-size: 1.22rem;
+    line-height: 1.25;
+  }
+
+  .controls {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .control-group {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .control-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .control-head label,
+  .section-title {
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .control-head output {
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+  }
+
+  .number-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .step-input {
+    min-width: 0;
+    width: 100%;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--bg-muted) 58%, transparent);
+    color: var(--ink);
+    padding: 0.65rem 0.75rem;
+  }
+
+  .icon-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+
+  .icon-btn,
+  .topic-btn {
+    border: 0.5px solid var(--border);
+    background: var(--bg-surface);
+    color: var(--ink);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  }
+
+  .icon-btn {
+    height: 42px;
+    display: grid;
+    place-items: center;
+    font-size: 19px;
+  }
+
+  .icon-btn:hover,
+  .topic-btn:hover {
+    border-color: var(--border-strong);
+  }
+
+  .icon-btn:active,
+  .topic-btn:active {
+    transform: translateY(1px);
+  }
+
+  .date-box {
+    display: grid;
+    gap: 0.5rem;
+    background: var(--bg-muted);
+    border-radius: var(--radius);
+    padding: 0.9rem;
+  }
+
+  .date-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 0.5px solid var(--border);
+    padding-bottom: 0.45rem;
+  }
+
+  .date-line:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .date-line span:first-child {
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .date-line span:last-child {
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-align: right;
+  }
+
+  .timeline-panel {
+    margin-top: 1rem;
+  }
+
+  .year-track {
+    position: relative;
+    display: flex;
+    height: 76px;
+    overflow: hidden;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-muted);
+  }
+
+  .season-segment {
+    position: relative;
+    min-width: 0;
+    border: 0;
+    border-right: 0.5px solid rgba(255,255,255,0.42);
+    color: #fff;
+    cursor: pointer;
+    padding: 0.65rem 0.55rem;
+    text-align: left;
+    overflow: hidden;
+  }
+
+  .season-segment:last-child { border-right: 0; }
+
+  .season-segment span {
+    position: relative;
+    z-index: 1;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.38);
+  }
+
+  .season-segment .season-days {
+    margin-top: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    opacity: 0.85;
+  }
+
+  .year-cursor {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.2), 0 0 18px rgba(255,255,255,0.7);
+    transform: translateX(-1px);
+    pointer-events: none;
+  }
+
+  .pulse-ticks {
+    position: relative;
+    height: 16px;
+    margin-top: 0.45rem;
+  }
+
+  .pulse-tick {
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 12px;
+    background: var(--border-strong);
+  }
+
+  .pulse-tick.major {
+    height: 16px;
+    background: var(--accent);
+  }
+
+  .explain-panel {
+    margin-top: 1rem;
+  }
+
+  .topic-tabs {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.85rem;
+  }
+
+  .topic-btn {
+    padding: 0.48rem 0.72rem;
+    font-size: 13px;
+  }
+
+  .topic-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .topic-detail {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @media (max-width: 720px) {
+    .topic-detail { grid-template-columns: 1fr; }
+  }
+
+  .topic-detail h2 {
+    margin: 0 0 0.35rem;
+    font-family: var(--font-serif);
+    font-size: 1.55rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .topic-detail p {
+    margin: 0 0 0.7rem;
+    color: var(--ink-soft);
+  }
+
+  .formula {
+    margin: 0;
+    padding: 0.85rem;
+    background: var(--bg-muted);
+    border-radius: var(--radius);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+
+  .footer {
+    margin-top: 2.5rem;
+    border-top: 0.5px solid var(--border);
+    padding-top: 1.25rem;
+    color: var(--ink-faint);
+    font-size: 12px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <a href="index.html" class="back">&larr; Volver</a>
+
+  <header class="header">
+    <h1>Simulador del Tiempo</h1>
+    <p>Una lectura visual del año de Zskahra: los dos soles, el Pulso Gemelo, el Paso de 42 horas, los Ciclos y las cinco estaciones.</p>
+  </header>
+
+  <div class="layout">
+    <section class="panel sky-panel" aria-label="Cielo simulado">
+      <div class="sky" id="sky">
+        <div class="pulse-flash" id="pulse-flash"></div>
+        <div class="thlask" aria-hidden="true"></div>
+        <div class="thlask-label">Thlask fijo</div>
+        <div class="sun primary" id="sun-a" aria-hidden="true"></div>
+        <div class="sun secondary" id="sun-b" aria-hidden="true"></div>
+        <div class="shadow primary" id="shadow-a" aria-hidden="true"></div>
+        <div class="shadow secondary" id="shadow-b" aria-hidden="true"></div>
+        <div class="ground-marker" aria-hidden="true"></div>
+      </div>
+      <div class="sky-caption">
+        <div class="metric">
+          <p class="metric-label">Separación solar</p>
+          <p class="metric-value" id="metric-separation">0°</p>
+        </div>
+        <div class="metric">
+          <p class="metric-label">Luz relativa</p>
+          <p class="metric-value" id="metric-light">0%</p>
+        </div>
+        <div class="metric">
+          <p class="metric-label">Sombras</p>
+          <p class="metric-value" id="metric-shadows">dobles</p>
+        </div>
+        <div class="metric">
+          <p class="metric-label">Pulso</p>
+          <p class="metric-value" id="metric-pulse">no</p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel controls" aria-label="Controles del simulador">
+      <div class="control-group">
+        <div class="control-head">
+          <label for="step-range">Paso del año</label>
+          <output id="step-output">1 / 288</output>
+        </div>
+        <div class="number-row">
+          <input id="step-range" type="range" min="1" max="288" value="1">
+          <input id="step-number" class="step-input" type="number" min="1" max="288" value="1" aria-label="Paso del año">
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="control-head">
+          <label for="hour-range">Hora dentro del Paso</label>
+          <output id="hour-output">21.00 h</output>
+        </div>
+        <input id="hour-range" type="range" min="0" max="42" step="0.25" value="21">
+      </div>
+
+      <div class="icon-row">
+        <button class="icon-btn" id="prev-step" type="button" title="Paso anterior" aria-label="Paso anterior">&#x23EE;</button>
+        <button class="icon-btn" id="play-toggle" type="button" title="Reproducir" aria-label="Reproducir">&#x25B6;</button>
+        <button class="icon-btn" id="next-step" type="button" title="Paso siguiente" aria-label="Paso siguiente">&#x23ED;</button>
+        <button class="icon-btn" id="next-pulse" type="button" title="Próximo Pulso" aria-label="Próximo Pulso">&#x2609;</button>
+      </div>
+
+      <div class="control-group">
+        <div class="control-head">
+          <label for="speed-range">Velocidad</label>
+          <output id="speed-output">1.0x</output>
+        </div>
+        <input id="speed-range" type="range" min="0.5" max="4" step="0.5" value="1">
+      </div>
+
+      <div class="date-box" aria-live="polite">
+        <div class="date-line"><span>Estación</span><span id="date-season">Calma Brillante</span></div>
+        <div class="date-line"><span>Ciclo</span><span id="date-cycle">1 de 9</span></div>
+        <div class="date-line"><span>Pulso</span><span id="date-pulse">1 del ciclo</span></div>
+        <div class="date-line"><span>Paso del Pulso</span><span id="date-pulse-step">1 de 8</span></div>
+        <div class="date-line"><span>Modelo</span><span id="date-model">soles cercanos</span></div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="panel timeline-panel" aria-label="Año de Zskahra">
+    <p class="section-title">Año de 288 Pasos</p>
+    <div class="year-track" id="year-track"></div>
+    <div class="pulse-ticks" id="pulse-ticks"></div>
+  </section>
+
+  <section class="panel explain-panel" aria-label="Explicación del modelo">
+    <div class="topic-tabs" role="tablist">
+      <button class="topic-btn active" type="button" data-topic="soles">Dos soles</button>
+      <button class="topic-btn" type="button" data-topic="pulso">Pulso</button>
+      <button class="topic-btn" type="button" data-topic="unidades">Unidades</button>
+      <button class="topic-btn" type="button" data-topic="estaciones">Estaciones</button>
+      <button class="topic-btn" type="button" data-topic="modelo">Modelo</button>
+    </div>
+    <div class="topic-detail" id="topic-detail"></div>
+  </section>
+
+  <footer class="footer">ZSKAHRA · HARP Homebrew</footer>
+</main>
+
+<script>
+(function() {
+  const YEAR_STEPS = 288;
+  const HOURS_PER_STEP = 42;
+  const PULSE_STEPS = 8;
+  const PULSE_HOUR = 21;
+
+  const seasons = [
+    {
+      id: 'calma',
+      name: 'La Calma Brillante',
+      shortName: 'Calma Brillante',
+      start: 1,
+      end: 72,
+      color: '#c9852f',
+      label: 'soles cercanos y altos',
+      summary: 'Los soles salen de la Conjunción pero todavía viajan juntos, altos y fuertes. El resultado es calor máximo, campos productivos y criaturas más activas.',
+      math: 'Separación anual baja-media, altura solar alta, noche corta.'
+    },
+    {
+      id: 'velo',
+      name: 'El Velo',
+      shortName: 'El Velo',
+      start: 73,
+      end: 120,
+      color: '#4e7c5d',
+      label: 'distancia media',
+      summary: 'Los soles se separan a una distancia media. La luz se reparte mejor, las sombras se abren sin volverse extremas y las rutas son más predecibles.',
+      math: 'Separación anual media, altura solar moderada, luz estable.'
+    },
+    {
+      id: 'ciegos',
+      name: 'Los Días Ciegos',
+      shortName: 'Días Ciegos',
+      start: 121,
+      end: 156,
+      color: '#5f659f',
+      label: 'soles casi opuestos',
+      summary: 'Los soles llegan a la mayor separación aparente. Uno puede estar saliendo mientras el otro se pone; hay crepúsculos largos y horas de luz tenue.',
+      math: 'Separación anual máxima, altura solar baja, sombras cruzadas.'
+    },
+    {
+      id: 'despertar',
+      name: 'El Despertar Rojo',
+      shortName: 'Despertar Rojo',
+      start: 157,
+      end: 210,
+      color: '#a84a38',
+      label: 're-acercamiento bajo',
+      summary: 'Los soles empiezan a re-acercarse, pero todavía viajan bajos. La luz rasante vuelve rojo y naranja el mundo durante semanas.',
+      math: 'Separación decreciente, altura baja-media, tinte cálido alto.'
+    },
+    {
+      id: 'conjuncion',
+      name: 'La Conjunción',
+      shortName: 'Conjunción',
+      start: 211,
+      end: 288,
+      color: '#7a4f86',
+      label: 'el Gemelo casi unido',
+      summary: 'Los dos discos permanecen casi unidos. La luz se vuelve extrema y sostenida, casi no hay noche verdadera y los artefactos se comportan de forma inestable.',
+      math: 'Separación anual mínima, altura alta, intensidad máxima.'
+    }
+  ];
+
+  const topics = {
+    soles: {
+      title: 'Los dos soles',
+      body: [
+        'La herramienta trata los soles como dos discos que recorren el cielo durante cada Paso, pero no a la misma velocidad aparente. Cuando están cerca, las sombras casi coinciden; cuando se separan, las sombras se abren y pueden cruzarse.',
+        'La separación visible no es solo anual. El año define la amplitud máxima de cada estación, y el Pulso introduce una realineación breve cada ocho Pasos.'
+      ],
+      formula: 'separacionVisible = separacionEstacional(Paso) * ondaDelPulso(tiempo)\n\nondaDelPulso = abs(sin(PI * distanciaAlPulso / 8))'
+    },
+    pulso: {
+      title: 'El Pulso Gemelo',
+      body: [
+        'Cada octavo Paso es día de Pulso. En el simulador, el destello ocurre alrededor de la mitad del Paso, cuando ambos soles se superponen por un instante.',
+        'Durante la Conjunción el Pulso casi se pierde dentro del brillo general. Durante los Días Ciegos se siente como alivio: un encuentro breve de luz en una estación de penumbra.'
+      ],
+      formula: 'esDiaPulso = Paso % 8 === 0\nmomentoDelPulso = hora cercana a 21 dentro de ese Paso\nCiclo = ceil(Paso / 32)'
+    },
+    unidades: {
+      title: 'Pasos, Pulsos y Ciclos',
+      body: [
+        'Un Paso dura 42 horas. Ocho Pasos forman un Pulso, cuatro Pulsos forman un Ciclo y nueve Ciclos forman un Año.',
+        'La fecha que ves aquí usa la misma aritmética que el Oráculo de Clima, de modo que un mismo Paso cae en la misma estación y en el mismo Pulso en ambas herramientas.'
+      ],
+      formula: 'Paso = 42 horas\nPulso = 8 Pasos\nCiclo = 4 Pulsos = 32 Pasos\nAño = 9 Ciclos = 288 Pasos'
+    },
+    estaciones: {
+      title: 'Las cinco estaciones',
+      body: [
+        'Las estaciones no tienen la misma duración porque no representan meses iguales; representan tramos desiguales del baile aparente entre los soles.',
+        'El calor sube cuando los soles viajan cerca y altos. La penumbra aparece cuando están muy separados y bajos. El rojo domina cuando vuelven a acercarse en ángulo rasante.'
+      ],
+      formula: 'Calma 1-72 · Velo 73-120 · Ciegos 121-156\nDespertar 157-210 · Conjunción 211-288'
+    },
+    modelo: {
+      title: 'Modelo astronómico',
+      body: [
+        'La lectura física propuesta es que Zskahra es una luna habitada de Thlask y está bloqueada por marea. Por eso Thlask no sale ni se pone desde el hemisferio conocido.',
+        'Thlask orbita un sistema de dos soles. Los aldeanos no necesitan esa explicación: para ellos Thlask es el Hogar, el Edén o el Más Allá. El simulador usa el modelo solo para hacer coherentes el calendario, las sombras y las estaciones.'
+      ],
+      formula: 'Thlask fijo en el cielo = bloqueo por marea\nZskahra = luna habitada\nEstaciones = separación aparente + altura diaria de los dos soles'
+    }
+  };
+
+  const state = {
+    step: 1,
+    hour: 21,
+    speed: 1,
+    playing: false,
+    topic: 'soles',
+    timer: null
+  };
+
+  const els = {
+    sky: document.getElementById('sky'),
+    sunA: document.getElementById('sun-a'),
+    sunB: document.getElementById('sun-b'),
+    shadowA: document.getElementById('shadow-a'),
+    shadowB: document.getElementById('shadow-b'),
+    pulseFlash: document.getElementById('pulse-flash'),
+    stepRange: document.getElementById('step-range'),
+    stepNumber: document.getElementById('step-number'),
+    stepOutput: document.getElementById('step-output'),
+    hourRange: document.getElementById('hour-range'),
+    hourOutput: document.getElementById('hour-output'),
+    speedRange: document.getElementById('speed-range'),
+    speedOutput: document.getElementById('speed-output'),
+    playToggle: document.getElementById('play-toggle'),
+    prevStep: document.getElementById('prev-step'),
+    nextStep: document.getElementById('next-step'),
+    nextPulse: document.getElementById('next-pulse'),
+    yearTrack: document.getElementById('year-track'),
+    pulseTicks: document.getElementById('pulse-ticks'),
+    topicDetail: document.getElementById('topic-detail'),
+    metricSeparation: document.getElementById('metric-separation'),
+    metricLight: document.getElementById('metric-light'),
+    metricShadows: document.getElementById('metric-shadows'),
+    metricPulse: document.getElementById('metric-pulse'),
+    dateSeason: document.getElementById('date-season'),
+    dateCycle: document.getElementById('date-cycle'),
+    datePulse: document.getElementById('date-pulse'),
+    datePulseStep: document.getElementById('date-pulse-step'),
+    dateModel: document.getElementById('date-model')
+  };
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function smooth(t) {
+    return t * t * (3 - 2 * t);
+  }
+
+  function getSeason(step) {
+    return seasons.find(season => step >= season.start && step <= season.end) || seasons[0];
+  }
+
+  function getSeasonProgress(step, season) {
+    const span = season.end - season.start;
+    return span === 0 ? 0 : clamp((step - season.start) / span, 0, 1);
+  }
+
+  function getCycle(step) {
+    return Math.ceil(step / 32);
+  }
+
+  function getPulseInCycle(step) {
+    return Math.floor(((step - 1) % 32) / 8) + 1;
+  }
+
+  function isPulseDay(step) {
+    return step % PULSE_STEPS === 0;
+  }
+
+  function getPulseDistance(step, hour) {
+    const continuous = (step - 1) + (hour / HOURS_PER_STEP);
+    const firstPulse = (PULSE_STEPS - 1) + (PULSE_HOUR / HOURS_PER_STEP);
+    const cycles = Math.round((continuous - firstPulse) / PULSE_STEPS);
+    return continuous - (firstPulse + cycles * PULSE_STEPS);
+  }
+
+  function getPulseWave(step, hour) {
+    const distance = getPulseDistance(step, hour);
+    return Math.abs(Math.sin(Math.PI * distance / PULSE_STEPS));
+  }
+
+  function getSeasonProfile(step) {
+    const season = getSeason(step);
+    const p = smooth(getSeasonProgress(step, season));
+    let separation;
+    let height;
+    let warmth;
+    let red;
+    let dusk;
+
+    if (season.id === 'calma') {
+      separation = lerp(18, 54, p);
+      height = lerp(0.98, 0.9, p);
+      warmth = 0.92;
+      red = 0.08;
+      dusk = 0.16;
+    } else if (season.id === 'velo') {
+      separation = lerp(56, 92, p);
+      height = lerp(0.82, 0.72, p);
+      warmth = 0.64;
+      red = 0.12;
+      dusk = 0.28;
+    } else if (season.id === 'ciegos') {
+      separation = lerp(118, 164, Math.sin(Math.PI * getSeasonProgress(step, season)));
+      height = 0.46;
+      warmth = 0.32;
+      red = 0.18;
+      dusk = 0.62;
+    } else if (season.id === 'despertar') {
+      separation = lerp(138, 58, p);
+      height = lerp(0.48, 0.67, p);
+      warmth = lerp(0.45, 0.74, p);
+      red = 0.78;
+      dusk = lerp(0.54, 0.32, p);
+    } else {
+      separation = 10 + 13 * Math.sin(Math.PI * getSeasonProgress(step, season));
+      height = 0.96;
+      warmth = 1;
+      red = 0.22;
+      dusk = 0.1;
+    }
+
+    return { season, separation, height, warmth, red, dusk };
+  }
+
+  function getSunPosition(phase, profile, side) {
+    const visible = phase >= 0 && phase <= 1;
+    const clamped = clamp(phase, 0, 1);
+    const arc = Math.sin(Math.PI * clamped);
+    const peak = 54 * profile.height;
+    const lowShift = profile.season.id === 'ciegos' ? 9 : profile.season.id === 'despertar' ? 6 : 0;
+    const wave = side === 'a' ? Math.sin(clamped * Math.PI * 2) : Math.cos(clamped * Math.PI * 2);
+    const x = 7 + clamped * 86;
+    const y = 79 - arc * peak + lowShift + wave * 2;
+    const opacity = visible ? lerp(0.38, 1, arc) : 0.16;
+    return { x, y, arc, opacity, visible };
+  }
+
+  function getSkyColors(profile, light, hourRatio) {
+    const night = 1 - clamp(light, 0, 1);
+    const dawnBand = Math.sin(Math.PI * hourRatio);
+    const top = mixColor([21, 29, 54], [88, 128, 165], clamp(light + profile.warmth * 0.1, 0, 1));
+    const midWarm = [
+      Math.round(216 + profile.red * 18),
+      Math.round(154 - profile.red * 42),
+      Math.round(96 - profile.red * 22)
+    ];
+    const mid = mixColor([42, 44, 69], midWarm, clamp(light * 0.88 + dawnBand * 0.14, 0, 1));
+    const low = mixColor([37, 33, 43], [92, 74, 54], clamp(light + profile.dusk * 0.24, 0, 1));
+    const haze = Math.round(16 + profile.dusk * 26 + night * 10);
+    return {
+      background: 'linear-gradient(to bottom, ' + rgb(top) + ' 0%, ' + rgb(mid) + ' 58%, ' + rgb(low) + ' 100%)',
+      haze
+    };
+  }
+
+  function mixColor(a, b, t) {
+    const amount = clamp(t, 0, 1);
+    return [
+      Math.round(lerp(a[0], b[0], amount)),
+      Math.round(lerp(a[1], b[1], amount)),
+      Math.round(lerp(a[2], b[2], amount))
+    ];
+  }
+
+  function rgb(parts) {
+    return 'rgb(' + parts.join(',') + ')';
+  }
+
+  function setSun(el, pos, scale) {
+    el.style.left = pos.x + '%';
+    el.style.top = pos.y + '%';
+    el.style.opacity = pos.opacity;
+    el.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(3) + ')';
+  }
+
+  function setShadow(el, sunPos, arc, intensity) {
+    const objectX = 50;
+    const objectY = 80;
+    const dx = objectX - sunPos.x;
+    const dy = objectY - sunPos.y;
+    const angle = Math.atan2(dx, Math.max(8, dy)) * 180 / Math.PI;
+    const length = clamp(50 + (1 - arc) * 92, 46, 136);
+    el.style.transform = 'translateX(-50%) rotate(' + angle.toFixed(2) + 'deg)';
+    el.style.height = length.toFixed(0) + 'px';
+    el.style.opacity = clamp(intensity * (0.28 + arc * 0.78), 0.05, 0.78);
+  }
+
+  function renderTimeline() {
+    els.yearTrack.innerHTML = '';
+    seasons.forEach(season => {
+      const width = ((season.end - season.start + 1) / YEAR_STEPS) * 100;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'season-segment';
+      button.style.width = width + '%';
+      button.style.background = 'linear-gradient(135deg, ' + season.color + ', rgba(30,24,18,0.82))';
+      button.title = season.name + ' · Pasos ' + season.start + '-' + season.end;
+      button.innerHTML = '<span>' + season.shortName + '</span><span class="season-days">' + season.start + '-' + season.end + '</span>';
+      button.addEventListener('click', () => {
+        state.step = season.start;
+        state.hour = PULSE_HOUR;
+        syncControls();
+        render();
+      });
+      els.yearTrack.appendChild(button);
+    });
+
+    const cursor = document.createElement('div');
+    cursor.className = 'year-cursor';
+    cursor.id = 'year-cursor';
+    els.yearTrack.appendChild(cursor);
+
+    els.pulseTicks.innerHTML = '';
+    for (let step = PULSE_STEPS; step <= YEAR_STEPS; step += PULSE_STEPS) {
+      const tick = document.createElement('span');
+      tick.className = 'pulse-tick' + (step % 32 === 0 ? ' major' : '');
+      tick.style.left = ((step - 0.5) / YEAR_STEPS * 100) + '%';
+      els.pulseTicks.appendChild(tick);
+    }
+  }
+
+  function renderTopic() {
+    document.querySelectorAll('.topic-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.topic === state.topic);
+    });
+    const topic = topics[state.topic];
+    els.topicDetail.innerHTML = [
+      '<div>',
+      '<h2>' + topic.title + '</h2>',
+      topic.body.map(text => '<p>' + text + '</p>').join(''),
+      '</div>',
+      '<pre class="formula">' + topic.formula + '</pre>'
+    ].join('');
+  }
+
+  function syncControls() {
+    els.stepRange.value = state.step;
+    els.stepNumber.value = state.step;
+    els.stepOutput.textContent = state.step + ' / ' + YEAR_STEPS;
+    els.hourRange.value = state.hour;
+    els.hourOutput.textContent = Number(state.hour).toFixed(2) + ' h';
+    els.speedRange.value = state.speed;
+    els.speedOutput.textContent = Number(state.speed).toFixed(1) + 'x';
+  }
+
+  function render() {
+    const profile = getSeasonProfile(state.step);
+    const pulseWave = getPulseWave(state.step, state.hour);
+    const separation = profile.separation * pulseWave;
+    const hourRatio = state.hour / HOURS_PER_STEP;
+    const midpoint = hourRatio;
+    const phaseOffset = (separation / 180) * 0.42;
+    const posA = getSunPosition(midpoint - phaseOffset, profile, 'a');
+    const posB = getSunPosition(midpoint + phaseOffset, profile, 'b');
+    const pulseDistance = Math.abs(getPulseDistance(state.step, state.hour));
+    const pulseMoment = isPulseDay(state.step) && pulseDistance < 0.055;
+    const light = clamp((posA.arc + posB.arc) * 0.39 + profile.warmth * 0.34 + (pulseMoment ? 0.18 : 0), 0, 1.2);
+    const lightPercent = Math.round(clamp(light / 1.15, 0, 1) * 100);
+    const sunScale = profile.season.id === 'conjuncion' ? 1.12 : profile.season.id === 'ciegos' ? 0.88 : 1;
+    const skyColors = getSkyColors(profile, light, hourRatio);
+
+    els.sky.style.background = skyColors.background;
+    els.sky.style.setProperty('--pulse-x', ((posA.x + posB.x) / 2) + '%');
+    els.sky.style.setProperty('--pulse-y', ((posA.y + posB.y) / 2) + '%');
+    els.sky.style.boxShadow = 'inset 0 0 ' + skyColors.haze + 'px rgba(255,232,181,0.24)';
+    els.pulseFlash.classList.toggle('active', pulseMoment);
+
+    setSun(els.sunA, posA, sunScale);
+    setSun(els.sunB, posB, sunScale * 0.97);
+    setShadow(els.shadowA, posA, posA.arc, light);
+    setShadow(els.shadowB, posB, posB.arc, light);
+
+    const shadowsLabel = separation < 9 ? 'casi una' : separation > 95 ? 'abiertas' : 'dobles';
+    const pulseLabel = pulseMoment ? 'destello' : isPulseDay(state.step) ? 'hoy' : 'no';
+
+    els.metricSeparation.textContent = Math.round(separation) + '°';
+    els.metricLight.textContent = lightPercent + '%';
+    els.metricShadows.textContent = shadowsLabel;
+    els.metricPulse.textContent = pulseLabel;
+
+    els.dateSeason.textContent = profile.season.name;
+    els.dateCycle.textContent = getCycle(state.step) + ' de 9';
+    els.datePulse.textContent = getPulseInCycle(state.step) + ' del ciclo';
+    els.datePulseStep.textContent = (((state.step - 1) % 8) + 1) + ' de 8';
+    els.dateModel.textContent = profile.season.label;
+
+    const cursor = document.getElementById('year-cursor');
+    if (cursor) {
+      cursor.style.left = (((state.step - 1) + hourRatio) / YEAR_STEPS * 100) + '%';
+    }
+
+    syncControls();
+  }
+
+  function setStep(value) {
+    state.step = clamp(Math.round(Number(value) || 1), 1, YEAR_STEPS);
+    render();
+  }
+
+  function setHour(value) {
+    state.hour = clamp(Number(value) || 0, 0, HOURS_PER_STEP);
+    render();
+  }
+
+  function advanceHours(delta) {
+    state.hour += delta;
+    while (state.hour >= HOURS_PER_STEP) {
+      state.hour -= HOURS_PER_STEP;
+      state.step = state.step >= YEAR_STEPS ? 1 : state.step + 1;
+    }
+    while (state.hour < 0) {
+      state.hour += HOURS_PER_STEP;
+      state.step = state.step <= 1 ? YEAR_STEPS : state.step - 1;
+    }
+    render();
+  }
+
+  function setPlaying(playing) {
+    state.playing = playing;
+    els.playToggle.innerHTML = playing ? '&#x23F8;' : '&#x25B6;';
+    els.playToggle.title = playing ? 'Pausar' : 'Reproducir';
+    els.playToggle.setAttribute('aria-label', els.playToggle.title);
+    if (state.timer) {
+      window.clearInterval(state.timer);
+      state.timer = null;
+    }
+    if (playing) {
+      state.timer = window.setInterval(() => advanceHours(0.5 * state.speed), 170);
+    }
+  }
+
+  function jumpToNextPulse() {
+    const beforeCurrentPulse = isPulseDay(state.step) && state.hour < PULSE_HOUR;
+    if (beforeCurrentPulse) {
+      state.hour = PULSE_HOUR;
+    } else {
+      const remainder = state.step % PULSE_STEPS;
+      const jump = remainder === 0 ? PULSE_STEPS : PULSE_STEPS - remainder;
+      state.step += jump;
+      if (state.step > YEAR_STEPS) state.step -= YEAR_STEPS;
+      state.hour = PULSE_HOUR;
+    }
+    render();
+  }
+
+  function bindEvents() {
+    els.stepRange.addEventListener('input', event => setStep(event.target.value));
+    els.stepNumber.addEventListener('input', event => setStep(event.target.value));
+    els.hourRange.addEventListener('input', event => setHour(event.target.value));
+    els.speedRange.addEventListener('input', event => {
+      state.speed = Number(event.target.value);
+      syncControls();
+      if (state.playing) setPlaying(true);
+    });
+    els.prevStep.addEventListener('click', () => {
+      state.step = state.step <= 1 ? YEAR_STEPS : state.step - 1;
+      render();
+    });
+    els.nextStep.addEventListener('click', () => {
+      state.step = state.step >= YEAR_STEPS ? 1 : state.step + 1;
+      render();
+    });
+    els.playToggle.addEventListener('click', () => setPlaying(!state.playing));
+    els.nextPulse.addEventListener('click', jumpToNextPulse);
+
+    document.querySelectorAll('.topic-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.topic = btn.dataset.topic;
+        renderTopic();
+      });
+    });
+  }
+
+  renderTimeline();
+  renderTopic();
+  bindEvents();
+  render();
+})();
+</script>
+</body>
+</html>

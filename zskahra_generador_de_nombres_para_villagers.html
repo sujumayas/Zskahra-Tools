@@ -143,6 +143,15 @@ button.secondary:hover { background: var(--bg-secondary); }
 .suffix-panel { display: none; }
 .note { font-size: 12px; color: var(--text-hint); margin-top: 6px; line-height: 1.5; }
 
+.villa-actions { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+.link-btn {
+  background: none; border: none; padding: 0;
+  font: inherit; font-size: 12px; color: var(--text-info);
+  cursor: pointer; letter-spacing: 0.02em;
+}
+.link-btn:hover { text-decoration: underline; }
+.link-sep { font-size: 12px; color: var(--text-hint); }
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { opacity: 1; }
 </style>
@@ -157,32 +166,29 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
   <p>Raza nueva — villa, sufijo de hito social, edad y trasfondo</p>
 </header>
 
-<!-- VILLA Y CANTIDAD -->
+<!-- VILLAS DE ORIGEN -->
 <div class="block">
-  <div class="section-label">Villa de origen</div>
-  <select id="villa-sel">
-    <option value="">— Sin villa (nómada / exiliado)</option>
-    <optgroup label="Villas del lago">
-      <option value="Halvar">Halvar — sal</option>
-      <option value="Ikhmar">Ikhmar — pescado y algas</option>
-    </optgroup>
-    <optgroup label="Villas centrales">
-      <option value="Siteth">Siteth — grano</option>
-      <option value="Karven">Karven — huertos</option>
-      <option value="Poymel">Poymel — ganado</option>
-      <option value="Ydral">Ydral — agua dulce</option>
-      <option value="Logven">Logven — archivo y memoria</option>
-    </optgroup>
-    <optgroup label="Villas de oficio">
-      <option value="Litor">Litor — piedra</option>
-      <option value="Kalvek">Kalvek — metal y forja</option>
-      <option value="Hisven">Hisven — textiles</option>
-    </optgroup>
-    <optgroup label="Villas de frontera">
-      <option value="Theriv">Theriv — caza</option>
-      <option value="Ksilnar">Ksilnar — madera</option>
-    </optgroup>
-  </select>
+  <div class="section-label">Villas de origen</div>
+  <div class="toggle-row">
+    <input type="checkbox" id="incluir-nomadas">
+    <label for="incluir-nomadas">Incluir nómadas / exiliados (sin villa)</label>
+  </div>
+  <div class="villa-actions">
+    <button type="button" class="link-btn" id="villa-all">Seleccionar todas</button>
+    <span class="link-sep">·</span>
+    <button type="button" class="link-btn" id="villa-clear">Limpiar</button>
+  </div>
+  <div id="villa-panel">
+    <div class="cat-label">Villas del lago</div>
+    <div class="suffix-grid" id="grid-villa-lago"></div>
+    <div class="cat-label">Villas centrales</div>
+    <div class="suffix-grid" id="grid-villa-central"></div>
+    <div class="cat-label">Villas de oficio</div>
+    <div class="suffix-grid" id="grid-villa-oficio"></div>
+    <div class="cat-label">Villas de frontera</div>
+    <div class="suffix-grid" id="grid-villa-frontera"></div>
+  </div>
+  <p class="note">Si marcas varias villas, los personajes se reparten equitativamente entre ellas.</p>
 </div>
 
 <div class="block row-3">
@@ -363,7 +369,24 @@ const catMap = {
   heridas:"grid-heridas", movilidad:"grid-movilidad"
 };
 
+const villas = [
+  { name:"Halvar",  grupo:"lago",     desc:"sal" },
+  { name:"Ikhmar",  grupo:"lago",     desc:"pescado y algas" },
+  { name:"Siteth",  grupo:"central",  desc:"grano" },
+  { name:"Karven",  grupo:"central",  desc:"huertos" },
+  { name:"Poymel",  grupo:"central",  desc:"ganado" },
+  { name:"Ydral",   grupo:"central",  desc:"agua dulce" },
+  { name:"Logven",  grupo:"central",  desc:"archivo y memoria" },
+  { name:"Litor",   grupo:"oficio",   desc:"piedra" },
+  { name:"Kalvek",  grupo:"oficio",   desc:"metal y forja" },
+  { name:"Hisven",  grupo:"oficio",   desc:"textiles" },
+  { name:"Theriv",  grupo:"frontera", desc:"caza" },
+  { name:"Ksilnar", grupo:"frontera", desc:"madera" },
+];
+const villaGridMap = { lago:"grid-villa-lago", central:"grid-villa-central", oficio:"grid-villa-oficio", frontera:"grid-villa-frontera" };
+
 let selectedSuffixes = new Set();
+let selectedVillas = new Set();
 
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function randInt(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
@@ -380,6 +403,41 @@ function buildGrids() {
       grid.appendChild(btn);
     });
   }
+}
+
+function buildVillaGrid() {
+  for (const [grupo, gridId] of Object.entries(villaGridMap)) {
+    const grid = document.getElementById(gridId);
+    villas.filter(v => v.grupo === grupo).forEach(v => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "suffix-btn";
+      btn.dataset.villa = v.name;
+      btn.innerHTML = `<div class="suffix-code">${v.name}</div><div class="suffix-meaning">${v.desc}</div>`;
+      btn.onclick = () => toggleVilla(v.name, btn);
+      grid.appendChild(btn);
+    });
+  }
+}
+
+function toggleVilla(name, btn) {
+  if (selectedVillas.has(name)) {
+    selectedVillas.delete(name);
+    btn.classList.remove("selected");
+  } else {
+    selectedVillas.add(name);
+    btn.classList.add("selected");
+  }
+}
+
+function selectAllVillas() {
+  selectedVillas = new Set(villas.map(v => v.name));
+  document.querySelectorAll("[data-villa]").forEach(b => b.classList.add("selected"));
+}
+
+function clearVillas() {
+  selectedVillas.clear();
+  document.querySelectorAll("[data-villa]").forEach(b => b.classList.remove("selected"));
 }
 
 function toggleSuffix(s, btn) {
@@ -441,21 +499,54 @@ function pickSufijo(villa) {
   }
 }
 
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function buildAsignaciones(pool, cantidad) {
+  const base = Math.floor(cantidad / pool.length);
+  const extra = cantidad % pool.length;
+  const ganadores = shuffle([...pool]).slice(0, extra);
+  const ganadoresSet = new Set(ganadores);
+  const asignaciones = [];
+  pool.forEach(v => {
+    const slots = base + (ganadoresSet.has(v) ? 1 : 0);
+    for (let i = 0; i < slots; i++) asignaciones.push(v);
+  });
+  return shuffle(asignaciones);
+}
+
 function generar() {
-  const villa = document.getElementById("villa-sel").value;
+  const villasMarcadas = [...selectedVillas];
+  const incluirNomadas = document.getElementById("incluir-nomadas").checked;
+  const pool = [...villasMarcadas];
+  if (incluirNomadas) pool.push("");
+
   const cantidad = Math.min(15, Math.max(1, parseInt(document.getElementById("cantidad").value) || 1));
   const conEdad = document.getElementById("edad-opt").value === "si";
   const conBg = document.getElementById("bg-opt").value === "si";
   const sinSufijo = document.getElementById("no-suffix").checked;
   const isRandom = document.getElementById("random-suffix").checked;
 
+  if (pool.length === 0) {
+    alert("Marca al menos una villa o activa 'Incluir nómadas'.");
+    return;
+  }
+
   if (!sinSufijo && !isRandom && selectedSuffixes.size === 0) {
     alert("Elige al menos un sufijo, activa la opción aleatoria, o marca 'sin sufijo'.");
     return;
   }
 
+  const asignaciones = buildAsignaciones(pool, cantidad);
+
   const resultados = [];
   for (let i = 0; i < cantidad; i++) {
+    const villa = asignaciones[i];
     let sufKey, sufObj, nombre, nombreCompleto, edad, bg;
     const base = rand(raices);
 
@@ -494,6 +585,7 @@ function generar() {
       html += `<span class="pill" style="font-style:italic;">sin sufijo</span>`;
     }
     if (r.villa) html += `<span class="pill">${r.villa}</span>`;
+    else html += `<span class="pill" style="font-style:italic;">Nómada</span>`;
     if (r.edad !== null) html += `<span class="pill">${r.edad} años</span>`;
     html += `</div>`;
     html += `<hr class="result-divider">`;
@@ -536,6 +628,9 @@ function limpiar() {
 }
 
 buildGrids();
+buildVillaGrid();
+document.getElementById("villa-all").addEventListener("click", selectAllVillas);
+document.getElementById("villa-clear").addEventListener("click", clearVillas);
 
 // Lightbox
 (function() {

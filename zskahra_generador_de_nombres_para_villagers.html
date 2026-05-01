@@ -141,25 +141,20 @@ button.secondary:hover { background: var(--bg-secondary); }
 .results-wrap { margin-top: 2rem; }
 .results-header {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
-  color: var(--text-hint); font-weight: 500; margin-bottom: 12px;
+  color: var(--text-hint); font-weight: 500; margin-bottom: 10px;
   display: flex; justify-content: space-between; align-items: center;
+}
+.results-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px;
 }
 .result-item {
   background: var(--bg-card); border: 0.5px solid var(--border);
-  border-radius: var(--radius-lg); padding: 1.1rem 1.3rem; margin-bottom: 10px;
+  border-radius: var(--radius-md); padding: 9px 13px;
 }
-.result-name { font-size: 24px; font-weight: 500; color: var(--text); letter-spacing: 0.01em; }
-.result-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.pill {
-  font-size: 11px; padding: 3px 9px; border-radius: 20px;
-  border: 0.5px solid var(--border); background: var(--bg-secondary);
-  color: var(--text-muted);
-}
-.pill.accent { background: var(--bg-info); color: var(--text-info); border-color: var(--border-info); }
-.result-divider { border: none; border-top: 0.5px solid var(--border); margin: 10px 0; }
-.result-bg { font-size: 13px; color: var(--text-muted); line-height: 1.6; font-style: italic; }
-.result-cuando { font-size: 12px; color: var(--text-hint); line-height: 1.5; margin-top: 6px; }
-.result-cuando strong { color: var(--text-muted); font-weight: 500; }
+.result-name { font-size: 17px; font-weight: 500; color: var(--text); letter-spacing: 0.01em; }
+.result-sig { font-size: 13px; color: var(--text-info); font-weight: 400; }
 
 .note { font-size: 12px; color: var(--text-hint); margin-top: 6px; line-height: 1.5; }
 
@@ -212,25 +207,9 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
 </div>
 
 <!-- OPCIONES -->
-<div class="block row-3">
-  <div>
-    <div class="section-label">Cantidad</div>
-    <input type="number" id="cantidad" min="1" max="30" value="10">
-  </div>
-  <div>
-    <div class="section-label">Incluir edad</div>
-    <select id="edad-opt">
-      <option value="si">Sí, con rangos realistas</option>
-      <option value="no">No</option>
-    </select>
-  </div>
-  <div>
-    <div class="section-label">Incluir trasfondo</div>
-    <select id="bg-opt">
-      <option value="si">Sí, frase corta</option>
-      <option value="no">No</option>
-    </select>
-  </div>
+<div class="block" style="max-width:160px;">
+  <div class="section-label">Cantidad</div>
+  <input type="number" id="cantidad" min="1" max="30" value="10">
 </div>
 
 <div class="btn-row">
@@ -243,7 +222,7 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
   <div class="results-header">
     <span id="results-count"></span>
   </div>
-  <div id="results-list"></div>
+  <div class="results-list" id="results-list"></div>
 </div>
 
 <figure style="margin:1.5rem auto 0;max-width:420px;border-radius:var(--radius-lg);overflow:hidden;border:0.5px solid var(--border);background:var(--bg-card);cursor:pointer;transition:border-color .15s;" id="nombres-illus">
@@ -322,19 +301,6 @@ const sufijos = [
     bgs:["salió por curiosidad y volvió por deber","ha visto villas que otros solo conocen de nombre","lleva un mapa mental que no ha compartido con nadie","el camino le cambió algo que no sabe nombrar","la primera vez que salió tuvo más miedo del que admite"] },
 ];
 
-const sinSufijoData = {
-  edadMin: 10, edadMax: 18,
-  bgs: [
-    "aún no ha matado su primera criatura, pero ya ha visto lo que hacen",
-    "creció en la villa sin salir nunca más allá del perímetro",
-    "nadie le ha puesto un sufijo todavía, aunque él ya se siente listo",
-    "todavía aprende el oficio de su familia, sin certificar",
-    "es demasiado joven para la mayoría de cosas que ya ha visto",
-    "la villa lo conoce solo por su nombre, y eso por ahora le basta",
-    "está en ese punto en que el mundo aún no lo ha marcado formalmente"
-  ]
-};
-
 const raices = [
   "Arnd","Bel","Dal","Drav","Dur","Eld","Fal","Garm","Hal","Hask",
   "Ird","Kel","Lar","Lex","Mir","Nal","Orm","Pel","Pev","Rak",
@@ -359,7 +325,6 @@ let selectedSuffixes = new Set();
 let incluirSinSufijo = false;
 
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
 
 function buildGrids() {
   for (const [cat, gridId] of Object.entries(catMap)) {
@@ -442,51 +407,24 @@ function generar() {
   }
 
   const cantidad = Math.min(30, Math.max(1, parseInt(document.getElementById("cantidad").value) || 10));
-  const conEdad = document.getElementById("edad-opt").value === "si";
-  const conBg = document.getElementById("bg-opt").value === "si";
 
   const resultados = [];
   for (let i = 0; i < cantidad; i++) {
     const base = rand(raices);
     const sufKey = rand(pool);
     const sufObj = sufKey ? sufijos.find(s => s.s === sufKey) : null;
-
     const nombre = sufKey ? (base + sufKey.slice(1)) : base;
-    const edad = conEdad
-      ? (sufObj ? randInt(sufObj.edadMin, sufObj.edadMax) : randInt(sinSufijoData.edadMin, sinSufijoData.edadMax))
-      : null;
-    const bg = conBg
-      ? (sufObj ? rand(sufObj.bgs) : rand(sinSufijoData.bgs))
-      : null;
-
-    resultados.push({ nombre, sufObj, sufKey, edad, bg });
+    resultados.push({ nombre, sufObj });
   }
 
   const wrap = document.getElementById("results-wrap");
   const list = document.getElementById("results-list");
   document.getElementById("results-count").textContent =
-    resultados.length === 1 ? "1 personaje generado" : `${resultados.length} personajes generados`;
+    resultados.length === 1 ? "1 nombre generado" : `${resultados.length} nombres generados`;
 
   list.innerHTML = resultados.map(r => {
-    let html = `<div class="result-item">`;
-    html += `<div class="result-name">${r.nombre}</div>`;
-    html += `<div class="result-pills">`;
-    if (r.sufObj) {
-      html += `<span class="pill accent">${r.sufObj.s} — ${r.sufObj.sig}</span>`;
-    } else {
-      html += `<span class="pill" style="font-style:italic;">sin sufijo</span>`;
-    }
-    if (r.edad !== null) html += `<span class="pill">${r.edad} años</span>`;
-    html += `</div>`;
-    html += `<hr class="result-divider">`;
-    if (r.bg) html += `<div class="result-bg">${r.bg.charAt(0).toUpperCase() + r.bg.slice(1)}.</div>`;
-    if (r.sufObj) {
-      html += `<div class="result-cuando"><strong>Sufijo otorgado cuando:</strong> ${r.sufObj.cuando}</div>`;
-    } else {
-      html += `<div class="result-cuando">La villa aún no ha reconocido ningún hito en este personaje.</div>`;
-    }
-    html += `</div>`;
-    return html;
+    const sig = r.sufObj ? `<span class="result-sig"> (${r.sufObj.sig})</span>` : "";
+    return `<div class="result-item"><span class="result-name">${r.nombre}</span>${sig}</div>`;
   }).join("");
 
   wrap.style.display = "block";
@@ -499,13 +437,9 @@ function generar() {
 function copiarTodo() {
   if (!window._resultados) return;
   const texto = window._resultados.map(r => {
-    let linea = r.nombre;
-    if (r.edad !== null) linea += ` · ${r.edad} años`;
-    if (r.sufObj) linea += ` · ${r.sufObj.s} (${r.sufObj.sig})`;
-    else linea += ` · sin sufijo`;
-    if (r.bg) linea += `\n  ${r.bg.charAt(0).toUpperCase() + r.bg.slice(1)}.`;
-    return linea;
-  }).join("\n\n");
+    if (r.sufObj) return `${r.nombre} (${r.sufObj.sig})`;
+    return r.nombre;
+  }).join("\n");
   navigator.clipboard.writeText(texto).catch(() => {});
   const btn = document.getElementById("btn-copy");
   btn.textContent = "Copiado";

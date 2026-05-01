@@ -79,26 +79,47 @@ select:focus, input[type=number]:focus { outline: none; border-color: var(--bord
 .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
-.toggle-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
-.toggle-row input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--border-info); flex-shrink: 0; }
-.toggle-row label { font-size: 13px; color: var(--text-muted); cursor: pointer; }
-
 .cat-label {
   font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em;
   color: var(--text-hint); font-weight: 500; margin: 1.1rem 0 6px;
 }
-.suffix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 6px; }
+.suffix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
 
 .suffix-btn {
   background: var(--bg-secondary); border: 0.5px solid var(--border);
-  border-radius: var(--radius-md); padding: 7px 9px; cursor: pointer;
+  border-radius: var(--radius-md); padding: 8px 11px; cursor: pointer;
   text-align: left; transition: border-color 0.12s, background 0.12s; color: var(--text);
+  font-size: 13px; font-family: inherit;
+  display: flex; align-items: baseline; gap: 5px;
 }
 .suffix-btn:hover { border-color: var(--border-med); }
 .suffix-btn.selected { border: 1.5px solid var(--border-info); background: var(--bg-info); }
-.suffix-code { font-size: 13px; font-weight: 500; color: var(--text-info); }
-.suffix-meaning { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.3; }
-.suffix-btn.selected .suffix-meaning { color: var(--text-info); opacity: 0.85; }
+.suffix-code { font-weight: 600; color: var(--text-info); white-space: nowrap; }
+.suffix-sig { color: var(--text-muted); font-size: 12px; }
+.suffix-btn.selected .suffix-sig { color: var(--text-info); opacity: 0.85; }
+
+.no-suffix-btn {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  background: var(--bg-secondary); border: 0.5px solid var(--border);
+  border-radius: var(--radius-md); padding: 8px 11px; cursor: pointer;
+  text-align: left; transition: border-color 0.12s, background 0.12s; color: var(--text);
+  font-size: 13px; font-family: inherit; margin-top: 10px;
+}
+.no-suffix-btn:hover { border-color: var(--border-med); }
+.no-suffix-btn.selected { border: 1.5px solid var(--border-info); background: var(--bg-info); }
+.no-suffix-btn .suffix-code { color: var(--text-muted); font-style: italic; font-weight: 500; }
+.no-suffix-btn.selected .suffix-code { color: var(--text-info); }
+.no-suffix-btn .suffix-sig { color: var(--text-hint); font-size: 12px; }
+.no-suffix-btn.selected .suffix-sig { color: var(--text-info); opacity: 0.85; }
+
+.suffix-actions { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+.link-btn {
+  background: none; border: none; padding: 0;
+  font: inherit; font-size: 12px; color: var(--text-info);
+  cursor: pointer; letter-spacing: 0.02em;
+}
+.link-btn:hover { text-decoration: underline; }
+.link-sep { font-size: 12px; color: var(--text-hint); }
 
 .btn-row { display: flex; gap: 10px; margin-top: 1.5rem; flex-wrap: wrap; align-items: center; }
 
@@ -140,17 +161,7 @@ button.secondary:hover { background: var(--bg-secondary); }
 .result-cuando { font-size: 12px; color: var(--text-hint); line-height: 1.5; margin-top: 6px; }
 .result-cuando strong { color: var(--text-muted); font-weight: 500; }
 
-.suffix-panel { display: none; }
 .note { font-size: 12px; color: var(--text-hint); margin-top: 6px; line-height: 1.5; }
-
-.villa-actions { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
-.link-btn {
-  background: none; border: none; padding: 0;
-  font: inherit; font-size: 12px; color: var(--text-info);
-  cursor: pointer; letter-spacing: 0.02em;
-}
-.link-btn:hover { text-decoration: underline; }
-.link-sep { font-size: 12px; color: var(--text-hint); }
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { opacity: 1; }
@@ -163,38 +174,48 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
    onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-muted)'">&larr; Volver</a>
 <header>
   <h1>Zskahra · Generador de nombres</h1>
-  <p>Raza nueva — villa, sufijo de hito social, edad y trasfondo</p>
+  <p>Elige los sufijos a incluir y cuántos nombres generar</p>
 </header>
 
-<!-- VILLAS DE ORIGEN -->
+<!-- SUFIJOS -->
 <div class="block">
-  <div class="section-label">Villas de origen</div>
-  <div class="toggle-row">
-    <input type="checkbox" id="incluir-nomadas">
-    <label for="incluir-nomadas">Incluir nómadas / exiliados (sin villa)</label>
-  </div>
-  <div class="villa-actions">
-    <button type="button" class="link-btn" id="villa-all">Seleccionar todas</button>
+  <div class="section-label">Sufijos a incluir</div>
+  <div class="suffix-actions">
+    <button type="button" class="link-btn" id="sel-all">Seleccionar todos</button>
     <span class="link-sep">·</span>
-    <button type="button" class="link-btn" id="villa-clear">Limpiar</button>
+    <button type="button" class="link-btn" id="sel-clear">Limpiar</button>
   </div>
-  <div id="villa-panel">
-    <div class="cat-label">Villas del lago</div>
-    <div class="suffix-grid" id="grid-villa-lago"></div>
-    <div class="cat-label">Villas centrales</div>
-    <div class="suffix-grid" id="grid-villa-central"></div>
-    <div class="cat-label">Villas de oficio</div>
-    <div class="suffix-grid" id="grid-villa-oficio"></div>
-    <div class="cat-label">Villas de frontera</div>
-    <div class="suffix-grid" id="grid-villa-frontera"></div>
-  </div>
-  <p class="note">Si marcas varias villas, los personajes se reparten equitativamente entre ellas.</p>
+
+  <div class="cat-label">Supervivencia</div>
+  <div class="suffix-grid" id="grid-supervivencia"></div>
+
+  <div class="cat-label">Fertilidad y linaje</div>
+  <div class="suffix-grid" id="grid-linaje"></div>
+
+  <div class="cat-label">Conocimiento y cuidado</div>
+  <div class="suffix-grid" id="grid-conocimiento"></div>
+
+  <div class="cat-label">Autoridad y justicia</div>
+  <div class="suffix-grid" id="grid-autoridad"></div>
+
+  <div class="cat-label">Heridas y marcas</div>
+  <div class="suffix-grid" id="grid-heridas"></div>
+
+  <div class="cat-label">Movilidad</div>
+  <div class="suffix-grid" id="grid-movilidad"></div>
+
+  <button type="button" class="no-suffix-btn" id="no-suffix-btn">
+    <span class="suffix-code">sin sufijo</span>
+    <span class="suffix-sig">(nombre sin hito reconocido)</span>
+  </button>
+  <p class="note">El generador elige al azar entre los sufijos marcados para cada nombre.</p>
 </div>
 
+<!-- OPCIONES -->
 <div class="block row-3">
   <div>
     <div class="section-label">Cantidad</div>
-    <input type="number" id="cantidad" min="1" max="15" value="1">
+    <input type="number" id="cantidad" min="1" max="30" value="10">
   </div>
   <div>
     <div class="section-label">Incluir edad</div>
@@ -212,41 +233,6 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
   </div>
 </div>
 
-<!-- SUFIJO -->
-<div class="block">
-  <div class="section-label">Sufijo de hito social</div>
-  <div class="toggle-row">
-    <input type="checkbox" id="no-suffix">
-    <label for="no-suffix">Sin sufijo (personaje joven o sin hitos reconocidos aún)</label>
-  </div>
-  <div id="suffix-controls">
-  <div class="toggle-row">
-    <input type="checkbox" id="random-suffix" checked>
-    <label for="random-suffix">Al azar (según probabilidades de la villa seleccionada)</label>
-  </div>
-  <div class="toggle-row" id="multi-hint" style="display:none;">
-    <input type="checkbox" id="multi-suffix">
-    <label for="multi-suffix">Permitir selección múltiple (el generador elige entre los marcados)</label>
-  </div>
-  </div>
-
-  <div class="suffix-panel" id="suffix-panel">
-    <div class="cat-label">Supervivencia</div>
-    <div class="suffix-grid" id="grid-supervivencia"></div>
-    <div class="cat-label">Fertilidad y linaje</div>
-    <div class="suffix-grid" id="grid-linaje"></div>
-    <div class="cat-label">Conocimiento y cuidado</div>
-    <div class="suffix-grid" id="grid-conocimiento"></div>
-    <div class="cat-label">Autoridad y justicia</div>
-    <div class="suffix-grid" id="grid-autoridad"></div>
-    <div class="cat-label">Heridas y marcas</div>
-    <div class="suffix-grid" id="grid-heridas"></div>
-    <div class="cat-label">Movilidad</div>
-    <div class="suffix-grid" id="grid-movilidad"></div>
-    <p class="note" id="select-note">Haz clic en uno o varios sufijos. El generador elegirá entre los marcados al azar.</p>
-  </div>
-</div>
-
 <div class="btn-row">
   <button class="primary" onclick="generar()">Generar nombres</button>
   <button class="secondary" id="btn-copy" style="display:none;" onclick="copiarTodo()">Copiar todo</button>
@@ -260,14 +246,14 @@ input[type=number]::-webkit-outer-spin-button { opacity: 1; }
   <div id="results-list"></div>
 </div>
 
-<figure class="zk-illus" id="nombres-illus" style="margin:1.5rem auto 0;max-width:420px;border-radius:var(--radius-lg);overflow:hidden;border:0.5px solid var(--border);background:var(--bg-card);cursor:pointer;transition:border-color .15s;">
+<figure style="margin:1.5rem auto 0;max-width:420px;border-radius:var(--radius-lg);overflow:hidden;border:0.5px solid var(--border);background:var(--bg-card);cursor:pointer;transition:border-color .15s;" id="nombres-illus">
   <img src="Los nombres.png" alt="Ejemplos de nombres con sufijos" loading="lazy" style="width:100%;height:auto;display:block;">
   <figcaption style="padding:10px 16px;font-size:12px;color:var(--text-muted);font-style:italic;text-align:center;">Ejemplos de nombres con sufijos de hito social</figcaption>
 </figure>
 
 </div>
 
-<div class="zk-lightbox" id="zk-lightbox" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);justify-content:center;align-items:center;padding:24px;cursor:zoom-out;">
+<div id="zk-lightbox" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.88);justify-content:center;align-items:center;padding:24px;cursor:zoom-out;">
   <button id="zk-lightbox-close" style="position:fixed;top:16px;right:20px;z-index:10000;background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">&times;</button>
   <img id="zk-lightbox-img" src="" alt="" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:4px;box-shadow:0 8px 60px rgba(0,0,0,0.5);">
 </div>
@@ -336,20 +322,17 @@ const sufijos = [
     bgs:["salió por curiosidad y volvió por deber","ha visto villas que otros solo conocen de nombre","lleva un mapa mental que no ha compartido con nadie","el camino le cambió algo que no sabe nombrar","la primera vez que salió tuvo más miedo del que admite"] },
 ];
 
-const villaProbs = {
-  "Halvar":  ["-val","-val","-val","-mork","-mork","-skar","-velar","-velar","-neth","-thar","-kel","-ruk","-ior","-dren","-held"],
-  "Ikhmar":  ["-ion","-ion","-ion","-val","-val","-val","-mir","-mir","-neth","-velar","-kel","-ior","-sar","-thar","-ruk"],
-  "Siteth":  ["-val","-val","-val","-val","-velar","-velar","-tav","-tav","-neth","-thar","-ior","-mir","-kel","-dren","-skar"],
-  "Karven":  ["-mir","-mir","-ion","-ion","-val","-val","-neth","-neth","-velar","-oth","-thar","-sar","-kel","-ior","-dren"],
-  "Poymel":  ["-dren","-dren","-mork","-mork","-ruk","-ruk","-ior","-ior","-val","-neth","-velar","-thar","-kel","-skar","-khrav"],
-  "Ydral":   ["-skar","-skar","-held","-held","-tav","-tav","-val","-neth","-velar","-sar","-ior","-thar","-ruk","-mir","-dren"],
-  "Logven":  ["-sar","-sar","-sar","-tav","-tav","-oth","-oth","-val","-mir","-neth","-velar","-held","-ior","-thar","-ion"],
-  "Litor":   ["-val","-val","-val","-ruk","-ruk","-held","-held","-mork","-neth","-velar","-thar","-kel","-dren","-ior","-skar"],
-  "Kalvek":  ["-val","-val","-val","-val","-ruk","-ruk","-khrav","-dren","-neth","-velar","-kel","-thar","-ior","-mork","-skar"],
-  "Hisven":  ["-val","-val","-val","-mir","-mir","-mir","-ion","-ion","-neth","-velar","-thar","-kel","-ior","-oth","-sar"],
-  "Theriv":  ["-dren","-dren","-mork","-mork","-mork","-skar","-skar","-ruk","-ior","-ior","-neth","-val","-thar","-kel","-vran"],
-  "Ksilnar": ["-kel","-kel","-vran","-vran","-dren","-mork","-ruk","-val","-ior","-ior","-neth","-thar","-skar","-mir","-khrav"],
-  "":        sufijos.map(s => s.s),
+const sinSufijoData = {
+  edadMin: 10, edadMax: 18,
+  bgs: [
+    "aún no ha matado su primera criatura, pero ya ha visto lo que hacen",
+    "creció en la villa sin salir nunca más allá del perímetro",
+    "nadie le ha puesto un sufijo todavía, aunque él ya se siente listo",
+    "todavía aprende el oficio de su familia, sin certificar",
+    "es demasiado joven para la mayoría de cosas que ya ha visto",
+    "la villa lo conoce solo por su nombre, y eso por ahora le basta",
+    "está en ese punto en que el mundo aún no lo ha marcado formalmente"
+  ]
 };
 
 const raices = [
@@ -364,217 +347,126 @@ const raices = [
 ];
 
 const catMap = {
-  supervivencia:"grid-supervivencia", linaje:"grid-linaje",
-  conocimiento:"grid-conocimiento", autoridad:"grid-autoridad",
-  heridas:"grid-heridas", movilidad:"grid-movilidad"
+  supervivencia: "grid-supervivencia",
+  linaje:        "grid-linaje",
+  conocimiento:  "grid-conocimiento",
+  autoridad:     "grid-autoridad",
+  heridas:       "grid-heridas",
+  movilidad:     "grid-movilidad"
 };
 
-const villas = [
-  { name:"Halvar",  grupo:"lago",     desc:"sal" },
-  { name:"Ikhmar",  grupo:"lago",     desc:"pescado y algas" },
-  { name:"Siteth",  grupo:"central",  desc:"grano" },
-  { name:"Karven",  grupo:"central",  desc:"huertos" },
-  { name:"Poymel",  grupo:"central",  desc:"ganado" },
-  { name:"Ydral",   grupo:"central",  desc:"agua dulce" },
-  { name:"Logven",  grupo:"central",  desc:"archivo y memoria" },
-  { name:"Litor",   grupo:"oficio",   desc:"piedra" },
-  { name:"Kalvek",  grupo:"oficio",   desc:"metal y forja" },
-  { name:"Hisven",  grupo:"oficio",   desc:"textiles" },
-  { name:"Theriv",  grupo:"frontera", desc:"caza" },
-  { name:"Ksilnar", grupo:"frontera", desc:"madera" },
-];
-const villaGridMap = { lago:"grid-villa-lago", central:"grid-villa-central", oficio:"grid-villa-oficio", frontera:"grid-villa-frontera" };
-
 let selectedSuffixes = new Set();
-let selectedVillas = new Set();
+let incluirSinSufijo = false;
 
 function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function randInt(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
+function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
 
 function buildGrids() {
   for (const [cat, gridId] of Object.entries(catMap)) {
     const grid = document.getElementById(gridId);
     sufijos.filter(s => s.cat === cat).forEach(s => {
       const btn = document.createElement("button");
+      btn.type = "button";
       btn.className = "suffix-btn";
       btn.dataset.s = s.s;
-      btn.innerHTML = `<div class="suffix-code">${s.s}</div><div class="suffix-meaning">${s.sig}</div>`;
+      btn.innerHTML = `<span class="suffix-code">${s.s}</span><span class="suffix-sig">(${s.sig})</span>`;
       btn.onclick = () => toggleSuffix(s.s, btn);
       grid.appendChild(btn);
     });
   }
 }
 
-function buildVillaGrid() {
-  for (const [grupo, gridId] of Object.entries(villaGridMap)) {
-    const grid = document.getElementById(gridId);
-    villas.filter(v => v.grupo === grupo).forEach(v => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "suffix-btn";
-      btn.dataset.villa = v.name;
-      btn.innerHTML = `<div class="suffix-code">${v.name}</div><div class="suffix-meaning">${v.desc}</div>`;
-      btn.onclick = () => toggleVilla(v.name, btn);
-      grid.appendChild(btn);
-    });
-  }
-}
-
-function toggleVilla(name, btn) {
-  if (selectedVillas.has(name)) {
-    selectedVillas.delete(name);
+function toggleSuffix(s, btn) {
+  if (selectedSuffixes.has(s)) {
+    selectedSuffixes.delete(s);
     btn.classList.remove("selected");
   } else {
-    selectedVillas.add(name);
-    btn.classList.add("selected");
-  }
-}
-
-function selectAllVillas() {
-  selectedVillas = new Set(villas.map(v => v.name));
-  document.querySelectorAll("[data-villa]").forEach(b => b.classList.add("selected"));
-}
-
-function clearVillas() {
-  selectedVillas.clear();
-  document.querySelectorAll("[data-villa]").forEach(b => b.classList.remove("selected"));
-}
-
-function toggleSuffix(s, btn) {
-  const multi = document.getElementById("multi-suffix").checked;
-  if (!multi) {
-    document.querySelectorAll(".suffix-btn").forEach(b => b.classList.remove("selected"));
-    selectedSuffixes.clear();
     selectedSuffixes.add(s);
     btn.classList.add("selected");
-  } else {
-    if (selectedSuffixes.has(s)) {
-      selectedSuffixes.delete(s);
-      btn.classList.remove("selected");
-    } else {
-      selectedSuffixes.add(s);
-      btn.classList.add("selected");
-    }
   }
 }
 
-document.getElementById("random-suffix").addEventListener("change", function() {
-  const panel = document.getElementById("suffix-panel");
-  const hint = document.getElementById("multi-hint");
-  panel.style.display = this.checked ? "none" : "block";
-  hint.style.display = this.checked ? "none" : "flex";
-  if (this.checked) {
-    selectedSuffixes.clear();
-    document.querySelectorAll(".suffix-btn").forEach(b => b.classList.remove("selected"));
-  }
-});
-
-const sinSufijoData = {
-  edadMin: 10, edadMax: 18,
-  bgs: [
-    "aún no ha matado su primera criatura, pero ya ha visto lo que hacen",
-    "creció en la villa sin salir nunca más allá del perímetro",
-    "nadie le ha puesto un sufijo todavía, aunque él ya se siente listo",
-    "todavía aprende el oficio de su familia, sin certificar",
-    "es demasiado joven para la mayoría de cosas que ya ha visto",
-    "la villa lo conoce solo por su nombre, y eso por ahora le basta",
-    "está en ese punto en que el mundo aún no lo ha marcado formalmente"
-  ]
-};
-
-document.getElementById("no-suffix").addEventListener("change", function() {
-  document.getElementById("suffix-controls").style.display = this.checked ? "none" : "block";
-  document.getElementById("suffix-panel").style.display = this.checked ? "none" : (document.getElementById("random-suffix").checked ? "none" : "block");
-});
-
-function pickSufijo(villa) {
-  const isRandom = document.getElementById("random-suffix").checked;
-  if (isRandom) {
-    const pool = villaProbs[villa] || villaProbs[""];
-    return rand(pool);
-  } else {
-    if (selectedSuffixes.size === 0) return null;
-    const arr = [...selectedSuffixes];
-    return rand(arr);
-  }
+function selectAll() {
+  sufijos.forEach(s => selectedSuffixes.add(s.s));
+  document.querySelectorAll(".suffix-btn").forEach(b => b.classList.add("selected"));
+  incluirSinSufijo = true;
+  document.getElementById("no-suffix-btn").classList.add("selected");
 }
 
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+function clearAll() {
+  selectedSuffixes.clear();
+  document.querySelectorAll(".suffix-btn").forEach(b => b.classList.remove("selected"));
+  incluirSinSufijo = false;
+  document.getElementById("no-suffix-btn").classList.remove("selected");
 }
 
-function buildAsignaciones(pool, cantidad) {
-  const base = Math.floor(cantidad / pool.length);
-  const extra = cantidad % pool.length;
-  const ganadores = shuffle([...pool]).slice(0, extra);
-  const ganadoresSet = new Set(ganadores);
-  const asignaciones = [];
-  pool.forEach(v => {
-    const slots = base + (ganadoresSet.has(v) ? 1 : 0);
-    for (let i = 0; i < slots; i++) asignaciones.push(v);
+document.addEventListener("DOMContentLoaded", () => {
+  buildGrids();
+
+  document.getElementById("sel-all").addEventListener("click", selectAll);
+  document.getElementById("sel-clear").addEventListener("click", clearAll);
+
+  document.getElementById("no-suffix-btn").addEventListener("click", function() {
+    incluirSinSufijo = !incluirSinSufijo;
+    this.classList.toggle("selected", incluirSinSufijo);
   });
-  return shuffle(asignaciones);
+
+  // Lightbox
+  const lb = document.getElementById('zk-lightbox');
+  const lbImg = document.getElementById('zk-lightbox-img');
+  document.getElementById('nombres-illus').addEventListener('click', function() {
+    const img = this.querySelector('img');
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    lb.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  });
+  function closeLb() { lb.style.display = 'none'; document.body.style.overflow = ''; }
+  document.getElementById('zk-lightbox-close').addEventListener('click', closeLb);
+  lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && lb.style.display === 'flex') closeLb(); });
+});
+
+function buildPool() {
+  const pool = [];
+  selectedSuffixes.forEach(s => pool.push(s));
+  if (incluirSinSufijo) pool.push(null);
+  return pool;
 }
 
 function generar() {
-  const villasMarcadas = [...selectedVillas];
-  const incluirNomadas = document.getElementById("incluir-nomadas").checked;
-  const pool = [...villasMarcadas];
-  if (incluirNomadas) pool.push("");
+  const pool = buildPool();
+  if (pool.length === 0) {
+    alert("Marca al menos un sufijo o la opción 'sin sufijo'.");
+    return;
+  }
 
-  const cantidad = Math.min(15, Math.max(1, parseInt(document.getElementById("cantidad").value) || 1));
+  const cantidad = Math.min(30, Math.max(1, parseInt(document.getElementById("cantidad").value) || 10));
   const conEdad = document.getElementById("edad-opt").value === "si";
   const conBg = document.getElementById("bg-opt").value === "si";
-  const sinSufijo = document.getElementById("no-suffix").checked;
-  const isRandom = document.getElementById("random-suffix").checked;
-
-  if (pool.length === 0) {
-    alert("Marca al menos una villa o activa 'Incluir nómadas'.");
-    return;
-  }
-
-  if (!sinSufijo && !isRandom && selectedSuffixes.size === 0) {
-    alert("Elige al menos un sufijo, activa la opción aleatoria, o marca 'sin sufijo'.");
-    return;
-  }
-
-  const asignaciones = buildAsignaciones(pool, cantidad);
 
   const resultados = [];
   for (let i = 0; i < cantidad; i++) {
-    const villa = asignaciones[i];
-    let sufKey, sufObj, nombre, nombreCompleto, edad, bg;
     const base = rand(raices);
+    const sufKey = rand(pool);
+    const sufObj = sufKey ? sufijos.find(s => s.s === sufKey) : null;
 
-    if (sinSufijo) {
-      sufKey = null;
-      sufObj = null;
-      nombre = base;
-      nombreCompleto = villa ? `${base} de ${villa}` : base;
-      edad = conEdad ? randInt(sinSufijoData.edadMin, sinSufijoData.edadMax) : null;
-      bg = conBg ? rand(sinSufijoData.bgs) : null;
-    } else {
-      sufKey = pickSufijo(villa);
-      if (!sufKey) break;
-      sufObj = sufijos.find(s => s.s === sufKey);
-      nombre = base + sufKey.slice(1);
-      nombreCompleto = villa ? `${nombre} de ${villa}` : nombre;
-      edad = conEdad ? randInt(sufObj.edadMin, sufObj.edadMax) : null;
-      bg = conBg ? rand(sufObj.bgs) : null;
-    }
+    const nombre = sufKey ? (base + sufKey.slice(1)) : base;
+    const edad = conEdad
+      ? (sufObj ? randInt(sufObj.edadMin, sufObj.edadMax) : randInt(sinSufijoData.edadMin, sinSufijoData.edadMax))
+      : null;
+    const bg = conBg
+      ? (sufObj ? rand(sufObj.bgs) : rand(sinSufijoData.bgs))
+      : null;
 
-    resultados.push({ nombre: nombreCompleto, sufObj, sufKey, villa: villa || null, edad, bg });
+    resultados.push({ nombre, sufObj, sufKey, edad, bg });
   }
 
   const wrap = document.getElementById("results-wrap");
   const list = document.getElementById("results-list");
-  const count = document.getElementById("results-count");
+  document.getElementById("results-count").textContent =
+    resultados.length === 1 ? "1 personaje generado" : `${resultados.length} personajes generados`;
 
-  count.textContent = resultados.length === 1 ? "1 personaje generado" : `${resultados.length} personajes generados`;
   list.innerHTML = resultados.map(r => {
     let html = `<div class="result-item">`;
     html += `<div class="result-name">${r.nombre}</div>`;
@@ -584,14 +476,15 @@ function generar() {
     } else {
       html += `<span class="pill" style="font-style:italic;">sin sufijo</span>`;
     }
-    if (r.villa) html += `<span class="pill">${r.villa}</span>`;
-    else html += `<span class="pill" style="font-style:italic;">Nómada</span>`;
     if (r.edad !== null) html += `<span class="pill">${r.edad} años</span>`;
     html += `</div>`;
     html += `<hr class="result-divider">`;
     if (r.bg) html += `<div class="result-bg">${r.bg.charAt(0).toUpperCase() + r.bg.slice(1)}.</div>`;
-    if (r.sufObj) html += `<div class="result-cuando"><strong>Sufijo otorgado cuando:</strong> ${r.sufObj.cuando}</div>`;
-    else html += `<div class="result-cuando">La villa aún no ha reconocido ningún hito en este personaje.</div>`;
+    if (r.sufObj) {
+      html += `<div class="result-cuando"><strong>Sufijo otorgado cuando:</strong> ${r.sufObj.cuando}</div>`;
+    } else {
+      html += `<div class="result-cuando">La villa aún no ha reconocido ningún hito en este personaje.</div>`;
+    }
     html += `</div>`;
     return html;
   }).join("");
@@ -599,7 +492,6 @@ function generar() {
   wrap.style.display = "block";
   document.getElementById("btn-copy").style.display = "inline-block";
   document.getElementById("btn-clear").style.display = "inline-block";
-
   window._resultados = resultados;
   wrap.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -614,7 +506,7 @@ function copiarTodo() {
     if (r.bg) linea += `\n  ${r.bg.charAt(0).toUpperCase() + r.bg.slice(1)}.`;
     return linea;
   }).join("\n\n");
-  navigator.clipboard.writeText(texto).catch(()=>{});
+  navigator.clipboard.writeText(texto).catch(() => {});
   const btn = document.getElementById("btn-copy");
   btn.textContent = "Copiado";
   setTimeout(() => btn.textContent = "Copiar todo", 1600);
@@ -626,29 +518,6 @@ function limpiar() {
   document.getElementById("btn-clear").style.display = "none";
   window._resultados = null;
 }
-
-buildGrids();
-buildVillaGrid();
-document.getElementById("villa-all").addEventListener("click", selectAllVillas);
-document.getElementById("villa-clear").addEventListener("click", clearVillas);
-
-// Lightbox
-(function() {
-  const lb = document.getElementById('zk-lightbox');
-  const lbImg = document.getElementById('zk-lightbox-img');
-  const lbClose = document.getElementById('zk-lightbox-close');
-  document.getElementById('nombres-illus').addEventListener('click', function() {
-    const img = this.querySelector('img');
-    lbImg.src = img.src;
-    lbImg.alt = img.alt;
-    lb.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  });
-  function close() { lb.style.display = 'none'; document.body.style.overflow = ''; }
-  lbClose.addEventListener('click', close);
-  lb.addEventListener('click', function(e) { if (e.target === lb) close(); });
-  document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && lb.style.display === 'flex') close(); });
-})();
 </script>
 </body>
 </html>

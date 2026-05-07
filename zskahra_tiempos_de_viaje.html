@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra · Tiempos de Viaje</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0c09;
+    --bg2: #161310;
+    --bg3: #1e1a14;
+    --border: rgba(180,150,90,0.18);
+    --border-strong: rgba(180,150,90,0.4);
+    --gold: #c4a35a;
+    --gold-light: #e8c97a;
+    --text: #d4c8a8;
+    --text-dim: #8a7d5e;
+    --text-muted: #5a5040;
+    --cat0: #1a3a2a; --cat0t: #6ecfa0;
+    --cat1: #263318; --cat1t: #a0c96a;
+    --cat2: #3a2e10; --cat2t: #d4a040;
+    --cat3: #3a1e10; --cat3t: #d47040;
+    --cat4: #3a1010; --cat4t: #d45050;
+    --self: #111009;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 16px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 30% 20%, rgba(100,75,30,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 50% at 70% 80%, rgba(60,40,15,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; width: 100%; max-width: 900px; }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--gold); }
+
+  header { text-align: center; margin-bottom: 2.5rem; }
+
+  .title-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    opacity: 0.7;
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 400;
+    color: var(--gold-light);
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text-dim);
+    font-weight: 300;
+  }
+
+  .ornament {
+    display: block;
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 1rem auto;
+    opacity: 0.5;
+  }
+
+  .controls {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  select {
+    background: var(--bg3);
+    border: 0.5px solid var(--border-strong);
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px;
+    padding: 4px 28px 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c4a35a' opacity='.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    min-width: 130px;
+  }
+
+  select:focus { outline: none; border-color: var(--gold); }
+
+  .legend {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .swatch {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .table-wrapper { overflow-x: auto; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 580px;
+  }
+
+  thead th {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    font-weight: 400;
+    color: var(--text-dim);
+    padding: 6px 4px;
+    border: 0.5px solid var(--border);
+    background: var(--bg2);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  thead th.corner { border-color: transparent; background: transparent; }
+  thead th.hl { color: var(--gold-light); border-color: var(--border-strong); }
+
+  tbody tr th {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    font-weight: 400;
+    color: var(--text-dim);
+    padding: 5px 10px 5px 4px;
+    border: 0.5px solid var(--border);
+    background: var(--bg2);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  tbody tr.hlrow th { color: var(--gold-light); border-color: var(--border-strong); }
+
+  td {
+    text-align: center;
+    padding: 4px 3px;
+    font-size: 13px;
+    font-weight: 300;
+    border: 0.5px solid var(--border);
+    transition: opacity 0.2s, transform 0.1s;
+    cursor: default;
+    position: relative;
+  }
+
+  td.self {
+    background: var(--self);
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+
+  td.cat0 { background: var(--cat0); color: var(--cat0t); }
+  td.cat1 { background: var(--cat1); color: var(--cat1t); }
+  td.cat2 { background: var(--cat2); color: var(--cat2t); }
+  td.cat3 { background: var(--cat3); color: var(--cat3t); }
+  td.cat4 { background: var(--cat4); color: var(--cat4t); }
+
+  td.dimmed { opacity: 0.12; }
+
+  td:not(.self):not(.dimmed):hover {
+    outline: 1px solid var(--gold);
+    z-index: 2;
+  }
+
+  #tooltip {
+    position: fixed;
+    background: var(--bg3);
+    border: 0.5px solid var(--border-strong);
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+
+  #tooltip.visible { opacity: 1; }
+
+  .info-bar {
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 3px;
+    font-size: 13px;
+    color: var(--text-dim);
+    font-style: italic;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .info-bar strong { color: var(--gold); font-style: normal; font-weight: 400; }
+
+  .notes {
+    margin-top: 1.5rem;
+    border-top: 0.5px solid var(--border);
+    padding-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .note {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .note b {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+    font-weight: 400;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="index.html" class="back-link">&larr; Volver</a>
+
+  <header>
+    <p class="title-label">Zskahra · Logística</p>
+    <h1>Tiempos de Viaje entre Villas</h1>
+    <span class="ornament"></span>
+    <p class="subtitle">Caravana cargada · micro-pilón disponible · ruta establecida</p>
+  </header>
+
+  <div class="controls">
+    <div class="ctrl-group">
+      <label for="sel-villa">Villa</label>
+      <select id="sel-villa" onchange="update()">
+        <option value="">— todas —</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <label for="sel-max">Máx. días</label>
+      <select id="sel-max" onchange="update()">
+        <option value="99">todos</option>
+        <option value="3">3 días</option>
+        <option value="6">6 días</option>
+        <option value="9">9 días</option>
+        <option value="13">13 días</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="swatch" style="background:var(--cat0)"></span>Vecinas 2–3</div>
+    <div class="legend-item"><span class="swatch" style="background:var(--cat1)"></span>Cercanas 4–6</div>
+    <div class="legend-item"><span class="swatch" style="background:var(--cat2)"></span>Medias 7–9</div>
+    <div class="legend-item"><span class="swatch" style="background:var(--cat3)"></span>Largas 10–13</div>
+    <div class="legend-item"><span class="swatch" style="background:var(--cat4)"></span>Extremas 14+</div>
+  </div>
+
+  <div class="table-wrapper">
+    <table id="mv-table"></table>
+  </div>
+
+  <div class="info-bar" id="info-bar">Selecciona una villa para ver su resumen.</div>
+
+  <div class="notes">
+    <div class="note"><b>Velocidad base</b>~20 km/día con carga completa, pilón y descansos en ruta conocida.</div>
+    <div class="note"><b>Viajero ligero</b>Reduce 20–30% el tiempo. Asume riesgo de no usar pilón nocturno.</div>
+    <div class="note"><b>Sin pilón</b>Tiempo similar, pero riesgo crítico de exposición caótica al anochecer.</div>
+    <div class="note"><b>Variación</b>±1 día por clima, eventos en ruta o simple mala suerte.</div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+const villas = ["Halvar","Ikhmar","Ydral","Karven","Siteth","Logven","Litor","Kalvek","Hisven","Poymel","Theriv","Ksilnar"];
+const short  = ["Hal","Ikh","Ydr","Kar","Sit","Log","Lit","Klv","His","Poy","The","Ksi"];
+const data = [
+  [0,4,11,8,7,7,12,13,8,9,7,14],
+  [4,0,7,5,3,3,7,7,4,4,5,7],
+  [11,7,0,3,5,7,3,4,9,7,11,6],
+  [8,5,3,0,3,5,3,4,6,5,8,5],
+  [7,3,5,3,0,2,5,5,4,3,5,5],
+  [7,3,7,5,2,0,6,6,2,2,4,5],
+  [12,7,3,3,5,6,0,2,8,5,9,4],
+  [13,7,4,4,5,6,2,0,7,4,8,2],
+  [8,4,9,6,4,2,8,7,0,2,2,5],
+  [9,4,7,5,3,2,5,4,2,0,4,2],
+  [7,5,11,8,5,4,9,8,2,4,0,8],
+  [14,7,6,5,5,5,4,2,5,2,8,0]
+];
+
+function cat(v){ return v<=3?'cat0':v<=6?'cat1':v<=9?'cat2':v<=13?'cat3':'cat4'; }
+
+const sel = document.getElementById('sel-villa');
+villas.forEach((v,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=v; sel.appendChild(o); });
+
+const tip = document.getElementById('tooltip');
+
+function update(){
+  const idx = sel.value === '' ? -1 : parseInt(sel.value);
+  const maxD = parseInt(document.getElementById('sel-max').value);
+  const t = document.getElementById('mv-table');
+  t.innerHTML = '';
+
+  const thead = document.createElement('thead');
+  let htr = '<tr><th class="corner"></th>';
+  short.forEach((s,i) => {
+    const hl = i===idx ? ' hl' : '';
+    htr += `<th class="${hl}">${s}</th>`;
+  });
+  htr += '</tr>';
+  thead.innerHTML = htr;
+  t.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  villas.forEach((v,r) => {
+    const tr = document.createElement('tr');
+    if(r===idx) tr.classList.add('hlrow');
+    let row = `<th>${short[r]}</th>`;
+    data[r].forEach((val,c) => {
+      if(r===c){ row+=`<td class="self">—</td>`; return; }
+      const dim = val>maxD ? ' dimmed' : '';
+      const dias = val===1 ? '1 día' : `${val} días`;
+      row += `<td class="${cat(val)}${dim}" data-tip="${villas[r]} → ${villas[c]}: ${dias}">${val}</td>`;
+    });
+    tr.innerHTML = row;
+    tbody.appendChild(tr);
+  });
+  t.appendChild(tbody);
+
+  t.querySelectorAll('td[data-tip]').forEach(td => {
+    td.addEventListener('mousemove', e => {
+      tip.textContent = td.dataset.tip;
+      tip.classList.add('visible');
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top  = (e.clientY - 28) + 'px';
+    });
+    td.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+  });
+
+  const bar = document.getElementById('info-bar');
+  if(idx < 0){ bar.innerHTML = 'Selecciona una villa para ver su resumen.'; return; }
+  const row = data[idx];
+  const pairs = villas.map((v,i)=>({v,d:row[i],i}))
+    .filter(x => x.i!==idx && x.d<=maxD)
+    .sort((a,b)=>a.d-b.d);
+  if(!pairs.length){ bar.innerHTML = `<strong>${villas[idx]}</strong> — ninguna villa dentro del filtro.`; return; }
+  const near = pairs[0], far = pairs[pairs.length-1];
+  bar.innerHTML = `<strong>${villas[idx]}</strong> — más cercana: <strong>${near.v}</strong> (${near.d} días) · más lejana: <strong>${far.v}</strong> (${far.d} días) · ${pairs.length} villas en rango`;
+}
+
+update();
+</script>
+</body>
+</html>

@@ -36,6 +36,29 @@
   .b-cen { background: #102a20; color: #7dc4a0; }
   .b-ofi { background: #2a2010; color: #c9a96e; }
   .b-fro { background: #2a1010; color: #d47070; }
+  .b-villa { background: #0e2418; color: #7dc4a0; }
+  .b-silv { background: #14202c; color: #88b6d8; }
+  .b-caos { background: #2a1010; color: #d47070; }
+  .b-orden { background: #2a2010; color: #d8a040; }
+  .dif { font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 0.02em; }
+  .dif-l { color: #80b0c0; }
+  .dif-m { color: #7890b0; }
+  .dif-h { color: #c0b060; }
+  .dif-vh { color: #c09040; }
+  .dif-xh { color: #c06030; }
+  .dif-f { color: #c03030; }
+  .dif-a { color: #d04040; }
+  .col { font-size: 11px; font-style: italic; color: #7a7068; display: block; margin-top: 1px; }
+  .herb-table td { padding: 5px 10px; line-height: 1.35; vertical-align: middle; }
+  .herb-table .col { font-size: 10.5px; margin-top: 1px; line-height: 1.2; }
+  .hrow { cursor: pointer; transition: background 0.12s; }
+  .hrow:hover { background: #211e1a; }
+  .hrow.open { background: #1d1b16; }
+  .hexp { color: #5a5048; text-align: center; font-size: 11px; transition: color 0.15s, transform 0.15s; }
+  .hrow:hover .hexp, .hrow.open .hexp { color: #c9a96e; }
+  .hrow.open .hexp { transform: rotate(180deg); display: inline-block; }
+  .hnote td { background: #14110e !important; color: #a89e92 !important; font-size: 12px !important; padding: 8px 14px 10px 18px !important; line-height: 1.55 !important; font-style: italic; border-left: 2px solid #2a2010; }
+  .hnote .ckey { font-style: normal; color: #c9a96e; font-family: 'Courier New', monospace; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; margin-right: 6px; }
   .note { font-size: 11px; color: #7a7068; margin-top: 10px; font-style: italic; }
   .season-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
   .s1 { background: #4a9a80; flex: 54; }
@@ -61,11 +84,12 @@
   <h1>Zskahra</h1>
   <p class="subtitle">Referencia rápida · Director de Juego</p>
   <div class="tabs">
-    <button class="tab active" onclick="show('sufijos',this)">Sufijos</button>
-    <button class="tab" onclick="show('aldeas',this)">Aldeas</button>
-    <button class="tab" onclick="show('estaciones',this)">Estaciones</button>
-    <button class="tab" onclick="show('tiempo',this)">Tiempo</button>
-    <button class="tab" onclick="show('artefactos',this)">Artefactos</button>
+    <button class="tab active" data-tab="sufijos" onclick="show('sufijos',this)">Sufijos</button>
+    <button class="tab" data-tab="aldeas" onclick="show('aldeas',this)">Aldeas</button>
+    <button class="tab" data-tab="estaciones" onclick="show('estaciones',this)">Estaciones</button>
+    <button class="tab" data-tab="tiempo" onclick="show('tiempo',this)">Tiempo</button>
+    <button class="tab" data-tab="artefactos" onclick="show('artefactos',this)">Artefactos</button>
+    <button class="tab" data-tab="hierbas" onclick="show('hierbas',this)">Hierbas</button>
   </div>
 </header>
 
@@ -258,14 +282,184 @@
     <p class="note" style="margin-top:8px">Regla general: mientras haya pilón, hay villa. Cuando el pilón se apaga, la villa muere.</p>
   </div>
 
+  <!-- HIERBAS -->
+  <div id="hierbas" class="panel">
+    <p class="note" style="margin: 0 0 12px;">Click en una fila para ver notas y datos completos. Zonas: <strong>Int</strong>·Interior · <strong>Bor</strong>·Borde · <strong>Cer</strong>·Cercana · <strong>Med</strong>·Media · <strong>Pro</strong>·Profunda · <strong>Cri</strong>·Caminos.</p>
+
+    <div class="section-label">Flora de Villa · campo del pilón, sin Caos</div>
+    <table class="herb-table">
+      <tr><th style="width:130px">Hierba</th><th style="width:80px">Dif.</th><th style="width:160px">Estaciones</th><th style="width:140px">Zonas</th><th>Efecto</th><th style="width:24px"></th></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Vethrak</strong><span class="col">La Hoja Despierta</span></td>
+        <td><span class="dif dif-m">Med +0</span></td>
+        <td>Todas</td>
+        <td>Int · Bor</td>
+        <td><strong>Despaviladora</strong> — bonifica Stamina, resiste stun.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6">Común en todos los botiquines de villa.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Kalveth</strong><span class="col">Brote del Lago</span></td>
+        <td><span class="dif dif-m">Med +0</span></td>
+        <td>Cal · Vel · Roj · Con</td>
+        <td>Int · Bor</td>
+        <td><strong>Levantamuertos</strong> — recupera HP al instante.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6">Raíz acuática, abundante en villas lacustres. Escasa durante Los Días Ciegos.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Grulsev</strong><span class="col">Hierba del Olvido Corto</span></td>
+        <td><span class="dif dif-l">Lig +20</span></td>
+        <td>Todas</td>
+        <td>Int · Bor</td>
+        <td><strong>Matanervios</strong> — elimina penalizadores por minutos.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6">Resaca proporcional a la calidad. Se inhala triturada. El gruñido involuntario al sentirla actuar le da el nombre.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Tharvek</strong><span class="col">Raíz de la Voluntad</span></td>
+        <td><span class="dif dif-h">Dif −20</span></td>
+        <td>Todas <span style="color:#c9a96e">· amanecer/crepúsculo</span></td>
+        <td>Int · Bor · Cer</td>
+        <td><strong>Cabeza de Asno</strong> — bonifica Will. Calidades altas añaden Lie Perception.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6">Solo en la intersección de dos sombras superpuestas. Requiere amanecer o crepúsculo con los dos soles visibles.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Velneth</strong><span class="col">Flor del Velo</span></td>
+        <td><span class="dif dif-h">Dif −20</span></td>
+        <td><strong style="color:#c9a96e">Solo El Velo</strong></td>
+        <td>Int · Bor</td>
+        <td><strong>Ángel Guardián</strong> — resiste efectos mágicos y artefactos.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6">SOLO durante El Velo. La flor dura pocos días pero se conserva bien seca.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Sirnavel</strong><span class="col">Musgo Cosido</span></td>
+        <td><span class="dif dif-l">Lig +20</span></td>
+        <td>Todas</td>
+        <td>Int · Bor</td>
+        <td><strong>Tejeheridas</strong> — acelera recuperación de heridas (largo plazo).</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6">El más común de los musgos medicinales. Muy fácil de reconocer. Presente en prácticamente todos los sotobosques de villa.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Khorvath</strong><span class="col">Sangreverde</span></td>
+        <td><span class="dif dif-m">Med +0</span></td>
+        <td>Cal · Vel · Roj · Con</td>
+        <td>Int · Bor</td>
+        <td><strong>Bolsa de Sangre</strong> — más recuperación HP/día (largo plazo).</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6">Savia verde oscura con olor dulzón. Crece en el límite interior del radio del pilón.</td></tr>
+    </table>
+
+    <div class="section-label">Silvestres · Caos Potencia 1</div>
+    <table class="herb-table">
+      <tr><th style="width:130px">Hierba</th><th style="width:80px">Dif.</th><th style="width:160px">Estaciones</th><th style="width:140px">Zonas</th><th>Efecto</th><th style="width:24px"></th></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Drekthar</strong><span class="col">Trompeta de Guerra</span></td>
+        <td><span class="dif dif-vh">M.Dif −40</span></td>
+        <td>Cal · Vel · Roj · Con</td>
+        <td>Bor · Cer · Med · Pro · Cri</td>
+        <td><strong>Trompeta de Guerra</strong> — sin penalizadores 24 h. Adictiva.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6"><span class="ckey">Caos P1</span>Los <em>-mork</em> de Theriv la usan con plena conciencia del precio. Flores naranja oscuro llamativas. Los médicos de villa la desaconsejan.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Gemela</strong><span class="col">Hierba de Dos Sombras</span></td>
+        <td><span class="dif dif-xh">X.Dif −60</span></td>
+        <td>Cal · Vel · Roj <span style="color:#c9a96e">· amanecer/crep.</span></td>
+        <td>Cer · Med · Pro · Cri</td>
+        <td><strong>Las Dos Sombras</strong> — bonifica Lie Perception y detecta ilusiones.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6"><span class="ckey">Caos P1</span>La mente percibe dos lecturas de todo. Deja inquietud residual. Hojas asimétricas: una más oscura que la otra. Solo cosechable bajo dos sombras superpuestas.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Therken</strong><span class="col">Raíz de Criatura</span></td>
+        <td><span class="dif dif-f">Loc −80</span></td>
+        <td>Todas</td>
+        <td><strong style="color:#c9a96e">Solo Cri</strong></td>
+        <td><strong>Raíz de Criatura</strong> — +20 OB / 1 hr. Mejora Trompeta un tier.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6"><span class="ckey">Caos P1</span>Estimulante de combate. Zumbido en los dientes. SOLO en caminos de criaturas del Caos: peligro extremo. Los médicos de villa la prohíben formalmente.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Flor del Pulso</strong><span class="col">Pulso-flor</span></td>
+        <td><span class="dif dif-vh">M.Dif −40</span></td>
+        <td><strong style="color:#c9a96e">Solo Pulso Gemelo</strong></td>
+        <td>Bor · Cer · Med · Pro · Cri</td>
+        <td><strong>Reinicio de Estado</strong> — limpia venenos lentos y Caos menor.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6"><span class="ckey">Caos +1d10 (bajo)</span>No sana ni reduce Caos acumulado. La flor dura exactamente un Pulso y desaparece. Blanca con nervios dorados.</td></tr>
+    </table>
+
+    <div class="section-label">Flora Caótica · Caos Potencia 2</div>
+    <table class="herb-table">
+      <tr><th style="width:130px">Hierba</th><th style="width:80px">Dif.</th><th style="width:160px">Estaciones</th><th style="width:140px">Zonas</th><th>Efecto</th><th style="width:24px"></th></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Thlask-raíz</strong><span class="col">La Raíz del Orbe</span></td>
+        <td><span class="dif dif-f">Loc −80</span></td>
+        <td>Todas</td>
+        <td>Pro · Cri</td>
+        <td><strong>Cáliz de Vida</strong> — revivir (solo desde Infundida).</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6"><span class="ckey">Caos P2</span>El porcentaje de éxito depende de la calidad. Origen desconocido. Negra con vena luminosa pulsante. Comercio secreto. Los zelotes consideran su posesión una transgresión.</td></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Conjunción Negra</strong><span class="col">Sin nombre estable</span></td>
+        <td><span class="dif dif-xh">X.Dif −60</span></td>
+        <td><strong style="color:#c9a96e">Solo La Conjunción</strong></td>
+        <td>Med · Pro · Cri</td>
+        <td><strong>Impredecible</strong> — efecto herbal + tirada en tabla de Caos.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6"><span class="ckey">Caos P2 + tabla</span>Usarla es como usar un artefacto sin entenderlo. Aparece y desaparece sin patrón. Logven tiene registros de efectos en Conjunciones pasadas.</td></tr>
+    </table>
+
+    <div class="section-label">Flora de Orden · única hierba que reduce Caos</div>
+    <table class="herb-table">
+      <tr><th style="width:130px">Hierba</th><th style="width:80px">Dif.</th><th style="width:160px">Estaciones</th><th style="width:140px">Zonas</th><th>Efecto</th><th style="width:24px"></th></tr>
+      <tr class="hrow" onclick="hToggle(this)">
+        <td><strong>Pendrael</strong><span class="col">Luz de Penumbra</span></td>
+        <td><span class="dif dif-a">Abs −100</span></td>
+        <td><strong style="color:#c9a96e">Solo Días Ciegos</strong></td>
+        <td>Cer · Med · Pro · Cri</td>
+        <td><strong>REDUCE Caos</strong> — 1d10 × calidad. Bioluminiscencia 1d6 h.</td>
+        <td class="hexp">▾</td>
+      </tr>
+      <tr class="hnote" style="display:none"><td colspan="6"><span class="ckey">Reduce Caos</span>Única hierba que disminuye Caos acumulado. La planta muere al usarse. Negra con bioluminiscencia azul-blanca. Florece en Karven. No vuelve a crecer en ese suelo por meses.</td></tr>
+    </table>
+    <p class="note">Éxito HARP (All-or-Nothing): resultado final ≥ 101. Modificadores: zona (0 a −50), estación (variable), Pulso Gemelo +20, amanecer/crepúsculo +10, TP Herbalist +20.</p>
+  </div>
+
 </div>
 
 <script>
 function show(id, btn) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
+  const panel = document.getElementById(id);
+  if (!panel) return;
+  panel.classList.add('active');
+  const tab = btn || document.querySelector(`.tab[data-tab="${id}"]`);
+  if (tab) tab.classList.add('active');
+  if (history.replaceState) history.replaceState(null, '', '#' + id);
+  else location.hash = id;
+}
+function showFromHash() {
+  const id = (location.hash || '').replace(/^#/, '');
+  if (id && document.getElementById(id)) show(id);
+}
+window.addEventListener('hashchange', showFromHash);
+window.addEventListener('DOMContentLoaded', showFromHash);
+function hToggle(row) {
+  const next = row.nextElementSibling;
+  if (!next || !next.classList.contains('hnote')) return;
+  const open = next.style.display !== 'none';
+  next.style.display = open ? 'none' : 'table-row';
+  row.classList.toggle('open', !open);
 }
 </script>
 </body>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra · Referencia Rápida</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, 'Times New Roman', serif; font-size: 13px; background: #1a1714; color: #d4cfc8; min-height: 100vh; }
+  h1 { font-size: 20px; font-weight: normal; letter-spacing: 0.08em; text-transform: uppercase; color: #e8e0d4; margin-bottom: 2px; }
+  .subtitle { font-size: 11px; color: #7a7068; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
+  header { padding: 20px 24px 0; border-bottom: 1px solid #2e2a26; margin-bottom: 0; }
+  .back-link { display: inline-block; margin-bottom: 12px; font-size: 12px; color: #7a7068; text-decoration: none; letter-spacing: 0.04em; transition: color 0.15s; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .back-link:hover { color: #c4bdb4; }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid #2e2a26; padding: 0 24px; }
+  .tab { padding: 10px 18px; font-family: Georgia, serif; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: #7a7068; cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; }
+  .tab:hover { color: #c4bdb4; }
+  .tab.active { color: #c9a96e; border-bottom-color: #c9a96e; }
+  .content { padding: 20px 24px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .section-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #c9a96e; margin: 18px 0 8px; border-bottom: 1px solid #2e2a26; padding-bottom: 4px; }
+  .section-label:first-child { margin-top: 0; }
+  table { width: 100%; border-collapse: collapse; }
+  th { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #7a7068; font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid #2e2a26; }
+  td { padding: 7px 10px; border-bottom: 1px solid #252220; vertical-align: top; line-height: 1.5; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 3px; font-size: 11px; font-family: 'Courier New', monospace; letter-spacing: 0.02em; }
+  .b-sup { background: #2a2040; color: #a99de0; }
+  .b-lin { background: #2a2010; color: #c9a96e; }
+  .b-con { background: #102a20; color: #7dc4a0; }
+  .b-aut { background: #2a1a10; color: #d4a080; }
+  .b-her { background: #2a1010; color: #d47070; }
+  .b-mov { background: #102030; color: #70a8d4; }
+  .b-lago { background: #102030; color: #70a8d4; }
+  .b-cen { background: #102a20; color: #7dc4a0; }
+  .b-ofi { background: #2a2010; color: #c9a96e; }
+  .b-fro { background: #2a1010; color: #d47070; }
+  .note { font-size: 11px; color: #7a7068; margin-top: 10px; font-style: italic; }
+  .season-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+  .s1 { background: #4a9a80; flex: 54; }
+  .s2 { background: #c9a060; flex: 48; }
+  .s3 { background: #6a6560; flex: 36; }
+  .s4 { background: #904040; flex: 36; }
+  .s5 { background: #c07020; flex: 78; }
+  .cal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 4px; }
+  .cal-card { background: #222018; border: 1px solid #2e2a26; border-radius: 4px; padding: 10px 12px; }
+  .cal-unit { font-size: 13px; color: #e8e0d4; margin-bottom: 4px; }
+  .cal-val { font-size: 11px; color: #7a7068; line-height: 1.5; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  strong { font-weight: bold; color: #e8e0d4; }
+  @media (max-width: 600px) {
+    .cal-grid { grid-template-columns: repeat(2, 1fr); }
+    .tabs { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html" class="back-link">&larr; Volver</a>
+  <h1>Zskahra</h1>
+  <p class="subtitle">Referencia rápida · Director de Juego</p>
+  <div class="tabs">
+    <button class="tab active" onclick="show('sufijos',this)">Sufijos</button>
+    <button class="tab" onclick="show('aldeas',this)">Aldeas</button>
+    <button class="tab" onclick="show('estaciones',this)">Estaciones</button>
+    <button class="tab" onclick="show('tiempo',this)">Tiempo</button>
+    <button class="tab" onclick="show('artefactos',this)">Artefactos</button>
+  </div>
+</header>
+
+<div class="content">
+
+  <!-- SUFIJOS -->
+  <div id="sufijos" class="panel active">
+    <div class="section-label">Supervivencia</div>
+    <table>
+      <tr><th style="width:80px">Sufijo</th><th style="width:130px">Significado</th><th>Cuándo se otorga</th><th>¿Se pierde?</th></tr>
+      <tr><td><span class="badge b-sup">-dren</span></td><td>del Caos</td><td>Mató su primera criatura del Caos. El rito de paso más común.</td><td>No</td></tr>
+      <tr><td><span class="badge b-sup">-mork</span></td><td>del acecho</td><td>Cazador consumado, múltiples criaturas abatidas.</td><td>No (honor aunque no cace)</td></tr>
+      <tr><td><span class="badge b-sup">-ruk</span></td><td>del cruce</td><td>Sobrevivió heridas que debieron matarlo.</td><td>No</td></tr>
+      <tr><td><span class="badge b-sup">-skar</span></td><td>del escudo</td><td>Lidera la defensa de la villa ante un ataque.</td><td>Sí, si abandona el rol</td></tr>
+    </table>
+
+    <div class="section-label">Linaje</div>
+    <table>
+      <tr><th style="width:80px">Sufijo</th><th style="width:130px">Significado</th><th>Cuándo se otorga</th><th>¿Se pierde?</th></tr>
+      <tr><td><span class="badge b-lin">-thar</span></td><td>del hogar</td><td>Unión reconocida públicamente. Primer escalón.</td><td>Sí, si la pareja muere o la unión se disuelve</td></tr>
+      <tr><td><span class="badge b-lin">-neth</span></td><td>del linaje</td><td>Tuvo un hijo sano que sobrevivió el primer año.</td><td>No, aunque el hijo muera después</td></tr>
+      <tr><td><span class="badge b-lin">-velar</span></td><td>del tronco</td><td>Múltiples hijos sanos. El más codiciado del sistema.</td><td>Nunca. La fertilidad ya fue demostrada.</td></tr>
+    </table>
+
+    <div class="section-label">Conocimiento y cuidado</div>
+    <table>
+      <tr><th style="width:80px">Sufijo</th><th style="width:130px">Significado</th><th>Cuándo se otorga</th><th>¿Se pierde?</th></tr>
+      <tr><td><span class="badge b-con">-val</span></td><td>del oficio</td><td>Oficio técnico reconocido: herrero, tejedor, maestro, agricultor.</td><td>Sí, si pierde la capacidad o el reconocimiento</td></tr>
+      <tr><td><span class="badge b-con">-sar</span></td><td>del saber</td><td>Memoria de villa, custodio de historias y genealogías.</td><td>Sí, si la villa retira el reconocimiento</td></tr>
+      <tr><td><span class="badge b-con">-ion</span></td><td>del sanar</td><td>Sanador, partera, tratante de heridas.</td><td>Sí, si acumula demasiadas muertes de pacientes</td></tr>
+      <tr><td><span class="badge b-con">-mir</span></td><td>del cuidador</td><td>Cuida huérfanos, ancianos, dolientes crónicos.</td><td>Sí, si cesa el cuidado</td></tr>
+      <tr><td><span class="badge b-con">-oth</span></td><td>del vidente</td><td>Intérprete de sueños y presagios. Distinto del -sar: este recuerda; el -oth interpreta.</td><td>Sí, si la villa pierde la fe</td></tr>
+      <tr><td><span class="badge b-con">-veth</span></td><td>del rito</td><td>Miembro de la orden Vethkar. Requiere formación y aceptación formal.</td><td>Sí, si la orden lo expulsa</td></tr>
+    </table>
+
+    <div class="section-label">Autoridad y justicia</div>
+    <table>
+      <tr><th style="width:80px">Sufijo</th><th style="width:130px">Significado</th><th>Cuándo se otorga</th><th>¿Se pierde?</th></tr>
+      <tr><td><span class="badge b-aut">-held</span></td><td>del guardián</td><td>Custodia pública irreemplazable: pilón, archivo, cementerio. 1–2 por villa.</td><td>Sí, si el asiento cambia de manos</td></tr>
+      <tr><td><span class="badge b-aut">-tav</span></td><td>del juicio</td><td>Media disputas, arbitra entre familias. La ley viva.</td><td>Sí, si la villa deselecciona</td></tr>
+      <tr><td><span class="badge b-aut">-kron</span></td><td>del líder</td><td>Cabeza de villa. Solo uno. Suele requerir -velar o -held previo.</td><td>Sí, el -kron destituido regresa a su sufijo anterior</td></tr>
+    </table>
+
+    <div class="section-label">Heridas y marcas</div>
+    <table>
+      <tr><th style="width:80px">Sufijo</th><th style="width:130px">Significado</th><th>Cuándo se otorga</th><th>¿Se pierde?</th></tr>
+      <tr><td><span class="badge b-her">-kel</span></td><td>del vacío</td><td>Pérdida irreparable pública: huérfano, viudo, perdió hijos.</td><td>No (el duelo ya fue reconocido)</td></tr>
+      <tr><td><span class="badge b-her">-vran</span></td><td>del desastre</td><td>Sobrevivió un evento catastrófico colectivo siendo joven.</td><td>No</td></tr>
+      <tr><td><span class="badge b-her">-nak</span></td><td>del destierro</td><td>Expulsado y readmitido, o carga culpa pública no resuelta.</td><td>Difícil. No es absoluto como el -khrav.</td></tr>
+      <tr><td><span class="badge b-her">-khrav</span></td><td>del Caos</td><td>Visiblemente tocado por el Caos. Sufijo-advertencia.</td><td>Solo si el Caos retrocede visiblemente (raro)</td></tr>
+    </table>
+
+    <div class="section-label">Movilidad</div>
+    <table>
+      <tr><th style="width:80px">Sufijo</th><th style="width:130px">Significado</th><th>Cuándo se otorga</th><th>¿Se pierde?</th></tr>
+      <tr><td><span class="badge b-mov">-ior</span></td><td>del viaje</td><td>Cruzó fuera de su villa al menos una vez y regresó.</td><td>No</td></tr>
+    </table>
+    <p class="note">Un sufijo no se reclama: se otorga. Quien intenta auto-otorgarse uno es, a los oídos de todos, un farsante.</p>
+  </div>
+
+  <!-- ALDEAS -->
+  <div id="aldeas" class="panel">
+    <table>
+      <tr><th>Villa</th><th>Tipo</th><th>Pobl.</th><th>Ed. media</th><th>Recurso</th><th>Nota en juego</th></tr>
+      <tr><td><strong>Halvar</strong></td><td><span class="badge b-lago">lago</span></td><td>~380</td><td>52</td><td>Sal</td><td>Sin su sal, la carne se pudre en cualquier caravana. Poder estructural que nadie ejerce abiertamente.</td></tr>
+      <tr><td><strong>Ikhmar</strong></td><td><span class="badge b-lago">lago</span></td><td>~310</td><td>58</td><td>Pescado, algas med.</td><td>Única fuente de proteína de lago y de plantas medicinales acuáticas.</td></tr>
+      <tr><td><strong>Siteth</strong></td><td><span class="badge b-cen">central</span></td><td>~720</td><td>55</td><td>Grano</td><td>La más poblada. Mercado grande cada Ciclo. Sede de la Cámara de semilla.</td></tr>
+      <tr><td><strong>Karven</strong></td><td><span class="badge b-cen">central</span></td><td>~290</td><td>61</td><td>Huertos, frutas, hierbas</td><td>Florece la Pendrael en los Días Ciegos. Edad media más alta del territorio.</td></tr>
+      <tr><td><strong>Poymel</strong></td><td><span class="badge b-cen">central</span></td><td>~240</td><td>48</td><td>Ganado tocado por el Caos</td><td>Cría animales con corrupción controlada. Vida dura; una de las edades media más bajas.</td></tr>
+      <tr><td><strong>Ydral</strong></td><td><span class="badge b-cen">central</span></td><td>~180</td><td>57</td><td>Agua dulce</td><td>La planta purificadora abastece a todo el territorio. Los Kelheld la operan a costa de su cuerpo.</td></tr>
+      <tr><td><strong>Logven</strong></td><td><span class="badge b-cen">central</span></td><td>~210</td><td>63</td><td>Archivo y memoria</td><td>No produce nada material. Reconcilia el velkrai del territorio cada Ciclo. Edad media más alta: 63.</td></tr>
+      <tr><td><strong>Litor</strong></td><td><span class="badge b-ofi">oficio</span></td><td>~265</td><td>50</td><td>Piedra, pilones</td><td>Mantiene los pilones del territorio. Sin Litor, las rutas mueren.</td></tr>
+      <tr><td><strong>Kalvek</strong></td><td><span class="badge b-ofi">oficio</span></td><td>~300</td><td>46</td><td>Metal, forja</td><td>El horno profundo es el único centro metalúrgico real. Repara artefactos de otras villas.</td></tr>
+      <tr><td><strong>Hisven</strong></td><td><span class="badge b-ofi">oficio</span></td><td>~255</td><td>60</td><td>Textiles, cuerdas</td><td>El telar mayor produce la cuerda que sostiene todas las caravanas.</td></tr>
+      <tr><td><strong>Theriv</strong></td><td><span class="badge b-fro">frontera</span></td><td>~220</td><td>44</td><td>Caza, rutas</td><td>Sin Vethkar fijo. Alta densidad de -dren entre la juventud. Controla rutas del oeste.</td></tr>
+      <tr><td><strong>Ksilnar</strong></td><td><span class="badge b-fro">frontera</span></td><td>~195</td><td>41</td><td>Madera de selva</td><td>Sin Vethkar fijo. La más joven en edad media. Selva agreste con alta presencia del Caos.</td></tr>
+    </table>
+    <p class="note">Población total: ~3.570 · Sin moneda. Funciona por cuotas, deudas y reputación.</p>
+  </div>
+
+  <!-- ESTACIONES -->
+  <div id="estaciones" class="panel">
+    <div class="season-bar">
+      <div class="s1"></div><div class="s2"></div><div class="s3"></div><div class="s4"></div><div class="s5"></div>
+    </div>
+    <p class="note" style="margin-bottom:16px;">Año = 288 Pasos · 5 estaciones de duración desigual</p>
+    <div class="section-label">Las 4 festividades</div>
+    <table style="margin-bottom:18px">
+      <tr><th>Festividad</th><th style="width:60px">Pasos</th><th>Estación</th><th>Carácter</th></tr>
+      <tr><td><strong>La Cosecha</strong></td><td>65–72</td><td>Calma Brillante</td><td>Comida grande, reconocimiento de hitos del año, uniones.</td></tr>
+      <tr><td><strong>La Cuenta</strong></td><td>89–96</td><td>Calma Brillante (final)</td><td>Civil. Reconciliación del velkrai mayor en Logven. Banquete en cada villa, mercado en Siteth.</td></tr>
+      <tr><td><strong>La Memoria</strong></td><td>137–140</td><td>Días Ciegos</td><td>Lámparas en umbrales, historias de los muertos. Visita Vethkar casa por casa.</td></tr>
+      <tr><td><strong>El Silencio</strong></td><td>285–288</td><td>La Conjunción</td><td>Ayuno, recogimiento, rondas mudas alrededor del pilón. Termina con la palabra "volvemos".</td></tr>
+    </table>
+    <div class="section-label">Las 5 estaciones</div>
+    <table>
+      <tr><th>Estación</th><th style="width:60px">Pasos</th><th>Carácter</th><th>Festividades</th></tr>
+      <tr>
+        <td><span class="dot" style="background:#4a9a80"></span><strong>El Despertar Rojo</strong></td>
+        <td>54</td>
+        <td>Soles bajos re-acercándose. Luz rojiza. Parto de criaturas del Caos. Período de mayor peligro exterior.</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><span class="dot" style="background:#c9a060"></span><strong>Calma Brillante</strong></td>
+        <td>48</td>
+        <td>Calor máximo, cosecha, fiestas. La temporada más optimista del año.</td>
+        <td><strong>La Cosecha</strong> (Pasos 65–72): comida grande, reconocimiento de hitos, uniones.<br><strong>La Cuenta</strong> (Pasos 89–96): reconciliación del velkrai en Logven. Mercado en Siteth.</td>
+      </tr>
+      <tr>
+        <td><span class="dot" style="background:#6a6560"></span><strong>El Velo</strong></td>
+        <td>48</td>
+        <td>Soles a distancia media. Clima estable. Temporada de caravana — la más segura para viajar.</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><span class="dot" style="background:#904040"></span><strong>Los Días Ciegos</strong></td>
+        <td>36</td>
+        <td>Soles en lados opuestos. Crepúsculos largos, vigilia ritual. Florece la Pendrael en Karven. Luz escasa.</td>
+        <td><strong>La Memoria</strong> (Pasos 137–140): lámparas en umbrales, historias de los muertos. Visita Vethkar casa por casa.</td>
+      </tr>
+      <tr>
+        <td><span class="dot" style="background:#c07020"></span><strong>La Conjunción</strong></td>
+        <td>78</td>
+        <td>Soles casi unidos. Luz extrema, calor máximo, artefactos imprevistos. Pulso de Orden anual. Cámara de semilla de Siteth bajo presión máxima.</td>
+        <td><strong>El Silencio</strong> (Pasos 285–288): ayuno, recogimiento, rondas mudas alrededor del pilón. Termina: "volvemos".</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- TIEMPO -->
+  <div id="tiempo" class="panel">
+    <div class="section-label">Unidades del calendario</div>
+    <div class="cal-grid">
+      <div class="cal-card">
+        <div class="cal-unit">El Paso</div>
+        <div class="cal-val">42 horas</div>
+        <div class="cal-val" style="margin-top:6px">Día completo. Actividad + Hora Baja + sueño.</div>
+      </div>
+      <div class="cal-card">
+        <div class="cal-unit">El Pulso</div>
+        <div class="cal-val">8 Pasos (336 h)</div>
+        <div class="cal-val" style="margin-top:6px">Semana. Termina con el destello máximo de los soles alineados.</div>
+      </div>
+      <div class="cal-card">
+        <div class="cal-unit">El Ciclo</div>
+        <div class="cal-val">4 Pulsos · 32 Pasos</div>
+        <div class="cal-val" style="margin-top:6px">Plazo y contrato. Mercado grande de Siteth cada Ciclo.</div>
+      </div>
+      <div class="cal-card">
+        <div class="cal-unit">El Año</div>
+        <div class="cal-val">9 Ciclos · 288 Pasos</div>
+        <div class="cal-val" style="margin-top:6px">Año completo. 5 estaciones de duración desigual.</div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:20px">Tiempos de viaje</div>
+    <table>
+      <tr><th>Categoría</th><th style="width:70px">Pasos</th><th>Ejemplos</th></tr>
+      <tr><td>Vecinas cercanas</td><td>2–3</td><td>Siteth–Logven · Litor–Kalvek · Hisven–Poymel · Poymel–Ksilnar</td></tr>
+      <tr><td>Cercanas</td><td>4–6</td><td>Halvar–Ikhmar · Karven–Litor · Ydral–Kalvek · Ikhmar–Siteth</td></tr>
+      <tr><td>Medias</td><td>7–9</td><td>Halvar–Karven · Logven–Litor · Karven–Theriv · Hisven–Ydral</td></tr>
+      <tr><td>Largas</td><td>10–13</td><td>Halvar–Ydral · Halvar–Litor · Ydral–Theriv · Halvar–Theriv (ruta oeste)</td></tr>
+      <tr><td>Extremas</td><td>14+</td><td>Halvar–Ksilnar (cruce diagonal completo)</td></tr>
+    </table>
+    <p class="note" style="margin-top:8px">Caravana cargada con micro-pilón: ~20 km/Paso.</p>
+  </div>
+
+  <!-- ARTEFACTOS -->
+  <div id="artefactos" class="panel">
+    <div class="section-label">Los 6 artefactos mayores</div>
+    <table>
+      <tr><th>Villa</th><th>Artefacto</th><th>Función crítica</th><th>Guardianes</th><th>Coste humano</th></tr>
+      <tr><td><strong>Ydral</strong></td><td>Planta purificadora</td><td>Purifica el manantial y abastece agua potable a todo el territorio vía el río.</td><td>Los Kelheld (3–4 por generación)</td><td>Alto. Los Kelheld acumulan Caos con los años. Envejecen visiblemente antes de los 50.</td></tr>
+      <tr><td><strong>Kalvek</strong></td><td>Horno profundo</td><td>Único lugar para fundir metales difíciles y reparar piezas de otros artefactos.</td><td>-held del horno y maestros forjadores</td><td>Moderado. Calor extremo y exposición prolongada al Caos.</td></tr>
+      <tr><td><strong>Halvar</strong></td><td>Pozas tratadoras</td><td>Acelera la evaporación y limpia la sal de impurezas que el sol solo no quita.</td><td>Capataz de pozas</td><td>Bajo-moderado. Exposición continua al filtrado del lago (Caos contenido).</td></tr>
+      <tr><td><strong>Hisven</strong></td><td>Telar mayor</td><td>Produce cuerda de grosor y resistencia que ningún telar manual puede igualar.</td><td>Maestros tejedores de Hisven</td><td>Bajo. Principalmente desgaste físico.</td></tr>
+      <tr><td><strong>Siteth</strong></td><td>Cámara de semilla</td><td>Mantiene vivas las semillas entre estaciones, crítica durante La Conjunción.</td><td>-held de los graneros centrales</td><td>Bajo. Mantenimiento técnico de runas estacionales.</td></tr>
+      <tr><td><strong>Logven</strong></td><td>Cámara de archivo</td><td>Preserva los velkrai de generaciones pasadas de la descomposición.</td><td>-sar y -held de Logven</td><td>Mínimo. Exposición crónica baja.</td></tr>
+    </table>
+
+    <div class="section-label" style="margin-top:20px">Micro-pilones de ruta</div>
+    <table>
+      <tr><th>Propiedad</th><th>Detalle</th></tr>
+      <tr><td>Función</td><td>Protegen el perímetro de una caravana acampada. Alcance: ~100–200 m. Más efectivos detenidos que en marcha.</td></tr>
+      <tr><td>Origen</td><td>No se fabrican ni se reactivan. Los que hay son los que hay.</td></tr>
+      <tr><td>Desgaste</td><td>Cada generación muere alguno. Cada pérdida es una ruta menos segura. Los -sar de Logven llevan la cuenta.</td></tr>
+      <tr><td>Pilones de villa</td><td>Distintos de los micro-pilones. Cuando un pilón de villa se apaga, la villa se evacúa hasta que Litor manda un equipo.</td></tr>
+    </table>
+    <p class="note" style="margin-top:8px">Regla general: mientras haya pilón, hay villa. Cuando el pilón se apaga, la villa muere.</p>
+  </div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

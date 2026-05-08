@@ -36,6 +36,17 @@ textarea{resize:vertical;min-height:70px}
 .toggle-group{display:flex;flex-wrap:wrap;gap:6px}
 .toggle-btn{padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--cream-dim);font-family:'Crimson Text',serif;font-size:15px;cursor:pointer;transition:all .15s}
 .toggle-btn.active{background:#2a1800;border-color:var(--gold);color:var(--gold)}
+/* RANDOM TRAITS */
+.traits-box{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:12px;margin-top:4px}
+.trait-row{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
+.trait-row:last-child{border-bottom:none}
+.trait-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;color:var(--gold-dim);text-transform:uppercase;min-width:80px;padding-top:2px;flex-shrink:0}
+.trait-value{font-size:14px;color:var(--cream);flex:1;font-style:italic}
+.reroll-btn{background:none;border:1px solid var(--border);border-radius:3px;color:var(--cream-dim);padding:3px 8px;font-size:13px;cursor:pointer;flex-shrink:0;transition:all .15s}
+.reroll-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+.reroll-all{width:100%;margin-top:10px;padding:8px;background:none;border:1px solid var(--border);border-radius:3px;color:var(--cream-dim);font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.reroll-all:hover{border-color:var(--gold-dim);color:var(--cream)}
+/* PROMPT */
 .prompt-container{margin-top:20px;border:1px solid var(--border);border-radius:4px;overflow:hidden}
 .prompt-header{background:var(--surface2);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
 .prompt-header span{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase}
@@ -90,10 +101,10 @@ textarea{resize:vertical;min-height:70px}
         <span>Prompt generado</span>
         <button class="btn btn-primary" style="flex:0;padding:6px 14px;font-size:11px;" onclick="copyPrompt()">Copiar</button>
       </div>
-      <div class="prompt-text" id="prompt-output">Selecciona un origen y completa los campos...</div>
+      <div class="prompt-text" id="prompt-output">Selecciona un origen...</div>
     </div>
     <div class="save-row">
-      <div class="field"><label>Nombre del personaje</label><input type="text" id="char-name" placeholder="Nombre de tu personaje..."></div>
+      <div class="field"><label>Nombre</label><input type="text" id="char-name" placeholder="Nombre del personaje..."></div>
       <button class="btn btn-secondary" onclick="saveCharacter()">Guardar</button>
     </div>
   </section>
@@ -104,34 +115,554 @@ textarea{resize:vertical;min-height:70px}
 </main>
 <div class="toast" id="toast"></div>
 <script>
-let currentRace='aldeano',currentData={};
-function switchTab(tab){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['crear','guardados'][i]===tab));document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');if(tab==='guardados')renderSaved()}
-function setRace(race,btn){currentRace=race;document.querySelectorAll('.race-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderForm();updatePrompt()}
-const forms={
-aldeano:`<div class="section-title">Identidad</div><div class="form-grid"><div class="field"><label>Género</label><div class="toggle-group"><button class="toggle-btn active" data-field="gender" data-val="male" onclick="setToggle(this)">Hombre</button><button class="toggle-btn" data-field="gender" data-val="female" onclick="setToggle(this)">Mujer</button></div></div><div class="field"><label>Edad</label><select onchange="setVal('age',this.value)"><option value="young adult (~18)">Joven adulto (~18)</option><option value="young adult (~20)">Joven adulto (~20)</option><option value="adult (~30)" selected>Adulto (~30)</option><option value="mature adult (~45)">Adulto maduro (~45)</option><option value="elder (~60)">Anciano (~60)</option></select></div><div class="field"><label>Villa de origen</label><select onchange="setVal('village',this.value)"><option>Ksilnar</option><option>Theriv</option><option>Karven</option><option>Logven</option><option>Litor</option><option>Kalvek</option><option>Hisven</option><option>Poymel</option><option>Sitesh</option><option>Halvar</option><option>Ikhmar</option><option>Ydral</option></select></div><div class="field"><label>Oficio / Sufijo</label><select onchange="setVal('role',this.value)"><option value="-ior (caravanero)">-ior · caravanero</option><option value="-mork (cazador/guerrero)">-mork · cazador/guerrero</option><option value="-ion (sanador)" selected>-ion · sanador</option><option value="-val (artesano/tejedor)">-val · artesano/tejedor</option><option value="-sar (archivista)">-sar · archivista</option><option value="-veth (religioso)">-veth · religioso</option><option value="-held (artefactos)">-held · artefactos</option><option value="-kron (consejo)">-kron · consejo</option><option value="-oth (vidente)">-oth · vidente</option><option value="aprendiz sin sufijo">Aprendiz (sin sufijo)</option></select></div></div><div class="section-title">Apariencia</div><div class="form-grid"><div class="field"><label>Color de pelo</label><select onchange="setVal('hair_color',this.value)"><option value="platinum blonde">Rubio platino</option><option value="ash blonde" selected>Rubio ceniza</option><option value="light brown">Castaño claro</option><option value="medium brown">Castaño medio</option><option value="dark brown">Castaño oscuro</option><option value="auburn">Pelirrojo (raro)</option></select></div><div class="field"><label>Largo de pelo</label><div class="toggle-group"><button class="toggle-btn" data-field="hair_length" data-val="cropped" onclick="setToggle(this)">Corto</button><button class="toggle-btn active" data-field="hair_length" data-val="shoulder-length" onclick="setToggle(this)">Medio</button><button class="toggle-btn" data-field="hair_length" data-val="long" onclick="setToggle(this)">Largo</button></div></div><div class="field"><label>Estilo</label><div class="toggle-group"><button class="toggle-btn" data-field="hair_style" data-val="loose" onclick="setToggle(this)">Suelto</button><button class="toggle-btn active" data-field="hair_style" data-val="tied back with cord" onclick="setToggle(this)">Recogido</button><button class="toggle-btn" data-field="hair_style" data-val="braided" onclick="setToggle(this)">Trenzado</button></div></div><div class="field"><label>Color de ojos</label><div class="toggle-group"><button class="toggle-btn active" data-field="eyes" data-val="pale grey" onclick="setToggle(this)">Gris</button><button class="toggle-btn" data-field="eyes" data-val="pale blue" onclick="setToggle(this)">Azul</button><button class="toggle-btn" data-field="eyes" data-val="green" onclick="setToggle(this)">Verde</button><button class="toggle-btn" data-field="eyes" data-val="blue-grey" onclick="setToggle(this)">Azul-gris</button></div></div><div class="field"><label>Tono de piel</label><div class="toggle-group"><button class="toggle-btn active" data-field="skin_scale" data-val="1" onclick="setToggle(this)">Muy claro</button><button class="toggle-btn" data-field="skin_scale" data-val="2" onclick="setToggle(this)">Claro</button></div></div></div><div class="section-title">Escena</div><div class="form-grid"><div class="field"><label>Contexto</label><select onchange="setVal('background',this.value)"><option value="interior of the village, stone buildings in background">Interior de villa</option><option value="edge of the village at dusk, forest visible beyond">Borde de villa al anochecer</option><option value="open road between villages, dry grassland">Ruta entre villas</option><option value="forest edge, treeline ahead">Borde del bosque</option><option value="beside a stone village pilón, late afternoon light">Junto a un pilón</option><option value="riverbank, water visible behind">Orilla del río</option><option value="salt flats, white deposits around">Salinas</option></select></div><div class="field"><label>Descripción libre (opcional)</label><textarea placeholder="Rasgos únicos, cicatrices, expresión, historia..." onchange="setVal('notes',this.value)" oninput="setVal('notes',this.value)"></textarea></div></div>`,
-mellizo:`<div class="section-title">Personaje</div><div class="form-grid"><div class="field"><label>¿Cuál mellizo?</label><div class="toggle-group"><button class="toggle-btn active" data-field="twin" data-val="female" onclick="setToggle(this)">Ella</button><button class="toggle-btn" data-field="twin" data-val="male" onclick="setToggle(this)">Él</button></div></div><div class="field"><label>Edad</label><div class="toggle-group"><button class="toggle-btn" data-field="age" data-val="~16" onclick="setToggle(this)">~16</button><button class="toggle-btn active" data-field="age" data-val="~18" onclick="setToggle(this)">~18</button><button class="toggle-btn" data-field="age" data-val="~20" onclick="setToggle(this)">~20</button></div></div></div><div class="section-title">Escena</div><div class="form-grid"><div class="field"><label>Contexto</label><select onchange="setVal('context',this.value)"><option value="medicinal herb garden at the edge of the village, late morning">Jardín medicinal (ella)</option><option value="beside a village pilón at late dusk">Junto al pilón al anochecer (él)</option><option value="inside the village, slightly apart from the crowd">Interior de villa, apartado</option><option value="at the edge of the village, looking toward the forest">Borde de villa, mirando al bosque</option></select></div><div class="field"><label>Descripción libre (opcional)</label><textarea placeholder="Expresión, postura, detalles del momento..." onchange="setVal('notes',this.value)" oninput="setVal('notes',this.value)"></textarea></div></div>`
+// ── STATE ──────────────────────────────────────────────────
+let currentRace = 'aldeano';
+let currentData = {};
+let randomTraits = { face: '', scar: '', wild: '' };
+
+// ── RANDOM BANKS ───────────────────────────────────────────
+const faceBank = [
+  'long and narrow face, sharp angular cheekbones',
+  'angular face with a prominent square jaw',
+  'oval face, high cheekbones, softer jawline',
+  'long face with strong aquiline bone structure',
+  'narrow face, deep-set eyes, prominent brow ridge',
+  'angular face, wide-set eyes, high flat cheekbones',
+  'long jaw, slightly asymmetric — left side slightly fuller',
+  'fine-boned angular face, almost severe in its precision'
+];
+
+const noseBank = [
+  'straight and narrow nose',
+  'slightly aquiline nose, strong bridge',
+  'short straight nose, faintly wide at the tip',
+  'long fine nose with a slight downward tip',
+  'broad bridge, flat tip',
+  'narrow nose with a faint leftward lean — broken once'
+];
+
+const browBank = [
+  'heavy expressive brows',
+  'fine sparse brows, barely there',
+  'strong defined brows set low over the eyes',
+  'asymmetric brows — the left sits slightly higher',
+  'straight thick brows, almost meeting at center',
+  'arched brows that give a permanent look of mild inquiry'
+];
+
+const profScars = {
+  '-ior (caravanero)': [
+    'a faded rope burn scar circling the left wrist',
+    'a small scar on the chin from an old road fall',
+    'a healed split through the right eyebrow',
+    'wind-chapped lips, cracked at the left corner — chronic'
+  ],
+  '-mork (cazador/guerrero)': [
+    'a pale scar crossing the left jaw from ear to chin',
+    'three parallel old claw marks on the right forearm',
+    'a crooked nose, broken once and healed imperfectly',
+    'the tip of the left little finger missing — old trap accident'
+  ],
+  '-ion (sanador)': [
+    'a small circular burn on the right palm from an old hot vessel',
+    'faint herb-stain discoloration on the inner wrists',
+    'unusually clean, careful hands with early calluses on fingertips only',
+    'a habit of holding the hands open and relaxed, always'
+  ],
+  '-val (artesano/tejedor)': [
+    'blue-grey dye stains permanently embedded in the knuckles',
+    'a rope callus on the right palm, raised and rough',
+    'a thin cut scar on the left index finger, old and white',
+    'permanently stained fingernails, work that never fully washes off'
+  ],
+  '-sar (archivista)': [
+    'fine lines at the outer corners of the eyes from years of close reading',
+    'unusually smooth hands from cord work, no calluses',
+    'a faint ink smudge on the right wrist that never fully cleans',
+    'a slight habitual tilt of the head to the left when listening'
+  ],
+  '-veth (religioso)': [
+    'a small deliberate ritual scar on the left palm, old and precise',
+    'bead-wear marks on the neck where the cords have rested for years',
+    'eyes that hold contact a beat longer than comfortable',
+    'a quality of absolute stillness in the face at rest'
+  ],
+  '-held (artefactos)': [
+    'a small burn mark on the back of the right hand from an energy discharge',
+    'one eyebrow slightly thinner where an old burn healed',
+    'faint blue-grey discoloration at the fingertips from contact exposure',
+    'a habit of going very still when examining anything small'
+  ],
+  '-kron (consejo)': [
+    'deep lines at the eye corners from decades of decisions made in silence',
+    'a long-healed scar on the left forearm, old enough to be pure white',
+    'a permanent slight furrow between the brows',
+    'hands that move slowly and with absolute deliberateness'
+  ],
+  '-oth (vidente)': [
+    'faint dark circles under both eyes — disrupted sleep, chronic',
+    'a habit of looking slightly past whoever is speaking',
+    'a small self-inflicted ritual nick on the left earlobe, old',
+    'the quality of someone who has been frightened by their own dreams'
+  ],
+  'aprendiz sin sufijo': [
+    'a fresh small cut on the right hand, recently acquired',
+    'work residue on the hands not fully scrubbed clean',
+    'a slight hesitation before making direct eye contact',
+    'the careful posture of someone still learning how much space to take'
+  ]
 };
-function renderForm(){const c=document.getElementById('form-container');c.innerHTML=forms[currentRace]||'';currentData={};c.querySelectorAll('.toggle-btn.active').forEach(b=>{currentData[b.dataset.field]=b.dataset.val});c.querySelectorAll('select').forEach(s=>{const m=s.getAttribute('onchange')?.match(/'([^']+)'/);if(m)currentData[m[1]]=s.value})}
-function setToggle(btn){const f=btn.dataset.field;btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentData[f]=btn.dataset.val;updatePrompt()}
-function setVal(f,v){currentData[f]=v;updatePrompt()}
-function buildAldeano(d){
-const h=d.gender==='female'?'1.85–2.00m':'1.95–2.10m';
-const beard=d.gender==='male'?'\nNo beard or very light stubble.':'';
-const skin=d.skin_scale==='2'?'skin tone scale 2 out of 10 — very light grey tint, barely perceptible, still nearly white.':'skin tone scale 1 out of 10 — near-white, minimal hatching, almost no shadow on skin surface.';
-const props={'-ior (caravanero)':'Carrying: travel pack on one shoulder, worn leather pouch at hip, folded document tucked into belt. Road-worn sandals.','-mork (cazador/guerrero)':'Carrying: hunting spear in one hand. Rough feather-and-hide shoulder cape. Small pouch at hip.','-ion (sanador)':'Carrying: bundle of fresh medicinal herbs in one hand. Wide belt with small herb pouches. Small cloth folded over forearm.','-val (artesano/tejedor)':'Carrying: rope coils at hip, small tool in hand. Stained fingers from work.','-sar (archivista)':'Carrying: multiple bundles of knotted cords at belt, one held loosely and read by touch.','-veth (religioso)':'Carrying: ritual staff. Many bead strands at neck. Raw linen band on left wrist.','-held (artefactos)':'Carrying: two or three small precision metal tools held carefully. A cleaning cloth in the other hand.','-kron (consejo)':'Nothing in hand. Simple but well-kept garments. Weight of authority in posture.','-oth (vidente)':'Carrying: small shallow ritual bowl. Knotted cord bundles at belt.','aprendiz sin sufijo':'Simple tools for the trade being learned. Attentive apprentice posture.'};
-return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.\nNO TEXT, NO LABELS, NO WRITING anywhere.\n\nSubject: a ${d.age} ${d.gender==='male'?'man':'woman'}, Aldeano from ${d.village||'a village'}, role: ${d.role}.\nExtraordinarily tall and lean (~${h}), limbs disproportionately long, very low body weight for height. NOT muscular. Built for agility.\n\nFace: angular, ${d.eyes} eyes.${beard}\n\nHair: ${d.hair_color}, ${d.hair_length}, ${d.hair_style}.\n\nSkin: ${skin}\n\n${props[d.role]||'Simple draped linen garments, earth tones.'}\n\nSimple draped linen garments, layered, earth tones. Cord-laced sandals.${d.notes?'\n\nAdditional notes: '+d.notes:''}\n\nBackground: ${d.background||'interior of the village'}.`}
-function buildMellizo(d){
-const f=d.twin==='female';
-if(f)return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.\nNO TEXT, NO LABELS, NO WRITING anywhere.\n\nSubject: a young woman, approximately ${d.age||'~18'} years old, raised in an Aldeano village.\n1.75m tall — visibly shorter and more solidly built than any Aldeano. Wide-shouldered, compact, muscular density visible. Stocky compared to the tall willowy Aldeano physique.\n\nSkin: skin tone medium grey, scale 6 out of 10 where 1=white 10=black. Noticeably darker than any Aldeano. No marks on skin.\n\nFace: strikingly beautiful, strong symmetry. High prominent cheekbones, defined jaw. Full lips, slightly broad nose. Deep-set dark grey eyes — warm and attentive.\n\nHair: dark brown, almost black. Long, loosely braided. A few small dried herb stems tucked in.\n\nAround neck: a small amulet on a cord — old, worn smooth. Not touching it consciously.\n\nClothing: simple Aldeano linen wrap, earth tones. Wide belt with small herb pouches. Cord-laced sandals.\nCarrying: bundle of fresh medicinal herbs in one hand. Small cloth folded over forearm.${d.notes?'\n\nAdditional notes: '+d.notes:''}\n\nBackground: ${d.context||'medicinal herb garden at the edge of the village'}.`;
-return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.\nNO TEXT, NO LABELS, NO WRITING anywhere.\n\nSubject: a young man, approximately ${d.age||'~18'} years old, raised in an Aldeano village.\n1.82m tall — visibly shorter and more solidly built than any Aldeano. Wide-shouldered, compact, muscular density visible. Stocky compared to the tall willowy Aldeano physique.\n\nSkin: skin tone medium grey, scale 6 out of 10 where 1=white 10=black. Noticeably darker than any Aldeano. No marks on skin.\n\nFace: strong symmetry, high prominent cheekbones. Angular jaw. Dark grey eyes, wide-set, expression still and inward — quiet, listening.\n\nHair: dark, tight curls, close-cropped at sides, slightly longer on top.\n\nAround neck: a small amulet on a cord — old, worn smooth. Identical to one his sister carries.\n\nClothing: simple Aldeano linen wrap, white-cream tones. Belt with small pouch and knotted cord bundles. Cord-laced sandals.\nCarrying: small shallow ritual bowl in one hand. Other arm raised slightly, palm open upward — quiet reception, not power.${d.notes?'\n\nAdditional notes: '+d.notes:''}\n\nBackground: ${d.context||'beside a village pilón at late dusk'}.`}
-function updatePrompt(){let p='';try{if(currentRace==='aldeano')p=buildAldeano(currentData);else if(currentRace==='mellizo')p=buildMellizo(currentData)}catch(e){p='Error generando prompt.'}document.getElementById('prompt-output').textContent=p}
-function copyPrompt(){navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).then(()=>showToast('Prompt copiado'))}
-async function saveCharacter(){const name=document.getElementById('char-name').value.trim();if(!name){showToast('Escribe un nombre primero');return}const char={id:Date.now().toString(),name,race:currentRace,data:{...currentData},saved:new Date().toLocaleDateString('es')};let chars=[];try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}chars.unshift(char);await window.storage.set('zskahra-player-chars',JSON.stringify(chars));document.getElementById('char-name').value='';showToast(`"${name}" guardado`)}
-async function renderSaved(){const list=document.getElementById('char-list');let chars=[];try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}if(!chars.length){list.innerHTML='<div class="empty-state">No hay personajes guardados aún.</div>';return}list.innerHTML=chars.map(c=>`<div class="char-card"><div class="char-info"><h3>${c.name}</h3><p>${c.race==='aldeano'?'Aldeano/a':'Mellizo/a'} · ${c.saved||''}</p></div><div class="char-actions"><button class="char-btn char-btn-load" onclick="loadChar('${c.id}')">Cargar</button><button class="char-btn char-btn-del" onclick="deleteChar('${c.id}')">✕</button></div></div>`).join('')}
-async function loadChar(id){let chars=[];try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}const char=chars.find(c=>c.id===id);if(!char)return;switchTab('crear');currentRace=char.race;document.querySelectorAll('.race-btn').forEach((b,i)=>b.classList.toggle('active',['aldeano','mellizo'][i]===char.race));currentData={...char.data};renderForm();setTimeout(()=>{document.querySelectorAll('.toggle-btn').forEach(b=>{if(b.dataset.field&&currentData[b.dataset.field]===b.dataset.val){b.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active')}});document.querySelectorAll('select').forEach(s=>{const m=s.getAttribute('onchange')?.match(/'([^']+)'/);if(m&&currentData[m[1]])s.value=currentData[m[1]]});updatePrompt()},50);document.getElementById('char-name').value=char.name;showToast(`"${char.name}" cargado`)}
-async function deleteChar(id){let chars=[];try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}chars=chars.filter(c=>c.id!==id);await window.storage.set('zskahra-player-chars',JSON.stringify(chars));renderSaved();showToast('Personaje eliminado')}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
-renderForm();updatePrompt();
+
+const wildBank = [
+  'a small dark birthmark just below the left eye',
+  'one earlobe slightly torn — an old cord accident',
+  'the left eye very slightly paler than the right',
+  'unusually heavy brows for an Aldeano — ancestral throwback',
+  'a gap between the two front teeth, visible when speaking',
+  'a scar through the left eyebrow — hair does not grow there',
+  'the left ear sits fractionally higher than the right, giving a subtle asymmetry',
+  'hands noticeably large for their frame',
+  'a permanent faint upturn at the left corner of the mouth — nerve damage, old',
+  'one eye very slightly larger than the other',
+  'cheekbones so sharp they cast visible shadow in direct light',
+  'a small patch of hair at the left temple that grows in a different direction',
+  'the right hand has a slightly longer index finger than the left — asymmetric',
+  'a faint old watermark-like discoloration on the right side of the neck, congenital'
+];
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function rollAll(role) {
+  const scars = profScars[role] || profScars['aprendiz sin sufijo'];
+  randomTraits = {
+    face: pick(faceBank) + ', ' + pick(noseBank) + '. ' + pick(browBank) + '.',
+    scar: pick(scars),
+    wild: pick(wildBank)
+  };
+  renderTraits();
+  updatePrompt();
+}
+
+function rollOne(key, role) {
+  if (key === 'face') randomTraits.face = pick(faceBank) + ', ' + pick(noseBank) + '. ' + pick(browBank) + '.';
+  if (key === 'scar') { const s = profScars[role] || profScars['aprendiz sin sufijo']; randomTraits.scar = pick(s); }
+  if (key === 'wild') randomTraits.wild = pick(wildBank);
+  renderTraits();
+  updatePrompt();
+}
+
+function renderTraits() {
+  const box = document.getElementById('traits-display');
+  if (!box) return;
+  box.innerHTML = `
+    <div class="trait-row">
+      <span class="trait-label">Cara</span>
+      <span class="trait-value">${randomTraits.face}</span>
+      <button class="reroll-btn" onclick="rollOne('face','${currentData.role||'aprendiz sin sufijo'}')">🎲</button>
+    </div>
+    <div class="trait-row">
+      <span class="trait-label">Marca</span>
+      <span class="trait-value">${randomTraits.scar}</span>
+      <button class="reroll-btn" onclick="rollOne('scar','${currentData.role||'aprendiz sin sufijo'}')">🎲</button>
+    </div>
+    <div class="trait-row">
+      <span class="trait-label">Distintivo</span>
+      <span class="trait-value">${randomTraits.wild}</span>
+      <button class="reroll-btn" onclick="rollOne('wild','${currentData.role||'aprendiz sin sufijo'}')">🎲</button>
+    </div>
+    <button class="reroll-all" onclick="rollAll('${currentData.role||'aprendiz sin sufijo'}')">🎲 Reroll todo</button>
+  `;
+}
+
+// ── TABS ───────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['crear','guardados'][i]===tab));
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if (tab==='guardados') renderSaved();
+}
+
+function setRace(race, btn) {
+  currentRace = race;
+  document.querySelectorAll('.race-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderForm();
+  updatePrompt();
+}
+
+// ── FORMS ──────────────────────────────────────────────────
+const profFaceNotes = {
+  '-ior (caravanero)': 'Expression of someone who reads distances — habitually assessing what lies ahead.',
+  '-mork (cazador/guerrero)': 'Alert expression, jaw set. Eyes that scan rather than rest.',
+  '-ion (sanador)': 'Warm and attentive expression — the gaze of someone who reads people the way others read terrain.',
+  '-val (artesano/tejedor)': 'Focused, inward quality. A person more comfortable with their hands than their words.',
+  '-sar (archivista)': 'Concentrated expression, slight forward lean of the head — the habit of someone always about to ask something.',
+  '-veth (religioso)': 'Still and inward. A face that gives away very little at rest.',
+  '-held (artefactos)': 'Precise, careful gaze — accustomed to looking at small things. Patient.',
+  '-kron (consejo)': 'Weight of authority visible in bearing. A face earned, not aged.',
+  '-oth (vidente)': 'Eyes slightly unfocused, tracking something at a different layer of the visible.',
+  'aprendiz sin sufijo': 'Attentive, careful. The slight uncertainty of someone still learning what they are.'
+};
+
+const roleProps = {
+  '-ior (caravanero)': 'Carrying: travel pack on one shoulder, worn leather pouch at hip, folded document tucked into belt. Road-worn sandals.',
+  '-mork (cazador/guerrero)': 'Carrying: hunting spear in one hand. Rough feather-and-hide shoulder cape. Small pouch at hip.',
+  '-ion (sanador)': 'Carrying: bundle of fresh medicinal herbs in one hand. Wide belt with small herb pouches. Small cloth folded over forearm.',
+  '-val (artesano/tejedor)': 'Carrying: rope coils at hip, small tool in hand. Stained fingers from work.',
+  '-sar (archivista)': 'Carrying: multiple bundles of knotted cords at belt, one held loosely and read by touch.',
+  '-veth (religioso)': 'Carrying: ritual staff. Many bead strands at neck. Raw linen band on left wrist with a specific knot.',
+  '-held (artefactos)': 'Carrying: two or three small precision metal tools held carefully. Cleaning cloth in other hand.',
+  '-kron (consejo)': 'Nothing in hand. Simple but well-kept garments. Deliberate posture of authority.',
+  '-oth (vidente)': 'Carrying: small shallow ritual bowl in one hand. Knotted cord bundles at belt. Other hand raised slightly, palm open.',
+  'aprendiz sin sufijo': 'Simple tools for the trade being learned. Attentive apprentice posture.'
+};
+
+function getAldFormHTML() {
+  return `
+    <div class="section-title">Identidad</div>
+    <div class="form-grid">
+      <div class="field"><label>Género</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-field="gender" data-val="male" onclick="setToggle(this)">Hombre</button>
+          <button class="toggle-btn" data-field="gender" data-val="female" onclick="setToggle(this)">Mujer</button>
+        </div>
+      </div>
+      <div class="field"><label>Edad</label>
+        <select onchange="setVal('age',this.value)">
+          <option value="young adult (~18)">Joven adulto (~18)</option>
+          <option value="young adult (~20)">Joven adulto (~20)</option>
+          <option value="adult (~30)" selected>Adulto (~30)</option>
+          <option value="mature adult (~45)">Adulto maduro (~45)</option>
+          <option value="elder (~60)">Anciano (~60)</option>
+        </select>
+      </div>
+      <div class="field"><label>Villa de origen</label>
+        <select onchange="setVal('village',this.value)">
+          <option>Ksilnar</option><option>Theriv</option><option>Karven</option>
+          <option>Logven</option><option>Litor</option><option>Kalvek</option>
+          <option>Hisven</option><option>Poymel</option><option>Sitesh</option>
+          <option>Halvar</option><option>Ikhmar</option><option>Ydral</option>
+        </select>
+      </div>
+      <div class="field"><label>Oficio / Sufijo</label>
+        <select onchange="onRoleChange(this.value)">
+          <option value="-ior (caravanero)">-ior · caravanero</option>
+          <option value="-mork (cazador/guerrero)">-mork · cazador/guerrero</option>
+          <option value="-ion (sanador)" selected>-ion · sanador</option>
+          <option value="-val (artesano/tejedor)">-val · artesano/tejedor</option>
+          <option value="-sar (archivista)">-sar · archivista</option>
+          <option value="-veth (religioso)">-veth · religioso</option>
+          <option value="-held (artefactos)">-held · artefactos</option>
+          <option value="-kron (consejo)">-kron · consejo</option>
+          <option value="-oth (vidente)">-oth · vidente</option>
+          <option value="aprendiz sin sufijo">Aprendiz (sin sufijo)</option>
+        </select>
+      </div>
+    </div>
+    <div class="section-title">Apariencia</div>
+    <div class="form-grid">
+      <div class="field"><label>Color de pelo</label>
+        <select onchange="setVal('hair_color',this.value)">
+          <option value="platinum blonde">Rubio platino</option>
+          <option value="ash blonde" selected>Rubio ceniza</option>
+          <option value="light brown">Castaño claro</option>
+          <option value="medium brown">Castaño medio</option>
+          <option value="dark brown">Castaño oscuro</option>
+          <option value="auburn">Pelirrojo (raro)</option>
+        </select>
+      </div>
+      <div class="field"><label>Largo de pelo</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" data-field="hair_length" data-val="cropped" onclick="setToggle(this)">Corto</button>
+          <button class="toggle-btn active" data-field="hair_length" data-val="shoulder-length" onclick="setToggle(this)">Medio</button>
+          <button class="toggle-btn" data-field="hair_length" data-val="long" onclick="setToggle(this)">Largo</button>
+        </div>
+      </div>
+      <div class="field"><label>Estilo de pelo</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" data-field="hair_style" data-val="loose" onclick="setToggle(this)">Suelto</button>
+          <button class="toggle-btn active" data-field="hair_style" data-val="tied back with cord" onclick="setToggle(this)">Recogido</button>
+          <button class="toggle-btn" data-field="hair_style" data-val="braided" onclick="setToggle(this)">Trenzado</button>
+        </div>
+      </div>
+      <div class="field"><label>Color de ojos</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-field="eyes" data-val="pale grey" onclick="setToggle(this)">Gris</button>
+          <button class="toggle-btn" data-field="eyes" data-val="pale blue" onclick="setToggle(this)">Azul</button>
+          <button class="toggle-btn" data-field="eyes" data-val="green" onclick="setToggle(this)">Verde</button>
+          <button class="toggle-btn" data-field="eyes" data-val="blue-grey" onclick="setToggle(this)">Azul-gris</button>
+        </div>
+      </div>
+      <div class="field"><label>Tono de piel</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-field="skin_scale" data-val="1" onclick="setToggle(this)">Muy claro</button>
+          <button class="toggle-btn" data-field="skin_scale" data-val="2" onclick="setToggle(this)">Claro</button>
+        </div>
+      </div>
+    </div>
+    <div class="section-title">Rasgos únicos <span style="font-size:10px;color:var(--cream-dim);font-family:'Crimson Text',serif;text-transform:none;letter-spacing:0;font-style:italic;margin-left:6px">generados automáticamente — re-rolleable</span></div>
+    <div class="traits-box" id="traits-display">Cargando...</div>
+    <div class="section-title">Escena</div>
+    <div class="form-grid">
+      <div class="field"><label>Contexto</label>
+        <select onchange="setVal('background',this.value)">
+          <option value="interior of the village, stone buildings in background">Interior de villa</option>
+          <option value="edge of the village at dusk, forest visible beyond">Borde de villa al anochecer</option>
+          <option value="open road between villages, dry grassland">Ruta entre villas</option>
+          <option value="forest edge, treeline ahead">Borde del bosque</option>
+          <option value="beside a stone village pilón, late afternoon light">Junto a un pilón</option>
+          <option value="riverbank, water visible behind">Orilla del río</option>
+          <option value="salt flats, white deposits around">Salinas</option>
+        </select>
+      </div>
+      <div class="field"><label>Notas adicionales (opcional)</label>
+        <textarea placeholder="Detalles extra, historia, sobreescribir rasgos..." onchange="setVal('notes',this.value)" oninput="setVal('notes',this.value)"></textarea>
+      </div>
+    </div>
+  `;
+}
+
+function getMellizoFormHTML() {
+  return `
+    <div class="section-title">Personaje</div>
+    <div class="form-grid">
+      <div class="field"><label>¿Cuál mellizo?</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-field="twin" data-val="female" onclick="setToggle(this)">Ella</button>
+          <button class="toggle-btn" data-field="twin" data-val="male" onclick="setToggle(this)">Él</button>
+        </div>
+      </div>
+      <div class="field"><label>Edad</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" data-field="age" data-val="~16" onclick="setToggle(this)">~16</button>
+          <button class="toggle-btn active" data-field="age" data-val="~18" onclick="setToggle(this)">~18</button>
+          <button class="toggle-btn" data-field="age" data-val="~20" onclick="setToggle(this)">~20</button>
+        </div>
+      </div>
+    </div>
+    <div class="section-title">Rasgos únicos <span style="font-size:10px;color:var(--cream-dim);font-family:'Crimson Text',serif;text-transform:none;letter-spacing:0;font-style:italic;margin-left:6px">generados automáticamente</span></div>
+    <div class="traits-box" id="traits-display">Cargando...</div>
+    <div class="section-title">Escena</div>
+    <div class="form-grid">
+      <div class="field"><label>Contexto</label>
+        <select onchange="setVal('context',this.value)">
+          <option value="medicinal herb garden at the edge of the village, late morning">Jardín medicinal (ella)</option>
+          <option value="beside a village pilón at late dusk">Junto al pilón al anochecer (él)</option>
+          <option value="inside the village, slightly apart from the crowd">Interior de villa, apartado</option>
+          <option value="at the edge of the village, looking toward the forest">Borde de villa, mirando al bosque</option>
+        </select>
+      </div>
+      <div class="field"><label>Notas adicionales (opcional)</label>
+        <textarea placeholder="Expresión, postura, detalles del momento..." onchange="setVal('notes',this.value)" oninput="setVal('notes',this.value)"></textarea>
+      </div>
+    </div>
+  `;
+}
+
+function renderForm() {
+  const c = document.getElementById('form-container');
+  c.innerHTML = currentRace === 'aldeano' ? getAldFormHTML() : getMellizoFormHTML();
+  currentData = {};
+  c.querySelectorAll('.toggle-btn.active').forEach(b => { currentData[b.dataset.field] = b.dataset.val; });
+  c.querySelectorAll('select').forEach(s => {
+    const m = s.getAttribute('onchange')?.match(/'([^']+)'/);
+    if (m) currentData[m[1]] = s.value;
+  });
+  if (currentRace === 'aldeano') currentData.role = '-ion (sanador)';
+  const role = currentData.role || 'aprendiz sin sufijo';
+  rollAll(role);
+}
+
+function onRoleChange(val) {
+  currentData.role = val;
+  rollAll(val);
+  updatePrompt();
+}
+
+function setToggle(btn) {
+  const f = btn.dataset.field;
+  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentData[f] = btn.dataset.val;
+  updatePrompt();
+}
+
+function setVal(f, v) { currentData[f] = v; updatePrompt(); }
+
+// ── PROMPT BUILDERS ────────────────────────────────────────
+function buildAldeano(d) {
+  const h = d.gender === 'female' ? '1.85–2.00m' : '1.95–2.10m';
+  const beard = d.gender === 'male' ? ' No beard or very light stubble.' : '';
+  const skin = d.skin_scale === '2'
+    ? 'skin tone scale 2 out of 10 — very light grey tint, barely perceptible, still nearly white.'
+    : 'skin tone scale 1 out of 10 — near-white, minimal hatching, almost no shadow on skin surface.';
+  const faceNote = profFaceNotes[d.role] || '';
+  const props = roleProps[d.role] || 'Simple draped linen garments, earth tones.';
+
+  return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.
+NO TEXT, NO LABELS, NO WRITING anywhere.
+
+Subject: a ${d.age} ${d.gender === 'male' ? 'man' : 'woman'}, Aldeano from ${d.village || 'a village'}, role: ${d.role}.
+Extraordinarily tall and lean (~${h}), limbs disproportionately long, very low body weight for height. NOT muscular. Built for agility.
+
+Face: ${randomTraits.face}${beard}
+${faceNote}
+
+Hair: ${d.hair_color}, ${d.hair_length}, ${d.hair_style}.
+Eyes: ${d.eyes}.
+
+Skin: ${skin}
+
+Distinctive physical detail: ${randomTraits.scar}.
+Unique trait: ${randomTraits.wild}.
+
+${props}
+
+Simple draped linen garments, layered, earth tones. Cord-laced sandals.${d.notes ? '\n\nAdditional notes: ' + d.notes : ''}
+
+Background: ${d.background || 'interior of the village'}.`;
+}
+
+function buildMellizo(d) {
+  const isFemale = d.twin === 'female';
+  const wild = `Distinctive detail: ${randomTraits.wild}.`;
+  if (isFemale) {
+    return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.
+NO TEXT, NO LABELS, NO WRITING anywhere.
+
+Subject: a young woman, approximately ${d.age || '~18'} years old, raised in an Aldeano village.
+1.75m tall — visibly shorter and more solidly built than any Aldeano. Wide-shouldered, compact, muscular density visible. Stocky compared to the tall willowy Aldeano physique.
+
+Skin: skin tone medium grey, scale 6 out of 10 where 1=white 10=black. Noticeably darker than any Aldeano. No marks on skin.
+
+Face: strikingly beautiful, strong symmetry. High prominent cheekbones, defined jaw. Full lips, slightly broad nose. Deep-set dark grey eyes — warm and attentive.
+${wild}
+
+Hair: dark brown, almost black. Long, loosely braided. A few small dried herb stems tucked in.
+
+Around neck: a small amulet on a cord — old, worn smooth. Not touching it consciously.
+
+Clothing: simple Aldeano linen wrap, earth tones. Wide belt with small herb pouches. Cord-laced sandals.
+Carrying: bundle of fresh medicinal herbs in one hand. Small cloth folded over forearm.${d.notes ? '\n\nAdditional notes: ' + d.notes : ''}
+
+Background: ${d.context || 'medicinal herb garden at the edge of the village'}.`;
+  }
+  return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.
+NO TEXT, NO LABELS, NO WRITING anywhere.
+
+Subject: a young man, approximately ${d.age || '~18'} years old, raised in an Aldeano village.
+1.82m tall — visibly shorter and more solidly built than any Aldeano. Wide-shouldered, compact, muscular density visible.
+
+Skin: skin tone medium grey, scale 6 out of 10 where 1=white 10=black. Noticeably darker than any Aldeano. No marks on skin.
+
+Face: strong symmetry, high prominent cheekbones. Angular jaw. Dark grey eyes, wide-set, expression still and inward.
+${wild}
+
+Hair: dark, tight curls, close-cropped at sides, slightly longer on top.
+
+Around neck: a small amulet on a cord — old, worn smooth. Identical to one his sister carries.
+
+Clothing: simple Aldeano linen wrap, white-cream tones. Belt with small pouch and knotted cord bundles. Cord-laced sandals.
+Carrying: small shallow ritual bowl in one hand. Other arm raised slightly, palm open upward.${d.notes ? '\n\nAdditional notes: ' + d.notes : ''}
+
+Background: ${d.context || 'beside a village pilón at late dusk'}.`;
+}
+
+function updatePrompt() {
+  let p = '';
+  try {
+    if (currentRace === 'aldeano') p = buildAldeano(currentData);
+    else p = buildMellizo(currentData);
+  } catch(e) { p = 'Error generando prompt.'; }
+  document.getElementById('prompt-output').textContent = p;
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(document.getElementById('prompt-output').textContent)
+    .then(() => showToast('Prompt copiado'));
+}
+
+// ── SAVE / LOAD ────────────────────────────────────────────
+async function saveCharacter() {
+  const name = document.getElementById('char-name').value.trim();
+  if (!name) { showToast('Escribe un nombre primero'); return; }
+  const char = {
+    id: Date.now().toString(), name,
+    race: currentRace,
+    data: { ...currentData },
+    traits: { ...randomTraits },
+    saved: new Date().toLocaleDateString('es')
+  };
+  let chars = [];
+  try { const r = await window.storage.get('zskahra-player-chars'); if (r) chars = JSON.parse(r.value); } catch(e) {}
+  chars.unshift(char);
+  await window.storage.set('zskahra-player-chars', JSON.stringify(chars));
+  document.getElementById('char-name').value = '';
+  showToast(`"${name}" guardado`);
+}
+
+async function renderSaved() {
+  const list = document.getElementById('char-list');
+  let chars = [];
+  try { const r = await window.storage.get('zskahra-player-chars'); if (r) chars = JSON.parse(r.value); } catch(e) {}
+  if (!chars.length) { list.innerHTML = '<div class="empty-state">No hay personajes guardados aún.</div>'; return; }
+  list.innerHTML = chars.map(c => `
+    <div class="char-card">
+      <div class="char-info"><h3>${c.name}</h3><p>${c.race === 'aldeano' ? 'Aldeano/a' : 'Mellizo/a'} · ${c.saved || ''}</p></div>
+      <div class="char-actions">
+        <button class="char-btn char-btn-load" onclick="loadChar('${c.id}')">Cargar</button>
+        <button class="char-btn char-btn-del" onclick="deleteChar('${c.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+async function loadChar(id) {
+  let chars = [];
+  try { const r = await window.storage.get('zskahra-player-chars'); if (r) chars = JSON.parse(r.value); } catch(e) {}
+  const char = chars.find(c => c.id === id);
+  if (!char) return;
+  switchTab('crear');
+  currentRace = char.race;
+  document.querySelectorAll('.race-btn').forEach((b, i) => b.classList.toggle('active', ['aldeano','mellizo'][i] === char.race));
+  currentData = { ...char.data };
+  if (char.traits) randomTraits = { ...char.traits };
+  renderForm();
+  setTimeout(() => {
+    document.querySelectorAll('.toggle-btn').forEach(b => {
+      if (b.dataset.field && currentData[b.dataset.field] === b.dataset.val) {
+        b.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+      }
+    });
+    document.querySelectorAll('select').forEach(s => {
+      const m = s.getAttribute('onchange')?.match(/'([^']+)'/);
+      if (m && currentData[m[1]]) s.value = currentData[m[1]];
+    });
+    if (char.traits) { randomTraits = { ...char.traits }; renderTraits(); }
+    updatePrompt();
+  }, 60);
+  document.getElementById('char-name').value = char.name;
+  showToast(`"${char.name}" cargado`);
+}
+
+async function deleteChar(id) {
+  let chars = [];
+  try { const r = await window.storage.get('zskahra-player-chars'); if (r) chars = JSON.parse(r.value); } catch(e) {}
+  chars = chars.filter(c => c.id !== id);
+  await window.storage.set('zskahra-player-chars', JSON.stringify(chars));
+  renderSaved();
+  showToast('Personaje eliminado');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── INIT ───────────────────────────────────────────────────
+renderForm();
 </script>
 </body>
 </html>

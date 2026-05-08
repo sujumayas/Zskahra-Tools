@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra — Generador de Imágenes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#110e08;--surface:#1e1608;--surface2:#2a1e0a;--border:#4a3418;--border-light:#6a4d28;--gold:#c8a045;--gold-dim:#8a6a2a;--cream:#e8d5a0;--cream-dim:#a08850;--prompt-bg:#0a0805}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--cream);font-family:'Crimson Text',Georgia,serif;font-size:17px;line-height:1.5;min-height:100vh}
+.back-link{display:block;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-decoration:none;text-transform:uppercase;transition:color .15s}
+.back-link:hover{color:var(--gold)}
+header{background:var(--surface);border-bottom:2px solid var(--gold);padding:20px 16px 14px;text-align:center;position:sticky;top:0;z-index:100}
+header h1{font-family:'Cinzel',serif;font-size:22px;font-weight:800;color:var(--gold);letter-spacing:3px;text-transform:uppercase}
+header p{font-size:13px;color:var(--cream-dim);margin-top:3px;font-style:italic}
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface)}
+.tab{flex:1;padding:12px;text-align:center;font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;color:var(--cream-dim);cursor:pointer;border:none;background:none;transition:all .2s;border-bottom:2px solid transparent}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+main{padding:16px;max-width:700px;margin:0 auto}
+section{display:none}
+section.active{display:block}
+.section-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.race-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.race-btn{padding:14px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--cream-dim);font-family:'Cinzel',serif;font-size:14px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-align:center}
+.race-btn:hover{border-color:var(--gold-dim);color:var(--cream)}
+.race-btn.active{background:#2a1e00;border-color:var(--gold);color:var(--gold)}
+.race-sub{font-size:11px;color:var(--cream-dim);display:block;margin-top:4px;font-family:'Crimson Text',serif;font-style:italic;letter-spacing:0}
+.form-grid{display:grid;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;color:var(--gold-dim);text-transform:uppercase}
+select,input[type=text],textarea{background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--cream);font-family:'Crimson Text',serif;font-size:16px;padding:9px 10px;width:100%;appearance:none;-webkit-appearance:none;outline:none;transition:border-color .2s}
+select:focus,input:focus,textarea:focus{border-color:var(--gold-dim)}
+select option{background:#1e1608}
+textarea{resize:vertical;min-height:70px}
+.toggle-group{display:flex;flex-wrap:wrap;gap:6px}
+.toggle-btn{padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--cream-dim);font-family:'Crimson Text',serif;font-size:15px;cursor:pointer;transition:all .15s}
+.toggle-btn.active{background:#2a1800;border-color:var(--gold);color:var(--gold)}
+.prompt-container{margin-top:20px;border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.prompt-header{background:var(--surface2);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.prompt-header span{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase}
+.prompt-text{background:var(--prompt-bg);padding:14px;font-family:'Courier Prime',monospace;font-size:12px;line-height:1.7;color:#b8a878;white-space:pre-wrap;word-break:break-word;max-height:300px;overflow-y:auto}
+.btn{flex:1;padding:12px;border:none;border-radius:4px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-primary{background:var(--gold);color:#0a0805;font-weight:600}
+.btn-primary:hover{background:#dab855}
+.btn-secondary{background:var(--surface2);color:var(--cream);border:1px solid var(--border-light)}
+.btn-secondary:hover{border-color:var(--gold-dim)}
+.save-row{display:flex;gap:8px;margin-top:12px;align-items:flex-end}
+.save-row .field{flex:1;margin:0}
+.save-row .btn{flex:0 0 auto;padding:9px 16px}
+.char-list{display:flex;flex-direction:column;gap:8px}
+.char-card{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+.char-card:hover{border-color:var(--gold-dim)}
+.char-info h3{font-family:'Cinzel',serif;font-size:14px;color:var(--cream);font-weight:600}
+.char-info p{font-size:13px;color:var(--cream-dim);margin-top:2px;font-style:italic}
+.char-actions{display:flex;gap:6px}
+.char-btn{padding:6px 10px;border-radius:3px;font-size:12px;cursor:pointer;border:1px solid;font-family:'Cinzel',serif;letter-spacing:.5px;transition:all .15s}
+.char-btn-load{background:#1a1400;color:var(--gold);border-color:var(--gold-dim)}
+.char-btn-del{background:#1a0500;color:#c85040;border-color:#5a1a10}
+.empty-state{text-align:center;padding:40px 20px;color:var(--cream-dim);font-style:italic}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gold);color:#0a0805;padding:10px 20px;border-radius:4px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;transition:transform .3s;z-index:999}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.divider{height:1px;background:var(--border);margin:20px 0}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link">&larr; Volver</a>
+<header>
+  <h1>Zskahra</h1>
+  <p>Generador de imágenes de personaje</p>
+</header>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('crear')">Crear</button>
+  <button class="tab" onclick="switchTab('guardados')">Guardados</button>
+</div>
+<main>
+  <section id="tab-crear" class="active">
+    <div class="section-title">Origen</div>
+    <div class="race-grid">
+      <button class="race-btn active" onclick="setRace('aldeano',this)">Aldeano/a<span class="race-sub">Nacido en las villas</span></button>
+      <button class="race-btn" onclick="setRace('mellizo',this)">Mellizo/a<span class="race-sub">Criado en las villas</span></button>
+    </div>
+    <div id="form-container"></div>
+    <div class="divider"></div>
+    <div class="prompt-container">
+      <div class="prompt-header">
+        <span>Prompt generado</span>
+        <button class="btn btn-primary" style="flex:0;padding:6px 14px;font-size:11px;" onclick="copyPrompt()">Copiar</button>
+      </div>
+      <div class="prompt-text" id="prompt-output">Selecciona un origen y completa los campos...</div>
+    </div>
+    <div class="save-row">
+      <div class="field"><label>Nombre del personaje</label><input type="text" id="char-name" placeholder="Nombre de tu personaje..."></div>
+      <button class="btn btn-secondary" onclick="saveCharacter()">Guardar</button>
+    </div>
+  </section>
+  <section id="tab-guardados">
+    <div class="section-title">Personajes guardados</div>
+    <div class="char-list" id="char-list"><div class="empty-state">No hay personajes guardados aún.</div></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+let currentRace='aldeano',currentData={};
+function switchTab(tab){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['crear','guardados'][i]===tab));document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');if(tab==='guardados')renderSaved()}
+function setRace(race,btn){currentRace=race;document.querySelectorAll('.race-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderForm();updatePrompt()}
+const forms={
+aldeano:`<div class="section-title">Identidad</div><div class="form-grid"><div class="field"><label>Género</label><div class="toggle-group"><button class="toggle-btn active" data-field="gender" data-val="male" onclick="setToggle(this)">Hombre</button><button class="toggle-btn" data-field="gender" data-val="female" onclick="setToggle(this)">Mujer</button></div></div><div class="field"><label>Edad</label><select onchange="setVal('age',this.value)"><option value="young adult (~18)">Joven adulto (~18)</option><option value="young adult (~20)">Joven adulto (~20)</option><option value="adult (~30)" selected>Adulto (~30)</option><option value="mature adult (~45)">Adulto maduro (~45)</option><option value="elder (~60)">Anciano (~60)</option></select></div><div class="field"><label>Villa de origen</label><select onchange="setVal('village',this.value)"><option>Ksilnar</option><option>Theriv</option><option>Karven</option><option>Logven</option><option>Litor</option><option>Kalvek</option><option>Hisven</option><option>Poymel</option><option>Sitesh</option><option>Halvar</option><option>Ikhmar</option><option>Ydral</option></select></div><div class="field"><label>Oficio / Sufijo</label><select onchange="setVal('role',this.value)"><option value="-ior (caravanero)">-ior · caravanero</option><option value="-mork (cazador/guerrero)">-mork · cazador/guerrero</option><option value="-ion (sanador)" selected>-ion · sanador</option><option value="-val (artesano/tejedor)">-val · artesano/tejedor</option><option value="-sar (archivista)">-sar · archivista</option><option value="-veth (religioso)">-veth · religioso</option><option value="-held (artefactos)">-held · artefactos</option><option value="-kron (consejo)">-kron · consejo</option><option value="-oth (vidente)">-oth · vidente</option><option value="aprendiz sin sufijo">Aprendiz (sin sufijo)</option></select></div></div><div class="section-title">Apariencia</div><div class="form-grid"><div class="field"><label>Color de pelo</label><select onchange="setVal('hair_color',this.value)"><option value="platinum blonde">Rubio platino</option><option value="ash blonde" selected>Rubio ceniza</option><option value="light brown">Castaño claro</option><option value="medium brown">Castaño medio</option><option value="dark brown">Castaño oscuro</option><option value="auburn">Pelirrojo (raro)</option></select></div><div class="field"><label>Largo de pelo</label><div class="toggle-group"><button class="toggle-btn" data-field="hair_length" data-val="cropped" onclick="setToggle(this)">Corto</button><button class="toggle-btn active" data-field="hair_length" data-val="shoulder-length" onclick="setToggle(this)">Medio</button><button class="toggle-btn" data-field="hair_length" data-val="long" onclick="setToggle(this)">Largo</button></div></div><div class="field"><label>Estilo</label><div class="toggle-group"><button class="toggle-btn" data-field="hair_style" data-val="loose" onclick="setToggle(this)">Suelto</button><button class="toggle-btn active" data-field="hair_style" data-val="tied back with cord" onclick="setToggle(this)">Recogido</button><button class="toggle-btn" data-field="hair_style" data-val="braided" onclick="setToggle(this)">Trenzado</button></div></div><div class="field"><label>Color de ojos</label><div class="toggle-group"><button class="toggle-btn active" data-field="eyes" data-val="pale grey" onclick="setToggle(this)">Gris</button><button class="toggle-btn" data-field="eyes" data-val="pale blue" onclick="setToggle(this)">Azul</button><button class="toggle-btn" data-field="eyes" data-val="green" onclick="setToggle(this)">Verde</button><button class="toggle-btn" data-field="eyes" data-val="blue-grey" onclick="setToggle(this)">Azul-gris</button></div></div><div class="field"><label>Tono de piel</label><div class="toggle-group"><button class="toggle-btn active" data-field="skin_scale" data-val="1" onclick="setToggle(this)">Muy claro</button><button class="toggle-btn" data-field="skin_scale" data-val="2" onclick="setToggle(this)">Claro</button></div></div></div><div class="section-title">Escena</div><div class="form-grid"><div class="field"><label>Contexto</label><select onchange="setVal('background',this.value)"><option value="interior of the village, stone buildings in background">Interior de villa</option><option value="edge of the village at dusk, forest visible beyond">Borde de villa al anochecer</option><option value="open road between villages, dry grassland">Ruta entre villas</option><option value="forest edge, treeline ahead">Borde del bosque</option><option value="beside a stone village pilón, late afternoon light">Junto a un pilón</option><option value="riverbank, water visible behind">Orilla del río</option><option value="salt flats, white deposits around">Salinas</option></select></div><div class="field"><label>Descripción libre (opcional)</label><textarea placeholder="Rasgos únicos, cicatrices, expresión, historia..." onchange="setVal('notes',this.value)" oninput="setVal('notes',this.value)"></textarea></div></div>`,
+mellizo:`<div class="section-title">Personaje</div><div class="form-grid"><div class="field"><label>¿Cuál mellizo?</label><div class="toggle-group"><button class="toggle-btn active" data-field="twin" data-val="female" onclick="setToggle(this)">Ella</button><button class="toggle-btn" data-field="twin" data-val="male" onclick="setToggle(this)">Él</button></div></div><div class="field"><label>Edad</label><div class="toggle-group"><button class="toggle-btn" data-field="age" data-val="~16" onclick="setToggle(this)">~16</button><button class="toggle-btn active" data-field="age" data-val="~18" onclick="setToggle(this)">~18</button><button class="toggle-btn" data-field="age" data-val="~20" onclick="setToggle(this)">~20</button></div></div></div><div class="section-title">Escena</div><div class="form-grid"><div class="field"><label>Contexto</label><select onchange="setVal('context',this.value)"><option value="medicinal herb garden at the edge of the village, late morning">Jardín medicinal (ella)</option><option value="beside a village pilón at late dusk">Junto al pilón al anochecer (él)</option><option value="inside the village, slightly apart from the crowd">Interior de villa, apartado</option><option value="at the edge of the village, looking toward the forest">Borde de villa, mirando al bosque</option></select></div><div class="field"><label>Descripción libre (opcional)</label><textarea placeholder="Expresión, postura, detalles del momento..." onchange="setVal('notes',this.value)" oninput="setVal('notes',this.value)"></textarea></div></div>`
+};
+function renderForm(){const c=document.getElementById('form-container');c.innerHTML=forms[currentRace]||'';currentData={};c.querySelectorAll('.toggle-btn.active').forEach(b=>{currentData[b.dataset.field]=b.dataset.val});c.querySelectorAll('select').forEach(s=>{const m=s.getAttribute('onchange')?.match(/'([^']+)'/);if(m)currentData[m[1]]=s.value})}
+function setToggle(btn){const f=btn.dataset.field;btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');currentData[f]=btn.dataset.val;updatePrompt()}
+function setVal(f,v){currentData[f]=v;updatePrompt()}
+function buildAldeano(d){
+const h=d.gender==='female'?'1.85–2.00m':'1.95–2.10m';
+const beard=d.gender==='male'?'\nNo beard or very light stubble.':'';
+const skin=d.skin_scale==='2'?'skin tone scale 2 out of 10 — very light grey tint, barely perceptible, still nearly white.':'skin tone scale 1 out of 10 — near-white, minimal hatching, almost no shadow on skin surface.';
+const props={'-ior (caravanero)':'Carrying: travel pack on one shoulder, worn leather pouch at hip, folded document tucked into belt. Road-worn sandals.','-mork (cazador/guerrero)':'Carrying: hunting spear in one hand. Rough feather-and-hide shoulder cape. Small pouch at hip.','-ion (sanador)':'Carrying: bundle of fresh medicinal herbs in one hand. Wide belt with small herb pouches. Small cloth folded over forearm.','-val (artesano/tejedor)':'Carrying: rope coils at hip, small tool in hand. Stained fingers from work.','-sar (archivista)':'Carrying: multiple bundles of knotted cords at belt, one held loosely and read by touch.','-veth (religioso)':'Carrying: ritual staff. Many bead strands at neck. Raw linen band on left wrist.','-held (artefactos)':'Carrying: two or three small precision metal tools held carefully. A cleaning cloth in the other hand.','-kron (consejo)':'Nothing in hand. Simple but well-kept garments. Weight of authority in posture.','-oth (vidente)':'Carrying: small shallow ritual bowl. Knotted cord bundles at belt.','aprendiz sin sufijo':'Simple tools for the trade being learned. Attentive apprentice posture.'};
+return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.\nNO TEXT, NO LABELS, NO WRITING anywhere.\n\nSubject: a ${d.age} ${d.gender==='male'?'man':'woman'}, Aldeano from ${d.village||'a village'}, role: ${d.role}.\nExtraordinarily tall and lean (~${h}), limbs disproportionately long, very low body weight for height. NOT muscular. Built for agility.\n\nFace: angular, ${d.eyes} eyes.${beard}\n\nHair: ${d.hair_color}, ${d.hair_length}, ${d.hair_style}.\n\nSkin: ${skin}\n\n${props[d.role]||'Simple draped linen garments, earth tones.'}\n\nSimple draped linen garments, layered, earth tones. Cord-laced sandals.${d.notes?'\n\nAdditional notes: '+d.notes:''}\n\nBackground: ${d.background||'interior of the village'}.`}
+function buildMellizo(d){
+const f=d.twin==='female';
+if(f)return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.\nNO TEXT, NO LABELS, NO WRITING anywhere.\n\nSubject: a young woman, approximately ${d.age||'~18'} years old, raised in an Aldeano village.\n1.75m tall — visibly shorter and more solidly built than any Aldeano. Wide-shouldered, compact, muscular density visible. Stocky compared to the tall willowy Aldeano physique.\n\nSkin: skin tone medium grey, scale 6 out of 10 where 1=white 10=black. Noticeably darker than any Aldeano. No marks on skin.\n\nFace: strikingly beautiful, strong symmetry. High prominent cheekbones, defined jaw. Full lips, slightly broad nose. Deep-set dark grey eyes — warm and attentive.\n\nHair: dark brown, almost black. Long, loosely braided. A few small dried herb stems tucked in.\n\nAround neck: a small amulet on a cord — old, worn smooth. Not touching it consciously.\n\nClothing: simple Aldeano linen wrap, earth tones. Wide belt with small herb pouches. Cord-laced sandals.\nCarrying: bundle of fresh medicinal herbs in one hand. Small cloth folded over forearm.${d.notes?'\n\nAdditional notes: '+d.notes:''}\n\nBackground: ${d.context||'medicinal herb garden at the edge of the village'}.`;
+return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.\nNO TEXT, NO LABELS, NO WRITING anywhere.\n\nSubject: a young man, approximately ${d.age||'~18'} years old, raised in an Aldeano village.\n1.82m tall — visibly shorter and more solidly built than any Aldeano. Wide-shouldered, compact, muscular density visible. Stocky compared to the tall willowy Aldeano physique.\n\nSkin: skin tone medium grey, scale 6 out of 10 where 1=white 10=black. Noticeably darker than any Aldeano. No marks on skin.\n\nFace: strong symmetry, high prominent cheekbones. Angular jaw. Dark grey eyes, wide-set, expression still and inward — quiet, listening.\n\nHair: dark, tight curls, close-cropped at sides, slightly longer on top.\n\nAround neck: a small amulet on a cord — old, worn smooth. Identical to one his sister carries.\n\nClothing: simple Aldeano linen wrap, white-cream tones. Belt with small pouch and knotted cord bundles. Cord-laced sandals.\nCarrying: small shallow ritual bowl in one hand. Other arm raised slightly, palm open upward — quiet reception, not power.${d.notes?'\n\nAdditional notes: '+d.notes:''}\n\nBackground: ${d.context||'beside a village pilón at late dusk'}.`}
+function updatePrompt(){let p='';try{if(currentRace==='aldeano')p=buildAldeano(currentData);else if(currentRace==='mellizo')p=buildMellizo(currentData)}catch(e){p='Error generando prompt.'}document.getElementById('prompt-output').textContent=p}
+function copyPrompt(){navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).then(()=>showToast('Prompt copiado'))}
+async function saveCharacter(){const name=document.getElementById('char-name').value.trim();if(!name){showToast('Escribe un nombre primero');return}const char={id:Date.now().toString(),name,race:currentRace,data:{...currentData},saved:new Date().toLocaleDateString('es')};let chars=[];try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}chars.unshift(char);await window.storage.set('zskahra-player-chars',JSON.stringify(chars));document.getElementById('char-name').value='';showToast(`"${name}" guardado`)}
+async function renderSaved(){const list=document.getElementById('char-list');let chars=[];try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}if(!chars.length){list.innerHTML='<div class="empty-state">No hay personajes guardados aún.</div>';return}list.innerHTML=chars.map(c=>`<div class="char-card"><div class="char-info"><h3>${c.name}</h3><p>${c.race==='aldeano'?'Aldeano/a':'Mellizo/a'} · ${c.saved||''}</p></div><div class="char-actions"><button class="char-btn char-btn-load" onclick="loadChar('${c.id}')">Cargar</button><button class="char-btn char-btn-del" onclick="deleteChar('${c.id}')">✕</button></div></div>`).join('')}
+async function loadChar(id){let chars=[];try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}const char=chars.find(c=>c.id===id);if(!char)return;switchTab('crear');currentRace=char.race;document.querySelectorAll('.race-btn').forEach((b,i)=>b.classList.toggle('active',['aldeano','mellizo'][i]===char.race));currentData={...char.data};renderForm();setTimeout(()=>{document.querySelectorAll('.toggle-btn').forEach(b=>{if(b.dataset.field&&currentData[b.dataset.field]===b.dataset.val){b.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active')}});document.querySelectorAll('select').forEach(s=>{const m=s.getAttribute('onchange')?.match(/'([^']+)'/);if(m&&currentData[m[1]])s.value=currentData[m[1]]});updatePrompt()},50);document.getElementById('char-name').value=char.name;showToast(`"${char.name}" cargado`)}
+async function deleteChar(id){let chars=[];try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}chars=chars.filter(c=>c.id!==id);await window.storage.set('zskahra-player-chars',JSON.stringify(chars));renderSaved();showToast('Personaje eliminado')}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+renderForm();updatePrompt();
+</script>
+</body>
+</html>

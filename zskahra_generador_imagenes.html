@@ -6,7 +6,7 @@
 <title>Zskahra — Generador de Imágenes</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#110e08;--surface:#1e1608;--surface2:#2a1e0a;--border:#4a3418;--border-light:#6a4d28;--gold:#c8a045;--gold-dim:#8a6a2a;--cream:#e8d5a0;--cream-dim:#a08850;--prompt-bg:#0a0805}
+:root{--bg:#110e08;--surface:#1e1608;--surface2:#2a1e0a;--border:#4a3418;--border-light:#6a4d28;--gold:#c8a045;--gold-dim:#8a6a2a;--cream:#e8d5a0;--cream-dim:#a08850;--prompt-bg:#0a0805;--red-dim:#8a3020}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--cream);font-family:'Crimson Text',Georgia,serif;font-size:17px;line-height:1.5;min-height:100vh}
 .back-link{display:block;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-decoration:none;text-transform:uppercase;transition:color .15s}
@@ -31,12 +31,13 @@ section.active{display:block}
 label{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;color:var(--gold-dim);text-transform:uppercase}
 select,input[type=text],textarea{background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--cream);font-family:'Crimson Text',serif;font-size:16px;padding:9px 10px;width:100%;appearance:none;-webkit-appearance:none;outline:none;transition:border-color .2s}
 select:focus,input:focus,textarea:focus{border-color:var(--gold-dim)}
-select option{background:#1e1608}
+select option,select optgroup{background:#1e1608}
 textarea{resize:vertical;min-height:70px}
 .toggle-group{display:flex;flex-wrap:wrap;gap:6px}
 .toggle-btn{padding:7px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--cream-dim);font-family:'Crimson Text',serif;font-size:15px;cursor:pointer;transition:all .15s}
 .toggle-btn.active{background:#2a1800;border-color:var(--gold);color:var(--gold)}
-/* RANDOM TRAITS */
+.suffix-note{font-size:13px;color:var(--cream-dim);font-style:italic;padding:8px 10px;background:var(--surface);border-left:2px solid var(--gold-dim);border-radius:2px;margin-top:4px}
+.suffix-note.mark{border-left-color:var(--red-dim);color:#c88060}
 .traits-box{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:12px;margin-top:4px}
 .trait-row{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
 .trait-row:last-child{border-bottom:none}
@@ -46,7 +47,6 @@ textarea{resize:vertical;min-height:70px}
 .reroll-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
 .reroll-all{width:100%;margin-top:10px;padding:8px;background:none;border:1px solid var(--border);border-radius:3px;color:var(--cream-dim);font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s;text-transform:uppercase}
 .reroll-all:hover{border-color:var(--gold-dim);color:var(--cream)}
-/* PROMPT */
 .prompt-container{margin-top:20px;border:1px solid var(--border);border-radius:4px;overflow:hidden}
 .prompt-header{background:var(--surface2);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
 .prompt-header span{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase}
@@ -115,13 +115,9 @@ textarea{resize:vertical;min-height:70px}
 </main>
 <div class="toast" id="toast"></div>
 <script>
-// ── STATE ──────────────────────────────────────────────────
-let currentRace = 'aldeano';
-let currentData = {};
-let randomTraits = { face: '', scar: '', wild: '' };
+let currentRace='aldeano', currentData={}, randomTraits={face:'',scar:'',wild:''};
 
-// ── RANDOM BANKS ───────────────────────────────────────────
-const faceBank = [
+const faceBank=[
   'long and narrow face, sharp angular cheekbones',
   'angular face with a prominent square jaw',
   'oval face, high cheekbones, softer jawline',
@@ -131,8 +127,7 @@ const faceBank = [
   'long jaw, slightly asymmetric — left side slightly fuller',
   'fine-boned angular face, almost severe in its precision'
 ];
-
-const noseBank = [
+const noseBank=[
   'straight and narrow nose',
   'slightly aquiline nose, strong bridge',
   'short straight nose, faintly wide at the tip',
@@ -140,8 +135,7 @@ const noseBank = [
   'broad bridge, flat tip',
   'narrow nose with a faint leftward lean — broken once'
 ];
-
-const browBank = [
+const browBank=[
   'heavy expressive brows',
   'fine sparse brows, barely there',
   'strong defined brows set low over the eyes',
@@ -149,63 +143,202 @@ const browBank = [
   'straight thick brows, almost meeting at center',
   'arched brows that give a permanent look of mild inquiry'
 ];
+const wildBank=[
+  'a small dark birthmark just below the left eye',
+  'one earlobe slightly torn — an old cord accident',
+  'the left eye very slightly paler than the right',
+  'unusually heavy brows for an Aldeano',
+  'a gap between the two front teeth, visible when speaking',
+  'a scar through the left eyebrow — hair does not grow there',
+  'the left ear sits fractionally higher than the right',
+  'hands noticeably large for their frame',
+  'a permanent faint upturn at the left corner of the mouth',
+  'one eye very slightly larger than the other',
+  'cheekbones so sharp they cast visible shadow in direct light',
+  'a small patch of hair at the left temple that grows in a different direction',
+  'a faint old discoloration on the right side of the neck, congenital',
+  'a very slight rasp in the voice from an old throat injury',
+  'the right hand has one finger noticeably longer than the others'
+];
 
-const profScars = {
-  '-ior (caravanero)': [
-    'a faded rope burn scar circling the left wrist',
-    'a small scar on the chin from an old road fall',
-    'a healed split through the right eyebrow',
-    'wind-chapped lips, cracked at the left corner — chronic'
+const profFaceNotes={
+  '-dren (primer Caos)':'Recently crossed a threshold. The quality of someone who was a child last week and knows they are not anymore. Alert but not yet seasoned.',
+  '-mork (cazador)':'Alert expression, jaw set. Eyes that scan rather than rest. The habit of a body that knows it may need to move fast.',
+  '-ruk (superviviente)':'The stillness of someone who has been to the edge of survival and returned. Not haunted — completed. Something behind the eyes that was not there before.',
+  '-skar (defensor)':'Always assessing entrances and exits. The expression of someone whose first thought in any space is where the threat will come from.',
+  '-thar (unión)':'Settled in a way that most people are not. The ease of someone who has found where they belong and who they belong with.',
+  '-neth (padre/madre)':'Watchful in a way that has nothing to do with danger — the habit of someone who knows exactly how fragile life is.',
+  '-velar (tronco)':'No need to prove anything. The settled authority of someone whose social position is the most secure in the village.',
+  '-val (artesano)':'Focused, inward quality. A person more comfortable with their hands than their words.',
+  '-sar (archivista)':'Concentrated expression, slight forward lean — the habit of someone always about to ask something.',
+  '-ion (sanador)':'Warm and attentive — the gaze of someone who reads people the way others read terrain.',
+  '-mir (cuidador)':'Soft, unhurried attention. The gaze of someone who reads emotional states the way hunters read tracks.',
+  '-oth (vidente)':'Eyes slightly unfocused, tracking something at a different layer of the visible.',
+  '-veth (rito)':'Still and inward. A face that gives away very little at rest.',
+  '-held (guardián)':'Precise, careful gaze — accustomed to looking at small things for long periods. Patient.',
+  '-tav (árbitro)':'Carefully neutral expression — learned, not natural. Someone who has trained away their visible reactions.',
+  '-kron (líder)':'Weight of authority visible in bearing. A face earned, not aged.',
+  '-kel (vacío)':'The open carrying of grief — not weakness, social permission. A weight in the face that the village has agreed to acknowledge.',
+  '-vran (desastre)':'Occasionally the gaze moves to distances, checking. The habit of someone who was there when something came.',
+  '-nak (destierro)':'Reads the room with care. Watches reactions before speaking. Someone who knows what it means to have the village turn away.',
+  '-khrav (Caos tocado)':'Long used to being looked at differently. Neither apology nor defiance — the steady bearing of someone who has adjusted to what they are.',
+  '-ior (viajero)':'Expression of someone who reads distances — habitually assessing what lies ahead. Road-worn ease.',
+  'aprendiz sin sufijo':'Attentive, careful. The slight uncertainty of someone still learning what they are.'
+};
+
+const roleProps={
+  '-dren (primer Caos)':'Carrying: hunting knife at hip, still slightly unfamiliar on the belt. A small token from the first kill worn but not displayed. Nothing else yet — this person just crossed.',
+  '-mork (cazador)':'Carrying: hunting spear or bow. Rough feather-and-hide shoulder cape. Multiple small pouches of practical supplies.',
+  '-ruk (superviviente)':'The survival scars are the primary visual marker. Practical worn garments. Nothing extra — learned to travel light.',
+  '-skar (defensor)':'Weapon always accessible, never put away. A cord-bound signal device at belt. Positioned naturally to watch the approaches.',
+  '-thar (unión)':'Wearing: a braided cord bracelet on the right wrist — the union token, worn to softness. Otherwise the garments of their primary trade.',
+  '-neth (padre/madre)':'Wearing: a small carved token on a cord alongside their necklace — the child\'s first-year token. Garments of their primary trade.',
+  '-velar (tronco)':'Multiple small tokens of linaje worn without display — simply present. Well-kept practical garments. The ease of authority.',
+  '-val (artesano)':'Carrying: tools of the trade — rope coils, weaving implement, forging tongs, or appropriate craft tool. Stained or calloused hands.',
+  '-sar (archivista)':'Carrying: multiple bundles of knotted cords at belt, one held loosely and read by touch.',
+  '-ion (sanador)':'Carrying: bundle of fresh medicinal herbs in one hand. Wide belt with small herb pouches. Small cloth folded over forearm.',
+  '-mir (cuidador)':'Carrying: a simple folded cloth over one arm. Small comfort items at belt — dried herb bundle, a small wrapped object. Soft open hands.',
+  '-oth (vidente)':'Carrying: small shallow ritual bowl in one hand. Knotted cord bundles at belt.',
+  '-veth (rito)':'Carrying: ritual staff. Many bead strands at neck. Raw linen band on left wrist with a specific knot.',
+  '-held (guardián)':'Carrying: precision tools for the thing they guard. Lantern or inspection light. Record cord at belt.',
+  '-tav (árbitro)':'Carrying: a large complex knotted cord tally at belt — dispute records. Practical clean garments.',
+  '-kron (líder)':'Nothing in hand. Simple but well-kept garments. Deliberate posture of settled authority.',
+  '-kel (vacío)':'Wearing: a small dark cloth strip tied to the upper arm or wrist — visible mourning mark. Otherwise their trade garments, slightly less maintained.',
+  '-vran (desastre)':'Disaster scars visible on body. Practical worn garments. Nothing extra carried.',
+  '-nak (destierro)':'Minimal carry. Nothing that could be challenged. Garments worn slightly below their station — the caution of someone readmitted but not restored.',
+  '-khrav (Caos tocado)':'Practical covering garments. The Chaos marks at collar and wrists where cloth ends — not hidden, impossible to fully hide. A small space others leave around them.',
+  '-ior (viajero)':'Travel pack on one shoulder, worn leather pouch at hip, folded document at belt. Road-worn sandals.',
+  'aprendiz sin sufijo':'Simple tools for the trade being learned. Attentive apprentice posture.'
+};
+
+const profScars={
+  '-dren (primer Caos)':[
+    'a minor scratch on the right forearm from the first hunt, still recent',
+    'the freshness of the event still on the hands despite washing',
+    'a small trophy token worn around the neck — the first kill, raw and recent',
+    'eyes slightly wider than usual — adrenaline memory not yet settled'
   ],
-  '-mork (cazador/guerrero)': [
-    'a pale scar crossing the left jaw from ear to chin',
+  '-mork (cazador)':[
+    'a pale scar crossing the left jaw',
     'three parallel old claw marks on the right forearm',
     'a crooked nose, broken once and healed imperfectly',
     'the tip of the left little finger missing — old trap accident'
   ],
-  '-ion (sanador)': [
-    'a small circular burn on the right palm from an old hot vessel',
-    'faint herb-stain discoloration on the inner wrists',
-    'unusually clean, careful hands with early calluses on fingertips only',
-    'a habit of holding the hands open and relaxed, always'
+  '-ruk (superviviente)':[
+    'a long healed scar from collarbone to upper chest — this should have ended it',
+    'a deep old wound scar on the thigh, white and permanent',
+    'two fingers on the right hand healed slightly crooked after a break',
+    'a section of the left ear missing — clean edge, fully healed'
   ],
-  '-val (artesano/tejedor)': [
-    'blue-grey dye stains permanently embedded in the knuckles',
+  '-skar (defensor)':[
+    'calluses on both hands from weapon use, heavy and old',
+    'a scar across the back of the left hand — stopped something meant for someone else',
+    'a habit of standing with weight slightly forward, always ready',
+    'a faded impact bruise pattern on the forearm from repeated shield work'
+  ],
+  '-thar (unión)':[
+    'a braided cord bracelet on the right wrist, worn to softness',
+    'a small matching mark with their partner — deliberate, private',
+    'the ease in the body of someone who sleeps without one eye open',
+    'a small mended tear in their garment — maintained not replaced, for reasons'
+  ],
+  '-neth (padre/madre)':[
+    'a small carved token on the same cord as their necklace',
+    'hands that know automatically how to be gentle',
+    'a faded stain on the left shoulder, permanent from the first months',
+    'the particular attentiveness of someone whose ears are always half-listening'
+  ],
+  '-velar (tronco)':[
+    'multiple small tokens worn without display — they are simply there',
+    'laugh lines around the eyes from years of large household noise',
+    'a deliberate slowness in movement — no need to rush anything',
+    'the relaxed authority of someone with nothing left to prove'
+  ],
+  '-val (artesano)':[
+    'blue-grey dye stains embedded in the knuckles',
     'a rope callus on the right palm, raised and rough',
     'a thin cut scar on the left index finger, old and white',
-    'permanently stained fingernails, work that never fully washes off'
+    'permanently stained fingernails that never fully clean'
   ],
-  '-sar (archivista)': [
+  '-sar (archivista)':[
     'fine lines at the outer corners of the eyes from years of close reading',
     'unusually smooth hands from cord work, no calluses',
     'a faint ink smudge on the right wrist that never fully cleans',
     'a slight habitual tilt of the head to the left when listening'
   ],
-  '-veth (religioso)': [
-    'a small deliberate ritual scar on the left palm, old and precise',
-    'bead-wear marks on the neck where the cords have rested for years',
-    'eyes that hold contact a beat longer than comfortable',
-    'a quality of absolute stillness in the face at rest'
+  '-ion (sanador)':[
+    'a small circular burn on the right palm from an old hot vessel',
+    'faint herb-stain discoloration on the inner wrists',
+    'unusually clean and careful hands, early calluses on fingertips only',
+    'a habit of holding the hands open and relaxed at all times'
   ],
-  '-held (artefactos)': [
-    'a small burn mark on the back of the right hand from an energy discharge',
-    'one eyebrow slightly thinner where an old burn healed',
-    'faint blue-grey discoloration at the fingertips from contact exposure',
-    'a habit of going very still when examining anything small'
+  '-mir (cuidador)':[
+    'soft calluses from years of gentle work',
+    'a faint old herb stain at the inner wrist',
+    'the habit of keeping the body slightly turned toward whoever is speaking',
+    'a small worn smooth stone in the belt pouch — passed to people who need to hold something'
   ],
-  '-kron (consejo)': [
-    'deep lines at the eye corners from decades of decisions made in silence',
-    'a long-healed scar on the left forearm, old enough to be pure white',
-    'a permanent slight furrow between the brows',
-    'hands that move slowly and with absolute deliberateness'
-  ],
-  '-oth (vidente)': [
+  '-oth (vidente)':[
     'faint dark circles under both eyes — disrupted sleep, chronic',
     'a habit of looking slightly past whoever is speaking',
     'a small self-inflicted ritual nick on the left earlobe, old',
     'the quality of someone who has been frightened by their own dreams'
   ],
-  'aprendiz sin sufijo': [
+  '-veth (rito)':[
+    'a small deliberate ritual scar on the left palm, old and precise',
+    'bead-wear marks on the neck where cords have rested for years',
+    'eyes that hold contact a beat longer than comfortable',
+    'a quality of absolute stillness in the face at rest'
+  ],
+  '-held (guardián)':[
+    'a small burn mark on the back of the right hand from an energy discharge',
+    'one eyebrow slightly thinner where an old burn healed',
+    'faint discoloration at the fingertips from long contact work',
+    'a habit of going very still when examining anything small'
+  ],
+  '-tav (árbitro)':[
+    'a permanent slight tension at the jaw from years of careful listening',
+    'ink marks on the right forefinger from dispute-cord notation',
+    'the stillness of someone who has trained away their visible reactions',
+    'a small old cut on the left palm — from a settlement that got physical before it resolved'
+  ],
+  '-kron (líder)':[
+    'deep lines at the eye corners from decades of decisions made in silence',
+    'a long-healed scar on the left forearm, old enough to be pure white',
+    'a permanent slight furrow between the brows',
+    'hands that move slowly and with absolute deliberateness'
+  ],
+  '-kel (vacío)':[
+    'a dark cloth strip tied to the upper left arm',
+    'the slight hollowness around the eyes of someone sleeping lightly',
+    'a mended tear in their garment kept as-is — the mending is visible',
+    'a habit of pausing mid-sentence as if checking something is still there'
+  ],
+  '-vran (desastre)':[
+    'a scar pattern on arms or neck consistent with burns or falling debris',
+    'a faint tremor in the left hand that appears when they are very still',
+    'the habit of noting exits in any enclosed space',
+    'white hair at the temples that came years before its time'
+  ],
+  '-nak (destierro)':[
+    'a careful economy in gesture — someone who learned not to take up too much space',
+    'a slight hesitation before speaking in groups',
+    'a very minor permanent squint from long nights outside',
+    'the posture of someone who has slept outdoors for stretches of time'
+  ],
+  '-khrav (Caos tocado)':[
+    'the faintest grey tint at the skin — barely perceptible but permanent, appearing at collar and wrist edges',
+    'others automatically leave slightly more physical space — not hostility, reflex',
+    'a stillness that does not quite match ordinary people',
+    'eyes that animals track before people do'
+  ],
+  '-ior (viajero)':[
+    'a faded rope burn scar circling the left wrist',
+    'a small scar on the chin from an old road fall',
+    'a healed split through the right eyebrow',
+    'wind-chapped lips, cracked at the left corner — chronic'
+  ],
+  'aprendiz sin sufijo':[
     'a fresh small cut on the right hand, recently acquired',
     'work residue on the hands not fully scrubbed clean',
     'a slight hesitation before making direct eye contact',
@@ -213,111 +346,138 @@ const profScars = {
   ]
 };
 
-const wildBank = [
-  'a small dark birthmark just below the left eye',
-  'one earlobe slightly torn — an old cord accident',
-  'the left eye very slightly paler than the right',
-  'unusually heavy brows for an Aldeano — ancestral throwback',
-  'a gap between the two front teeth, visible when speaking',
-  'a scar through the left eyebrow — hair does not grow there',
-  'the left ear sits fractionally higher than the right, giving a subtle asymmetry',
-  'hands noticeably large for their frame',
-  'a permanent faint upturn at the left corner of the mouth — nerve damage, old',
-  'one eye very slightly larger than the other',
-  'cheekbones so sharp they cast visible shadow in direct light',
-  'a small patch of hair at the left temple that grows in a different direction',
-  'the right hand has a slightly longer index finger than the left — asymmetric',
-  'a faint old watermark-like discoloration on the right side of the neck, congenital'
-];
+const suffixDesc={
+  '-dren (primer Caos)':'Mató su primera criatura del Caos. Paso de niño a adulto útil.',
+  '-mork (cazador)':'Cazador con múltiples piezas. Entrena a los jóvenes, sale en expediciones mayores.',
+  '-ruk (superviviente)':'Sobrevivió heridas que debieron matarlo. Un poco temido: dejó algo al otro lado.',
+  '-skar (defensor)':'Lidera la defensa de la villa. El cazador sale a buscar; el -skar se queda a proteger.',
+  '-thar (unión)':'Unión reconocida públicamente. Primer escalón del linaje.',
+  '-neth (padre/madre)':'Tuvo un hijo sano que sobrevivió su primer año. No se pierde aunque el hijo muera después.',
+  '-velar (tronco)':'Múltiples hijos sanos. El sufijo más codiciado. Su palabra pesa en decisiones de villa.',
+  '-val (artesano)':'Oficio técnico reconocido — artesano, herrero, tejedor, agricultor maestro.',
+  '-sar (archivista)':'Sabio reconocido. Memoria de villa, custodio de historias y genealogías.',
+  '-ion (sanador)':'Sanador, partera. Muy respetados — y muy expuestos si pierden pacientes.',
+  '-mir (cuidador)':'Cuidador emocional: huérfanos, ancianos, dolientes. Discreto pero muy valorado.',
+  '-oth (vidente)':'Intérprete de sueños y presagios. Distinto del -sar: el sabio recuerda, el vidente interpreta.',
+  '-veth (rito)':'Miembro de la orden Vethkar. Custodios del rito, maestros de alfabetización.',
+  '-held (guardián)':'Custodia pública irreemplazable: guardián del pilón, del archivo, de la planta.',
+  '-tav (árbitro)':'Media disputas, arbitra entre familias. En villas pequeñas, los -tav son la ley viva.',
+  '-kron (líder)':'Cabeza de villa. Solo uno por villa.',
+  '-kel (vacío)':'Sufrió una pérdida irreparable reconocida públicamente. Licencia social para el duelo.',
+  '-vran (desastre)':'Sobrevivió un evento catastrófico colectivo siendo joven. Testigo vivo.',
+  '-nak (destierro)':'Expulsado y readmitido, o carga culpa pública no resuelta. Estigma social.',
+  '-khrav (Caos tocado)':'Visiblemente tocado por el Caos. El sufijo-advertencia. Vigilado, a veces apartado.',
+  '-ior (viajero)':'Cruzó fuera de su villa al menos una vez y regresó. Sabe cosas que ningún archivista guarda.',
+  'aprendiz sin sufijo':'Aún no cruzó ningún hito reconocido públicamente.'
+};
 
-function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+const suffixIsHerida=['-kel (vacío)','-vran (desastre)','-nak (destierro)','-khrav (Caos tocado)'];
 
-function rollAll(role) {
-  const scars = profScars[role] || profScars['aprendiz sin sufijo'];
-  randomTraits = {
-    face: pick(faceBank) + ', ' + pick(noseBank) + '. ' + pick(browBank) + '.',
-    scar: pick(scars),
-    wild: pick(wildBank)
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function rollAll(role){
+  const s=profScars[role]||profScars['aprendiz sin sufijo'];
+  randomTraits={
+    face:pick(faceBank)+', '+pick(noseBank)+'. '+pick(browBank)+'.',
+    scar:pick(s),
+    wild:pick(wildBank)
   };
-  renderTraits();
-  updatePrompt();
+  renderTraits();updatePrompt();
 }
-
-function rollOne(key, role) {
-  if (key === 'face') randomTraits.face = pick(faceBank) + ', ' + pick(noseBank) + '. ' + pick(browBank) + '.';
-  if (key === 'scar') { const s = profScars[role] || profScars['aprendiz sin sufijo']; randomTraits.scar = pick(s); }
-  if (key === 'wild') randomTraits.wild = pick(wildBank);
-  renderTraits();
-  updatePrompt();
+function rollOne(key,role){
+  if(key==='face')randomTraits.face=pick(faceBank)+', '+pick(noseBank)+'. '+pick(browBank)+'.';
+  if(key==='scar'){const s=profScars[role]||profScars['aprendiz sin sufijo'];randomTraits.scar=pick(s);}
+  if(key==='wild')randomTraits.wild=pick(wildBank);
+  renderTraits();updatePrompt();
 }
-
-function renderTraits() {
-  const box = document.getElementById('traits-display');
-  if (!box) return;
-  box.innerHTML = `
+function renderTraits(){
+  const box=document.getElementById('traits-display');
+  if(!box)return;
+  const role=currentData.role||'aprendiz sin sufijo';
+  box.innerHTML=`
     <div class="trait-row">
       <span class="trait-label">Cara</span>
       <span class="trait-value">${randomTraits.face}</span>
-      <button class="reroll-btn" onclick="rollOne('face','${currentData.role||'aprendiz sin sufijo'}')">🎲</button>
+      <button class="reroll-btn" onclick="rollOne('face','${role.replace(/'/g,"\\'")}')">🎲</button>
     </div>
     <div class="trait-row">
       <span class="trait-label">Marca</span>
       <span class="trait-value">${randomTraits.scar}</span>
-      <button class="reroll-btn" onclick="rollOne('scar','${currentData.role||'aprendiz sin sufijo'}')">🎲</button>
+      <button class="reroll-btn" onclick="rollOne('scar','${role.replace(/'/g,"\\'")}')">🎲</button>
     </div>
     <div class="trait-row">
       <span class="trait-label">Distintivo</span>
       <span class="trait-value">${randomTraits.wild}</span>
-      <button class="reroll-btn" onclick="rollOne('wild','${currentData.role||'aprendiz sin sufijo'}')">🎲</button>
+      <button class="reroll-btn" onclick="rollOne('wild','${role.replace(/'/g,"\\'")}')">🎲</button>
     </div>
-    <button class="reroll-all" onclick="rollAll('${currentData.role||'aprendiz sin sufijo'}')">🎲 Reroll todo</button>
+    <button class="reroll-all" onclick="rollAll('${role.replace(/'/g,"\\'")}')">🎲 Reroll todo</button>
   `;
 }
 
-// ── TABS ───────────────────────────────────────────────────
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['crear','guardados'][i]===tab));
-  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['crear','guardados'][i]===tab));
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
-  if (tab==='guardados') renderSaved();
+  if(tab==='guardados')renderSaved();
+}
+function setRace(race,btn){
+  currentRace=race;
+  document.querySelectorAll('.race-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderForm();updatePrompt();
 }
 
-function setRace(race, btn) {
-  currentRace = race;
-  document.querySelectorAll('.race-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderForm();
+function buildSuffixSelect(){
+  const groups=[
+    {label:'Supervivencia',opts:['-dren (primer Caos)','-mork (cazador)','-ruk (superviviente)','-skar (defensor)']},
+    {label:'Linaje',opts:['-thar (unión)','-neth (padre/madre)','-velar (tronco)']},
+    {label:'Conocimiento y cuidado',opts:['-val (artesano)','-sar (archivista)','-ion (sanador)','-mir (cuidador)','-oth (vidente)','-veth (rito)']},
+    {label:'Autoridad y justicia',opts:['-held (guardián)','-tav (árbitro)','-kron (líder)']},
+    {label:'Heridas y marcas',opts:['-kel (vacío)','-vran (desastre)','-nak (destierro)','-khrav (Caos tocado)']},
+    {label:'Movilidad',opts:['-ior (viajero)']},
+    {label:'Sin sufijo',opts:['aprendiz sin sufijo']}
+  ];
+  let html='<select onchange="onRoleChange(this.value)">';
+  groups.forEach(g=>{
+    html+=`<optgroup label="${g.label}">`;
+    g.opts.forEach(o=>html+=`<option value="${o}"${o==='-ion (sanador)'?' selected':''}>${o}</option>`);
+    html+='</optgroup>';
+  });
+  return html+'</select>';
+}
+
+function renderForm(){
+  const c=document.getElementById('form-container');
+  c.innerHTML=currentRace==='mellizo'?getMellizoHTML():getAldHTML();
+  currentData={};
+  c.querySelectorAll('.toggle-btn.active').forEach(b=>{currentData[b.dataset.field]=b.dataset.val});
+  c.querySelectorAll('select').forEach(s=>{
+    const m=s.getAttribute('onchange')?.match(/'([^']+)'/);
+    if(m)currentData[m[1]]=s.value;
+  });
+  if(currentRace==='aldeano'){
+    currentData.role='-ion (sanador)';
+    updateSuffixNote('-ion (sanador)');
+  }
+  rollAll(currentData.role||'aprendiz sin sufijo');
+}
+
+function onRoleChange(val){
+  currentData.role=val;
+  updateSuffixNote(val);
+  rollAll(val);
   updatePrompt();
 }
 
-// ── FORMS ──────────────────────────────────────────────────
-const profFaceNotes = {
-  '-ior (caravanero)': 'Expression of someone who reads distances — habitually assessing what lies ahead.',
-  '-mork (cazador/guerrero)': 'Alert expression, jaw set. Eyes that scan rather than rest.',
-  '-ion (sanador)': 'Warm and attentive expression — the gaze of someone who reads people the way others read terrain.',
-  '-val (artesano/tejedor)': 'Focused, inward quality. A person more comfortable with their hands than their words.',
-  '-sar (archivista)': 'Concentrated expression, slight forward lean of the head — the habit of someone always about to ask something.',
-  '-veth (religioso)': 'Still and inward. A face that gives away very little at rest.',
-  '-held (artefactos)': 'Precise, careful gaze — accustomed to looking at small things. Patient.',
-  '-kron (consejo)': 'Weight of authority visible in bearing. A face earned, not aged.',
-  '-oth (vidente)': 'Eyes slightly unfocused, tracking something at a different layer of the visible.',
-  'aprendiz sin sufijo': 'Attentive, careful. The slight uncertainty of someone still learning what they are.'
-};
+function updateSuffixNote(role){
+  const el=document.getElementById('suffix-note');
+  if(!el)return;
+  const desc=suffixDesc[role]||'';
+  const isHerida=suffixIsHerida.includes(role);
+  el.className='suffix-note'+(isHerida?' mark':'');
+  el.textContent=desc;
+}
 
-const roleProps = {
-  '-ior (caravanero)': 'Carrying: travel pack on one shoulder, worn leather pouch at hip, folded document tucked into belt. Road-worn sandals.',
-  '-mork (cazador/guerrero)': 'Carrying: hunting spear in one hand. Rough feather-and-hide shoulder cape. Small pouch at hip.',
-  '-ion (sanador)': 'Carrying: bundle of fresh medicinal herbs in one hand. Wide belt with small herb pouches. Small cloth folded over forearm.',
-  '-val (artesano/tejedor)': 'Carrying: rope coils at hip, small tool in hand. Stained fingers from work.',
-  '-sar (archivista)': 'Carrying: multiple bundles of knotted cords at belt, one held loosely and read by touch.',
-  '-veth (religioso)': 'Carrying: ritual staff. Many bead strands at neck. Raw linen band on left wrist with a specific knot.',
-  '-held (artefactos)': 'Carrying: two or three small precision metal tools held carefully. Cleaning cloth in other hand.',
-  '-kron (consejo)': 'Nothing in hand. Simple but well-kept garments. Deliberate posture of authority.',
-  '-oth (vidente)': 'Carrying: small shallow ritual bowl in one hand. Knotted cord bundles at belt. Other hand raised slightly, palm open.',
-  'aprendiz sin sufijo': 'Simple tools for the trade being learned. Attentive apprentice posture.'
-};
-
-function getAldFormHTML() {
+function getAldHTML(){
   return `
     <div class="section-title">Identidad</div>
     <div class="form-grid">
@@ -329,6 +489,7 @@ function getAldFormHTML() {
       </div>
       <div class="field"><label>Edad</label>
         <select onchange="setVal('age',this.value)">
+          <option value="young adult (~16)">Joven (~16)</option>
           <option value="young adult (~18)">Joven adulto (~18)</option>
           <option value="young adult (~20)">Joven adulto (~20)</option>
           <option value="adult (~30)" selected>Adulto (~30)</option>
@@ -344,19 +505,10 @@ function getAldFormHTML() {
           <option>Halvar</option><option>Ikhmar</option><option>Ydral</option>
         </select>
       </div>
-      <div class="field"><label>Oficio / Sufijo</label>
-        <select onchange="onRoleChange(this.value)">
-          <option value="-ior (caravanero)">-ior · caravanero</option>
-          <option value="-mork (cazador/guerrero)">-mork · cazador/guerrero</option>
-          <option value="-ion (sanador)" selected>-ion · sanador</option>
-          <option value="-val (artesano/tejedor)">-val · artesano/tejedor</option>
-          <option value="-sar (archivista)">-sar · archivista</option>
-          <option value="-veth (religioso)">-veth · religioso</option>
-          <option value="-held (artefactos)">-held · artefactos</option>
-          <option value="-kron (consejo)">-kron · consejo</option>
-          <option value="-oth (vidente)">-oth · vidente</option>
-          <option value="aprendiz sin sufijo">Aprendiz (sin sufijo)</option>
-        </select>
+      <div class="field">
+        <label>Sufijo principal</label>
+        ${buildSuffixSelect()}
+        <div class="suffix-note" id="suffix-note">Sanador, partera. Muy respetados — y muy expuestos si pierden pacientes.</div>
       </div>
     </div>
     <div class="section-title">Apariencia</div>
@@ -400,7 +552,7 @@ function getAldFormHTML() {
         </div>
       </div>
     </div>
-    <div class="section-title">Rasgos únicos <span style="font-size:10px;color:var(--cream-dim);font-family:'Crimson Text',serif;text-transform:none;letter-spacing:0;font-style:italic;margin-left:6px">generados automáticamente — re-rolleable</span></div>
+    <div class="section-title">Rasgos únicos <span style="font-size:10px;color:var(--cream-dim);font-family:'Crimson Text',serif;text-transform:none;letter-spacing:0;font-style:italic;margin-left:6px">se regeneran al cambiar sufijo</span></div>
     <div class="traits-box" id="traits-display">Cargando...</div>
     <div class="section-title">Escena</div>
     <div class="form-grid">
@@ -413,16 +565,17 @@ function getAldFormHTML() {
           <option value="beside a stone village pilón, late afternoon light">Junto a un pilón</option>
           <option value="riverbank, water visible behind">Orilla del río</option>
           <option value="salt flats, white deposits around">Salinas</option>
+          <option value="stone workshop interior, tools visible">Taller interior</option>
         </select>
       </div>
       <div class="field"><label>Notas adicionales (opcional)</label>
-        <textarea placeholder="Detalles extra, historia, sobreescribir rasgos..." onchange="setVal('notes',this.value)" oninput="setVal('notes',this.value)"></textarea>
+        <textarea placeholder="Detalles extra, expresión, historia..." onchange="setVal('notes',this.value)" oninput="setVal('notes',this.value)"></textarea>
       </div>
     </div>
   `;
 }
 
-function getMellizoFormHTML() {
+function getMellizoHTML(){
   return `
     <div class="section-title">Personaje</div>
     <div class="form-grid">
@@ -440,7 +593,7 @@ function getMellizoFormHTML() {
         </div>
       </div>
     </div>
-    <div class="section-title">Rasgos únicos <span style="font-size:10px;color:var(--cream-dim);font-family:'Crimson Text',serif;text-transform:none;letter-spacing:0;font-style:italic;margin-left:6px">generados automáticamente</span></div>
+    <div class="section-title">Rasgos únicos</div>
     <div class="traits-box" id="traits-display">Cargando...</div>
     <div class="section-title">Escena</div>
     <div class="form-grid">
@@ -459,50 +612,27 @@ function getMellizoFormHTML() {
   `;
 }
 
-function renderForm() {
-  const c = document.getElementById('form-container');
-  c.innerHTML = currentRace === 'aldeano' ? getAldFormHTML() : getMellizoFormHTML();
-  currentData = {};
-  c.querySelectorAll('.toggle-btn.active').forEach(b => { currentData[b.dataset.field] = b.dataset.val; });
-  c.querySelectorAll('select').forEach(s => {
-    const m = s.getAttribute('onchange')?.match(/'([^']+)'/);
-    if (m) currentData[m[1]] = s.value;
-  });
-  if (currentRace === 'aldeano') currentData.role = '-ion (sanador)';
-  const role = currentData.role || 'aprendiz sin sufijo';
-  rollAll(role);
-}
-
-function onRoleChange(val) {
-  currentData.role = val;
-  rollAll(val);
-  updatePrompt();
-}
-
-function setToggle(btn) {
-  const f = btn.dataset.field;
-  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+function setToggle(btn){
+  const f=btn.dataset.field;
+  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  currentData[f] = btn.dataset.val;
+  currentData[f]=btn.dataset.val;
   updatePrompt();
 }
+function setVal(f,v){currentData[f]=v;updatePrompt();}
 
-function setVal(f, v) { currentData[f] = v; updatePrompt(); }
-
-// ── PROMPT BUILDERS ────────────────────────────────────────
-function buildAldeano(d) {
-  const h = d.gender === 'female' ? '1.85–2.00m' : '1.95–2.10m';
-  const beard = d.gender === 'male' ? ' No beard or very light stubble.' : '';
-  const skin = d.skin_scale === '2'
-    ? 'skin tone scale 2 out of 10 — very light grey tint, barely perceptible, still nearly white.'
-    : 'skin tone scale 1 out of 10 — near-white, minimal hatching, almost no shadow on skin surface.';
-  const faceNote = profFaceNotes[d.role] || '';
-  const props = roleProps[d.role] || 'Simple draped linen garments, earth tones.';
-
+function buildAldeano(d){
+  const h=d.gender==='female'?'1.85–2.00m':'1.95–2.10m';
+  const beard=d.gender==='male'?'\nNo beard or very light stubble.':'';
+  const skin=d.skin_scale==='2'
+    ?'skin tone scale 2 out of 10 — very light grey tint, barely perceptible, still nearly white.'
+    :'skin tone scale 1 out of 10 — near-white, minimal hatching, almost no shadow on skin surface.';
+  const faceNote=profFaceNotes[d.role]||'';
+  const props=roleProps[d.role]||'Simple draped linen garments, earth tones.';
   return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.
 NO TEXT, NO LABELS, NO WRITING anywhere.
 
-Subject: a ${d.age} ${d.gender === 'male' ? 'man' : 'woman'}, Aldeano from ${d.village || 'a village'}, role: ${d.role}.
+Subject: a ${d.age} ${d.gender==='male'?'man':'woman'}, Aldeano from ${d.village||'a village'}, suffix: ${d.role}.
 Extraordinarily tall and lean (~${h}), limbs disproportionately long, very low body weight for height. NOT muscular. Built for agility.
 
 Face: ${randomTraits.face}${beard}
@@ -510,28 +640,26 @@ ${faceNote}
 
 Hair: ${d.hair_color}, ${d.hair_length}, ${d.hair_style}.
 Eyes: ${d.eyes}.
-
 Skin: ${skin}
 
-Distinctive physical detail: ${randomTraits.scar}.
+Distinctive physical mark: ${randomTraits.scar}.
 Unique trait: ${randomTraits.wild}.
 
 ${props}
 
-Simple draped linen garments, layered, earth tones. Cord-laced sandals.${d.notes ? '\n\nAdditional notes: ' + d.notes : ''}
+Simple draped linen garments, layered, earth tones. Cord-laced sandals.${d.notes?'\n\nAdditional notes: '+d.notes:''}
 
-Background: ${d.background || 'interior of the village'}.`;
+Background: ${d.background||'interior of the village'}.`;
 }
 
-function buildMellizo(d) {
-  const isFemale = d.twin === 'female';
-  const wild = `Distinctive detail: ${randomTraits.wild}.`;
-  if (isFemale) {
-    return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.
+function buildMellizo(d){
+  const f=d.twin==='female';
+  const wild=`Distinctive detail: ${randomTraits.wild}.`;
+  if(f)return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.
 NO TEXT, NO LABELS, NO WRITING anywhere.
 
-Subject: a young woman, approximately ${d.age || '~18'} years old, raised in an Aldeano village.
-1.75m tall — visibly shorter and more solidly built than any Aldeano. Wide-shouldered, compact, muscular density visible. Stocky compared to the tall willowy Aldeano physique.
+Subject: a young woman, approximately ${d.age||'~18'} years old, raised in an Aldeano village.
+1.75m tall — visibly shorter and more solidly built than any Aldeano. Wide-shouldered, compact, muscular density visible. Stocky compared to tall willowy Aldeano physique.
 
 Skin: skin tone medium grey, scale 6 out of 10 where 1=white 10=black. Noticeably darker than any Aldeano. No marks on skin.
 
@@ -543,14 +671,13 @@ Hair: dark brown, almost black. Long, loosely braided. A few small dried herb st
 Around neck: a small amulet on a cord — old, worn smooth. Not touching it consciously.
 
 Clothing: simple Aldeano linen wrap, earth tones. Wide belt with small herb pouches. Cord-laced sandals.
-Carrying: bundle of fresh medicinal herbs in one hand. Small cloth folded over forearm.${d.notes ? '\n\nAdditional notes: ' + d.notes : ''}
+Carrying: bundle of fresh medicinal herbs in one hand. Small cloth folded over forearm.${d.notes?'\n\nAdditional notes: '+d.notes:''}
 
-Background: ${d.context || 'medicinal herb garden at the edge of the village'}.`;
-  }
+Background: ${d.context||'medicinal herb garden at the edge of the village'}.`;
   return `Full-body illustration, antique manuscript style, sepia ink line drawing on aged parchment, detailed hatching, no color except warm yellowed paper background.
 NO TEXT, NO LABELS, NO WRITING anywhere.
 
-Subject: a young man, approximately ${d.age || '~18'} years old, raised in an Aldeano village.
+Subject: a young man, approximately ${d.age||'~18'} years old, raised in an Aldeano village.
 1.82m tall — visibly shorter and more solidly built than any Aldeano. Wide-shouldered, compact, muscular density visible.
 
 Skin: skin tone medium grey, scale 6 out of 10 where 1=white 10=black. Noticeably darker than any Aldeano. No marks on skin.
@@ -563,105 +690,80 @@ Hair: dark, tight curls, close-cropped at sides, slightly longer on top.
 Around neck: a small amulet on a cord — old, worn smooth. Identical to one his sister carries.
 
 Clothing: simple Aldeano linen wrap, white-cream tones. Belt with small pouch and knotted cord bundles. Cord-laced sandals.
-Carrying: small shallow ritual bowl in one hand. Other arm raised slightly, palm open upward.${d.notes ? '\n\nAdditional notes: ' + d.notes : ''}
+Carrying: small shallow ritual bowl in one hand. Other arm raised slightly, palm open upward.${d.notes?'\n\nAdditional notes: '+d.notes:''}
 
-Background: ${d.context || 'beside a village pilón at late dusk'}.`;
+Background: ${d.context||'beside a village pilón at late dusk'}.`;
 }
 
-function updatePrompt() {
-  let p = '';
-  try {
-    if (currentRace === 'aldeano') p = buildAldeano(currentData);
-    else p = buildMellizo(currentData);
-  } catch(e) { p = 'Error generando prompt.'; }
-  document.getElementById('prompt-output').textContent = p;
+function updatePrompt(){
+  let p='';
+  try{
+    if(currentRace==='aldeano')p=buildAldeano(currentData);
+    else p=buildMellizo(currentData);
+  }catch(e){p='Error generando prompt.'}
+  document.getElementById('prompt-output').textContent=p;
+}
+function copyPrompt(){
+  navigator.clipboard.writeText(document.getElementById('prompt-output').textContent).then(()=>showToast('Prompt copiado'));
 }
 
-function copyPrompt() {
-  navigator.clipboard.writeText(document.getElementById('prompt-output').textContent)
-    .then(() => showToast('Prompt copiado'));
-}
-
-// ── SAVE / LOAD ────────────────────────────────────────────
-async function saveCharacter() {
-  const name = document.getElementById('char-name').value.trim();
-  if (!name) { showToast('Escribe un nombre primero'); return; }
-  const char = {
-    id: Date.now().toString(), name,
-    race: currentRace,
-    data: { ...currentData },
-    traits: { ...randomTraits },
-    saved: new Date().toLocaleDateString('es')
-  };
-  let chars = [];
-  try { const r = await window.storage.get('zskahra-player-chars'); if (r) chars = JSON.parse(r.value); } catch(e) {}
+async function saveCharacter(){
+  const name=document.getElementById('char-name').value.trim();
+  if(!name){showToast('Escribe un nombre primero');return}
+  const char={id:Date.now().toString(),name,race:currentRace,data:{...currentData},traits:{...randomTraits},saved:new Date().toLocaleDateString('es')};
+  let chars=[];
+  try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}
   chars.unshift(char);
-  await window.storage.set('zskahra-player-chars', JSON.stringify(chars));
-  document.getElementById('char-name').value = '';
+  await window.storage.set('zskahra-player-chars',JSON.stringify(chars));
+  document.getElementById('char-name').value='';
   showToast(`"${name}" guardado`);
 }
-
-async function renderSaved() {
-  const list = document.getElementById('char-list');
-  let chars = [];
-  try { const r = await window.storage.get('zskahra-player-chars'); if (r) chars = JSON.parse(r.value); } catch(e) {}
-  if (!chars.length) { list.innerHTML = '<div class="empty-state">No hay personajes guardados aún.</div>'; return; }
-  list.innerHTML = chars.map(c => `
-    <div class="char-card">
-      <div class="char-info"><h3>${c.name}</h3><p>${c.race === 'aldeano' ? 'Aldeano/a' : 'Mellizo/a'} · ${c.saved || ''}</p></div>
-      <div class="char-actions">
-        <button class="char-btn char-btn-load" onclick="loadChar('${c.id}')">Cargar</button>
-        <button class="char-btn char-btn-del" onclick="deleteChar('${c.id}')">✕</button>
-      </div>
-    </div>`).join('');
+async function renderSaved(){
+  const list=document.getElementById('char-list');
+  let chars=[];
+  try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}
+  if(!chars.length){list.innerHTML='<div class="empty-state">No hay personajes guardados aún.</div>';return}
+  list.innerHTML=chars.map(c=>`<div class="char-card"><div class="char-info"><h3>${c.name}</h3><p>${c.race==='aldeano'?'Aldeano/a':'Mellizo/a'} · ${c.data?.role||''} · ${c.saved||''}</p></div><div class="char-actions"><button class="char-btn char-btn-load" onclick="loadChar('${c.id}')">Cargar</button><button class="char-btn char-btn-del" onclick="deleteChar('${c.id}')">✕</button></div></div>`).join('');
 }
-
-async function loadChar(id) {
-  let chars = [];
-  try { const r = await window.storage.get('zskahra-player-chars'); if (r) chars = JSON.parse(r.value); } catch(e) {}
-  const char = chars.find(c => c.id === id);
-  if (!char) return;
+async function loadChar(id){
+  let chars=[];
+  try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}
+  const char=chars.find(c=>c.id===id);if(!char)return;
   switchTab('crear');
-  currentRace = char.race;
-  document.querySelectorAll('.race-btn').forEach((b, i) => b.classList.toggle('active', ['aldeano','mellizo'][i] === char.race));
-  currentData = { ...char.data };
-  if (char.traits) randomTraits = { ...char.traits };
+  currentRace=char.race;
+  document.querySelectorAll('.race-btn').forEach((b,i)=>b.classList.toggle('active',['aldeano','mellizo'][i]===char.race));
+  currentData={...char.data};
+  if(char.traits)randomTraits={...char.traits};
   renderForm();
-  setTimeout(() => {
-    document.querySelectorAll('.toggle-btn').forEach(b => {
-      if (b.dataset.field && currentData[b.dataset.field] === b.dataset.val) {
-        b.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(x => x.classList.remove('active'));
+  setTimeout(()=>{
+    document.querySelectorAll('.toggle-btn').forEach(b=>{
+      if(b.dataset.field&&currentData[b.dataset.field]===b.dataset.val){
+        b.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(x=>x.classList.remove('active'));
         b.classList.add('active');
       }
     });
-    document.querySelectorAll('select').forEach(s => {
-      const m = s.getAttribute('onchange')?.match(/'([^']+)'/);
-      if (m && currentData[m[1]]) s.value = currentData[m[1]];
+    document.querySelectorAll('select').forEach(s=>{
+      const m=s.getAttribute('onchange')?.match(/'([^']+)'/);
+      if(m&&currentData[m[1]])s.value=currentData[m[1]];
     });
-    if (char.traits) { randomTraits = { ...char.traits }; renderTraits(); }
+    if(char.traits){randomTraits={...char.traits};renderTraits();}
+    updateSuffixNote(currentData.role||'aprendiz sin sufijo');
     updatePrompt();
-  }, 60);
-  document.getElementById('char-name').value = char.name;
+  },60);
+  document.getElementById('char-name').value=char.name;
   showToast(`"${char.name}" cargado`);
 }
-
-async function deleteChar(id) {
-  let chars = [];
-  try { const r = await window.storage.get('zskahra-player-chars'); if (r) chars = JSON.parse(r.value); } catch(e) {}
-  chars = chars.filter(c => c.id !== id);
-  await window.storage.set('zskahra-player-chars', JSON.stringify(chars));
-  renderSaved();
-  showToast('Personaje eliminado');
+async function deleteChar(id){
+  let chars=[];
+  try{const r=await window.storage.get('zskahra-player-chars');if(r)chars=JSON.parse(r.value)}catch(e){}
+  chars=chars.filter(c=>c.id!==id);
+  await window.storage.set('zskahra-player-chars',JSON.stringify(chars));
+  renderSaved();showToast('Personaje eliminado');
 }
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
 }
-
-// ── INIT ───────────────────────────────────────────────────
 renderForm();
 </script>
 </body>

@@ -18,7 +18,7 @@
     --accent: #6b4a2b;
     --accent-subtle: rgba(107, 74, 43, 0.08);
     --radius-md: 8px;
-    --radius-lg: 12px;
+    --radius-lg: 10px;
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
   }
@@ -43,35 +43,26 @@
     color: var(--text-primary);
     font-family: var(--font-sans);
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
   }
   .app {
-    max-width: 900px;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 2rem 1.5rem 3rem;
-  }
-  .columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    align-items: start;
-  }
-  @media (max-width: 640px) {
-    .columns { grid-template-columns: 1fr; }
+    padding: 1.5rem 1.5rem 1.25rem;
   }
   .header {
     display: flex;
     align-items: baseline;
     gap: 12px;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
     border-bottom: 0.5px solid var(--border);
   }
   .header h1 {
     font-family: var(--font-serif);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 500;
     letter-spacing: 0.06em;
     margin: 0;
@@ -83,10 +74,30 @@
     font-style: italic;
     margin: 0;
   }
-  .tools {
-    display: flex;
-    flex-direction: column;
+  .section {
+    margin-bottom: 1.25rem;
+  }
+  .section:last-of-type {
+    margin-bottom: 0;
+  }
+  .section-title {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+    margin: 0 0 0.6rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 540px) {
+    .grid { grid-template-columns: 1fr; }
   }
   .tool-card {
     display: block;
@@ -95,27 +106,27 @@
     background: var(--bg-card);
     border: 0.5px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 1.25rem 1.5rem;
+    padding: 0.7rem 0.85rem;
     transition: background 0.15s, border-color 0.15s, transform 0.1s;
   }
   .tool-card:hover {
     background: var(--bg-card-hover);
     border-color: var(--border-hover);
-    transform: translateX(3px);
+    transform: translateY(-1px);
   }
   .tool-card:active {
-    transform: translateX(1px);
+    transform: translateY(0);
   }
   .tool-top {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 6px;
+    gap: 10px;
+    margin-bottom: 4px;
   }
   .tool-icon {
-    font-size: 20px;
-    width: 36px;
-    height: 36px;
+    font-size: 15px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -125,28 +136,20 @@
   }
   .tool-name {
     font-family: var(--font-serif);
-    font-size: 1.1rem;
+    font-size: 0.98rem;
     font-weight: 500;
     letter-spacing: 0.02em;
+    line-height: 1.2;
   }
   .tool-desc {
-    font-size: 13px;
-    color: var(--text-secondary);
-    padding-left: 48px;
-    line-height: 1.5;
-  }
-  .section-title {
     font-size: 12px;
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 500;
-    margin: 0 0 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
   }
   .footer {
     text-align: center;
-    margin-top: 3.5rem;
-    font-size: 12px;
+    margin-top: 1.5rem;
+    font-size: 11px;
     color: var(--text-tertiary);
     letter-spacing: 0.04em;
   }
@@ -159,81 +162,87 @@
     <p>Herramientas para el mundo y sus villas</p>
   </header>
 
-  <div class="columns">
-    <div>
-      <p class="section-title">Herramientas</p>
-      <div class="tools">
-<a class="tool-card" href="zskahra_generador_de_nombres_para_villagers.html">
-          <div class="tool-top">
-            <div class="tool-icon">&#x270D;</div>
-            <div class="tool-name">Generador de nombres</div>
-          </div>
-          <div class="tool-desc">Nombres para villagers con raza, villa, sufijo de hito social, edad y trasfondo.</div>
-        </a>
+  <section class="section">
+    <p class="section-title">Herramientas</p>
+    <div class="grid">
+      <a class="tool-card" href="zskahra_generador_de_nombres_para_villagers.html">
+        <div class="tool-top">
+          <div class="tool-icon">&#x270D;</div>
+          <div class="tool-name">Generador de nombres</div>
+        </div>
+        <div class="tool-desc">Nombres con raza, villa, sufijo, edad y trasfondo.</div>
+      </a>
 
-        <a class="tool-card" href="zskahra_clima_generador.html">
-          <div class="tool-top">
-            <div class="tool-icon">&#x2601;</div>
-            <div class="tool-name">Oráculo de Clima</div>
-          </div>
-          <div class="tool-desc">Genera el clima por khar para cualquier bioma del mundo.</div>
-        </a>
+      <a class="tool-card" href="zskahra_clima_generador.html">
+        <div class="tool-top">
+          <div class="tool-icon">&#x2601;</div>
+          <div class="tool-name">Oráculo de Clima</div>
+        </div>
+        <div class="tool-desc">Genera el clima por khar para cualquier bioma.</div>
+      </a>
 
-<a class="tool-card" href="zskahra_herbalist_generador.html">
-          <div class="tool-top">
-            <div class="tool-icon">&#x1F33F;</div>
-            <div class="tool-name">Guía del Herbalista</div>
-          </div>
-          <div class="tool-desc">Sistema de recolección de hierbas, ingredientes y preparaciones.</div>
-        </a>
+      <a class="tool-card" href="zskahra_herbalist_generador.html">
+        <div class="tool-top">
+          <div class="tool-icon">&#x1F33F;</div>
+          <div class="tool-name">Guía del Herbalista</div>
+        </div>
+        <div class="tool-desc">Recolección de hierbas, ingredientes y preparaciones.</div>
+      </a>
 
-        <a class="tool-card" href="zskahra_referencia.html">
-          <div class="tool-top">
-            <div class="tool-icon">&#x1F4CB;</div>
-            <div class="tool-name">Referencia Rápida</div>
-          </div>
-          <div class="tool-desc">Sufijos, aldeas, estaciones, calendario y artefactos. Para el Director de Juego.</div>
-        </a>
+      <a class="tool-card" href="zskahra_referencia.html">
+        <div class="tool-top">
+          <div class="tool-icon">&#x1F4CB;</div>
+          <div class="tool-name">Referencia Rápida</div>
+        </div>
+        <div class="tool-desc">Sufijos, aldeas, calendario y artefactos.</div>
+      </a>
 
-        <a class="tool-card" href="zskahra_tiempos_de_viaje.html">
-          <div class="tool-top">
-            <div class="tool-icon">&#x1F5FA;</div>
-            <div class="tool-name">Tiempos de Viaje</div>
-          </div>
-          <div class="tool-desc">Tabla de distancias entre las doce villas en días de caravana.</div>
-        </a>
+      <a class="tool-card" href="zskahra_tiempos_de_viaje.html">
+        <div class="tool-top">
+          <div class="tool-icon">&#x1F5FA;</div>
+          <div class="tool-name">Tiempos de Viaje</div>
+        </div>
+        <div class="tool-desc">Distancias entre las doce villas en días de caravana.</div>
+      </a>
 
-        <a class="tool-card" href="zskahra_generador_imagenes.html">
-          <div class="tool-top">
-            <div class="tool-icon">&#x1F5BC;</div>
-            <div class="tool-name">Generador de Imágenes</div>
-          </div>
-          <div class="tool-desc">Genera prompts para ilustraciones de personajes aldeanos y mellizos.</div>
-        </a>
-      </div>
+      <a class="tool-card" href="zskahra_generador_imagenes.html">
+        <div class="tool-top">
+          <div class="tool-icon">&#x1F5BC;</div>
+          <div class="tool-name">Generador de Imágenes</div>
+        </div>
+        <div class="tool-desc">Prompts para ilustraciones de aldeanos y mellizos.</div>
+      </a>
     </div>
+  </section>
 
-    <div>
-      <p class="section-title">Links</p>
-      <div class="tools">
-        <a class="tool-card" href="https://drive.google.com/drive/u/0/folders/1rKpMlWanw-3y0x_-mCMpseu5hVSkm_zT" target="_blank" rel="noopener">
-          <div class="tool-top">
-            <div class="tool-icon">&#x1F4C1;</div>
-            <div class="tool-name">Google Drive</div>
-          </div>
-          <div class="tool-desc">Carpeta compartida con documentos del proyecto.</div>
-        </a>
+  <section class="section">
+    <p class="section-title">Links</p>
+    <div class="grid">
+      <a class="tool-card" href="https://drive.google.com/drive/u/0/folders/1rKpMlWanw-3y0x_-mCMpseu5hVSkm_zT" target="_blank" rel="noopener">
+        <div class="tool-top">
+          <div class="tool-icon">&#x1F4C1;</div>
+          <div class="tool-name">Google Drive</div>
+        </div>
+        <div class="tool-desc">Carpeta compartida con documentos del proyecto.</div>
+      </a>
 
-        <a class="tool-card" href="https://app.roll20.net/join/21399330/A1U2Rg" target="_blank" rel="noopener">
-          <div class="tool-top">
-            <div class="tool-icon">&#x1F3B2;</div>
-            <div class="tool-name">Roll20</div>
-          </div>
-          <div class="tool-desc">Mesa virtual de la campaña.</div>
-        </a>
-      </div>
+      <a class="tool-card" href="https://app.roll20.net/join/21399330/A1U2Rg" target="_blank" rel="noopener">
+        <div class="tool-top">
+          <div class="tool-icon">&#x1F3B2;</div>
+          <div class="tool-name">Roll20</div>
+        </div>
+        <div class="tool-desc">Mesa virtual de la campaña.</div>
+      </a>
+
+      <a class="tool-card" href="https://zskahra-blog.netlify.app/" target="_blank" rel="noopener">
+        <div class="tool-top">
+          <div class="tool-icon">&#x1F4DC;</div>
+          <div class="tool-name">Blog</div>
+        </div>
+        <div class="tool-desc">Crónicas, lore y notas del mundo de Zskahra.</div>
+      </a>
     </div>
-  </div>
+  </section>
 
   <div class="footer">HARP Homebrew &middot; Suplemento de Campaña</div>
 </div>

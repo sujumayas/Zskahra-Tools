@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Two-Sun World — a planet with a closer sun and a farther sun</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Two-Sun World</h1>
+      <p class="tagline">
+        A planet with one closer sun and one farther sun — Newtonian gravity,
+        symplectic integration, and the Holman&nbsp;&amp;&nbsp;Wiegert stability limit.
+      </p>
+    </header>
+
+    <main>
+      <section class="views">
+        <figure class="view">
+          <figcaption>Top-down · orbital view</figcaption>
+          <canvas id="topdown" width="640" height="520"></canvas>
+        </figure>
+        <figure class="view">
+          <figcaption>Surface · the planet's sky</figcaption>
+          <canvas id="sky" width="640" height="520"></canvas>
+        </figure>
+      </section>
+
+      <aside class="controls">
+        <div class="group">
+          <h2>Configuration</h2>
+          <div class="presets">
+            <button class="preset" data-preset="s-type">S-type</button>
+            <button class="preset" data-preset="p-type">P-type</button>
+            <button class="preset" data-preset="kepler16b">Kepler-16b</button>
+          </div>
+          <div id="stability" class="stability"></div>
+          <p id="config-note" class="note"></p>
+        </div>
+
+        <div class="group">
+          <h2>Stars</h2>
+          <label
+            >Sun A mass <span id="M1-val"></span>
+            <input id="M1" type="range" min="0.2" max="2.0" step="0.01" />
+          </label>
+          <label
+            >Sun B mass <span id="M2-val"></span>
+            <input id="M2" type="range" min="0.1" max="2.0" step="0.01" />
+          </label>
+          <label
+            >Binary separation <span id="sep-val"></span>
+            <input id="sep" type="range" min="0.1" max="30" step="0.05" />
+          </label>
+          <label
+            >Binary eccentricity <span id="eb-val"></span>
+            <input id="eb" type="range" min="0" max="0.7" step="0.01" />
+          </label>
+        </div>
+
+        <div class="group">
+          <h2>Planet</h2>
+          <label
+            >Orbit radius <span id="pd-val"></span>
+            <input id="pd" type="range" min="0.1" max="12" step="0.01" />
+          </label>
+        </div>
+
+        <div class="group">
+          <h2>Simulation</h2>
+          <label
+            >Speed <span id="speed-val"></span>
+            <input id="speed" type="range" min="0.1" max="5" step="0.1" />
+          </label>
+          <div class="buttons">
+            <button id="playpause">Pause</button>
+            <button id="reset">Reset</button>
+          </div>
+        </div>
+
+        <div class="group readouts">
+          <h2>Readouts</h2>
+          <div class="readout"><span>Sun A distance</span><b id="ro-dA">—</b></div>
+          <div class="readout"><span>Sun B distance</span><b id="ro-dB">—</b></div>
+          <div class="readout"><span>Total brightness</span><b id="ro-flux">—</b></div>
+          <div class="readout"><span>Sim time</span><b id="ro-time">—</b></div>
+          <div class="readout"><span>Energy drift</span><b id="ro-energy">—</b></div>
+        </div>
+      </aside>
+    </main>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

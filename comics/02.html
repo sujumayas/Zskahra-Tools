@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra — Sesión 02</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#110e08;--surface:#1e1608;--surface2:#2a1e0a;--border:#4a3418;--border-light:#6a4d28;--gold:#c8a045;--gold-dim:#8a6a2a;--cream:#e8d5a0;--cream-dim:#a08850}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--cream);font-family:'Crimson Text',Georgia,serif;font-size:17px;line-height:1.5;min-height:100vh}
+.back-link{display:block;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-decoration:none;text-transform:uppercase;transition:color .15s}
+.back-link:hover{color:var(--gold)}
+header{background:var(--surface);border-bottom:2px solid var(--gold);padding:20px 16px 14px;text-align:center;position:sticky;top:0;z-index:100}
+header h1{font-family:'Cinzel',serif;font-size:22px;font-weight:800;color:var(--gold);letter-spacing:3px;text-transform:uppercase}
+header p{font-size:13px;color:var(--cream-dim);margin-top:3px;font-style:italic}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
+
+header .page-count{font-size:11px;color:var(--gold-dim);letter-spacing:1px;margin-top:4px}
+main{padding:16px;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+main img{display:block;width:100%;height:auto;border-radius:3px;border:1px solid var(--border)}
+.reader-nav{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.reader-nav a,.reader-nav span{flex:1;text-align:center;padding:10px 12px;border:1px solid var(--border);border-radius:4px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;color:var(--cream-dim);transition:all .15s}
+.reader-nav a:hover{border-color:var(--gold-dim);color:var(--gold)}
+.reader-nav span{opacity:.35}
+.reader-nav a.gallery-link{color:var(--gold)}
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link">&larr; Cómics</a>
+<header>
+  <h1>Sesión 02</h1>
+  <p class="page-count">15 páginas</p>
+</header>
+<main>
+  <img src="comics_pages/02/cover.png" alt="Sesión 02 — página 0" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p01.png" alt="Sesión 02 — página 1" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p02.png" alt="Sesión 02 — página 2" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p03.png" alt="Sesión 02 — página 3" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p04.png" alt="Sesión 02 — página 4" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p05.png" alt="Sesión 02 — página 5" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p06.png" alt="Sesión 02 — página 6" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p07.png" alt="Sesión 02 — página 7" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p08.png" alt="Sesión 02 — página 8" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p09.png" alt="Sesión 02 — página 9" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p10.png" alt="Sesión 02 — página 10" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p11.png" alt="Sesión 02 — página 11" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p12.png" alt="Sesión 02 — página 12" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p13.png" alt="Sesión 02 — página 13" loading="lazy" decoding="async">
+  <img src="comics_pages/02/p14.png" alt="Sesión 02 — página 14" loading="lazy" decoding="async">
+  <nav class="reader-nav">
+    <a href="01.html">&larr; Sesión 01</a>
+    <a class="gallery-link" href="index.html">Índice</a>
+    <a href="03.html">Sesión 03 &rarr;</a>
+  </nav>
+</main>
+</body>
+</html>

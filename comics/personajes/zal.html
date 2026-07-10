@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra — Zal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#110e08;--surface:#1e1608;--surface2:#2a1e0a;--border:#4a3418;--border-light:#6a4d28;--gold:#c8a045;--gold-dim:#8a6a2a;--cream:#e8d5a0;--cream-dim:#a08850}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--cream);font-family:'Crimson Text',Georgia,serif;font-size:17px;line-height:1.5;min-height:100vh}
+.back-link{display:block;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-decoration:none;text-transform:uppercase;transition:color .15s}
+.back-link:hover{color:var(--gold)}
+header{background:var(--surface);border-bottom:2px solid var(--gold);padding:20px 16px 14px;text-align:center;position:sticky;top:0;z-index:100}
+header h1{font-family:'Cinzel',serif;font-size:22px;font-weight:800;color:var(--gold);letter-spacing:3px;text-transform:uppercase}
+header p{font-size:13px;color:var(--cream-dim);margin-top:3px;font-style:italic}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
+
+main{padding:16px;max-width:760px;margin:0 auto}
+.detail-hero{width:100%;border-radius:4px;border:1px solid var(--border);margin-bottom:16px}
+.detail-meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:14px}
+.detail-meta div{font-size:13px}
+.detail-meta span{display:block;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;color:var(--gold-dim);text-transform:uppercase;margin-bottom:2px}
+.detail-blurb{font-size:16px;color:var(--cream);margin-bottom:20px;font-style:italic}
+.detail-extra{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px}
+.detail-extra figure{margin:0}
+.detail-extra img{width:100%;border-radius:4px;border:1px solid var(--border);display:block}
+.detail-extra figcaption{font-size:11px;color:var(--cream-dim);text-align:center;margin-top:4px;font-family:'Cinzel',serif;letter-spacing:1px;text-transform:uppercase}
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link">&larr; Personajes</a>
+<header>
+  <h1>Zal</h1>
+</header>
+<main>
+  <img class="detail-hero" src="zal/sheet-clearline.png" alt="Zal">
+  <div class="detail-meta">
+    <div><span>Villa</span>Logven</div>
+    <div><span>Oficio</span>Aprendiz de sanadora (-ion)</div>
+  </div>
+  <p class="detail-blurb">Trenza gruesa con una ramita de hierbas siempre sujeta, cinturón con bolsas de hierbas y un pequeño mortero. Lleva un amuleto de piedra oscura al cuello que nunca se quita.</p>
+  <div class="detail-extra">
+    <figure><img src="zal/turnaround.png" alt="Zal — turnaround" loading="lazy"><figcaption>turnaround</figcaption></figure>
+    <figure><img src="zal/plate.png" alt="Zal — plate" loading="lazy"><figcaption>plate</figcaption></figure>
+    <figure><img src="zal/accion-sanadora.png" alt="Zal — accion-sanadora" loading="lazy"><figcaption>accion sanadora</figcaption></figure>
+  </div>
+</main>
+</body>
+</html>

@@ -19,6 +19,9 @@ header p{font-size:13px;color:var(--cream-dim);margin-top:3px;font-style:italic}
 ::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
 
 main{padding:20px 16px 40px;max-width:900px;margin:0 auto}
+.subnav{text-align:center;margin-bottom:20px}
+.subnav a{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;color:var(--gold-dim);text-decoration:none;text-transform:uppercase;border:1px solid var(--border);border-radius:4px;padding:8px 16px;transition:all .15s}
+.subnav a:hover{border-color:var(--gold-dim);color:var(--gold)}
 .comic-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 @media (max-width:820px){.comic-grid{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:600px){.comic-grid{grid-template-columns:repeat(2,1fr)}}
@@ -37,6 +40,7 @@ main{padding:20px 16px 40px;max-width:900px;margin:0 auto}
   <p>Cómics de la campaña</p>
 </header>
 <main>
+  <div class="subnav"><a href="personajes/index.html">Ver personajes &rarr;</a></div>
   <div class="comic-grid">
       <a class="comic-card" href="01.html">
         <img src="comics_pages/01/cover.png" alt="Portada Sesión 01" loading="lazy">

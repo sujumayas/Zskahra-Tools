@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zskahra — Personajes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#110e08;--surface:#1e1608;--surface2:#2a1e0a;--border:#4a3418;--border-light:#6a4d28;--gold:#c8a045;--gold-dim:#8a6a2a;--cream:#e8d5a0;--cream-dim:#a08850}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--cream);font-family:'Crimson Text',Georgia,serif;font-size:17px;line-height:1.5;min-height:100vh}
+.back-link{display:block;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-dim);text-decoration:none;text-transform:uppercase;transition:color .15s}
+.back-link:hover{color:var(--gold)}
+header{background:var(--surface);border-bottom:2px solid var(--gold);padding:20px 16px 14px;text-align:center;position:sticky;top:0;z-index:100}
+header h1{font-family:'Cinzel',serif;font-size:22px;font-weight:800;color:var(--gold);letter-spacing:3px;text-transform:uppercase}
+header p{font-size:13px;color:var(--cream-dim);margin-top:3px;font-style:italic}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:3px}
+
+main{padding:20px 16px 40px;max-width:1000px;margin:0 auto}
+.section-title{font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:var(--gold-dim);text-transform:uppercase;margin:24px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.section-title:first-child{margin-top:0}
+.char-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media (max-width:820px){.char-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:600px){.char-grid{grid-template-columns:repeat(2,1fr)}}
+.char-card{display:block;text-decoration:none;color:inherit;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface2);transition:border-color .15s,transform .1s}
+.char-card:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
+.char-card img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;object-position:top;background:var(--bg)}
+.char-card .char-label{padding:10px 10px 12px}
+.char-card .char-name{font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;color:var(--gold);text-transform:uppercase}
+.char-card .char-sub{font-size:12px;color:var(--cream-dim);margin-top:2px;font-style:italic}
+</style>
+</head>
+<body>
+<a href="../index.html" class="back-link">&larr; Cómics</a>
+<header>
+  <h1>Zskahra</h1>
+  <p>Personajes del cómic</p>
+</header>
+<main>
+  <p class="section-title">Personajes jugadores</p>
+  <div class="char-grid">
+      <a class="char-card" href="zal.html">
+        <img src="zal/sheet-clearline.png" alt="Zal" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Zal</div>
+          <div class="char-sub">Logven &middot; Aprendiz de sanadora (-ion)</div>
+        </div>
+      </a>
+      <a class="char-card" href="vala.html">
+        <img src="vala/sheet-clearline.png" alt="Vala" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Vala</div>
+          <div class="char-sub">Logven &middot; Aprendiz de vidente (-oth)</div>
+        </div>
+      </a>
+      <a class="char-card" href="kelx.html">
+        <img src="kelx/sheet-clearline.png" alt="Kelx" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Kelx</div>
+          <div class="char-sub">Litor &middot; Aprendiz de técnico de pilones (-held)</div>
+        </div>
+      </a>
+      <a class="char-card" href="axthen.html">
+        <img src="axthen/sheet-clearline.png" alt="Axthen" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Axthen</div>
+          <div class="char-sub">Logven &middot; Aprendiz de archivista (-sar)</div>
+        </div>
+      </a>
+      <a class="char-card" href="dur.html">
+        <img src="dur/sheet-clearline.png" alt="Dur" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Dur</div>
+          <div class="char-sub">Theriv &middot; Aprendiz de cazador (-dren/-mork)</div>
+        </div>
+      </a>
+  </div>
+
+  <p class="section-title">Otros personajes</p>
+  <div class="char-grid">
+      <a class="char-card" href="vimsar.html">
+        <img src="vimsar/sheet-clearline.png" alt="Vimsar" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Vimsar</div>
+          <div class="char-sub">Logven &middot; Archivista jefe (NPC)</div>
+        </div>
+      </a>
+      <a class="char-card" href="alvior.html">
+        <img src="alvior/sheet-clearline.png" alt="Alvior" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Alvior</div>
+          <div class="char-sub">Personaje del cómic</div>
+        </div>
+      </a>
+      <a class="char-card" href="arnsar.html">
+        <img src="arnsar/sheet-clearline.png" alt="Arnsar" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Arnsar</div>
+          <div class="char-sub">Personaje del cómic</div>
+        </div>
+      </a>
+      <a class="char-card" href="irheld.html">
+        <img src="irheld/sheet-clearline.png" alt="Irheld" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Irheld</div>
+          <div class="char-sub">Personaje del cómic</div>
+        </div>
+      </a>
+      <a class="char-card" href="pelvskar.html">
+        <img src="pelvskar/sheet-clearline.png" alt="Pelvskar" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Pelvskar</div>
+          <div class="char-sub">Personaje del cómic</div>
+        </div>
+      </a>
+      <a class="char-card" href="rimtav.html">
+        <img src="rimtav/sheet-clearline.png" alt="Rimtav" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Rimtav</div>
+          <div class="char-sub">Personaje del cómic</div>
+        </div>
+      </a>
+      <a class="char-card" href="ulbior.html">
+        <img src="ulbior/sheet-clearline.png" alt="Ulbior" loading="lazy">
+        <div class="char-label">
+          <div class="char-name">Ulbior</div>
+          <div class="char-sub">Personaje del cómic</div>
+        </div>
+      </a>
+  </div>
+</main>
+</body>
+</html>

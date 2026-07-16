@@ -72,9 +72,27 @@
   .cal-val { font-size: 11px; color: #7a7068; line-height: 1.5; }
   .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
   strong { font-weight: bold; color: #e8e0d4; }
+  .villa-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .villa-card { background: #222018; border: 1px solid #2e2a26; border-radius: 6px; overflow: hidden; }
+  .villa-card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; cursor: zoom-in; background: #14110e; }
+  .villa-body { padding: 10px 12px 12px; }
+  .villa-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 3px; }
+  .villa-name { font-size: 15px; color: #e8e0d4; letter-spacing: 0.04em; }
+  .villa-meta { font-size: 11px; color: #c9a96e; font-family: 'Courier New', monospace; letter-spacing: 0.02em; margin-bottom: 5px; }
+  .villa-desc { font-size: 12px; color: #a89e92; line-height: 1.5; }
+  .villa-card.no-img { display: flex; flex-direction: column; justify-content: center; }
+  .map-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 4px; }
+  .map-card { background: #222018; border: 1px solid #2e2a26; border-radius: 6px; overflow: hidden; }
+  .map-card img { width: 100%; display: block; cursor: zoom-in; background: #14110e; }
+  .map-card .villa-body { padding: 8px 12px; }
+  .lightbox { display: none; position: fixed; inset: 0; background: rgba(10, 8, 6, 0.92); z-index: 100; cursor: zoom-out; align-items: center; justify-content: center; padding: 24px; }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; }
+  .lightbox-caption { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: #c9a96e; letter-spacing: 0.08em; text-transform: uppercase; }
   @media (max-width: 600px) {
     .cal-grid { grid-template-columns: repeat(2, 1fr); }
     .tabs { flex-wrap: wrap; }
+    .villa-grid, .map-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -86,6 +104,7 @@
   <div class="tabs">
     <button class="tab active" data-tab="sufijos" onclick="show('sufijos',this)">Sufijos</button>
     <button class="tab" data-tab="aldeas" onclick="show('aldeas',this)">Aldeas</button>
+    <button class="tab" data-tab="ciudades" onclick="show('ciudades',this)">Ciudades</button>
     <button class="tab" data-tab="estaciones" onclick="show('estaciones',this)">Estaciones</button>
     <button class="tab" data-tab="tiempo" onclick="show('tiempo',this)">Tiempo</button>
     <button class="tab" data-tab="artefactos" onclick="show('artefactos',this)">Artefactos</button>
@@ -168,6 +187,91 @@
       <tr><td><strong>Ksilnar</strong></td><td><span class="badge b-fro">frontera</span></td><td>~195</td><td>41</td><td>Madera de selva</td><td>Sin Vethkar fijo. La más joven en edad media. Selva agreste con alta presencia del Caos.</td></tr>
     </table>
     <p class="note">Población total: ~3.570 · Sin moneda. Funciona por cuotas, deudas y reputación.</p>
+  </div>
+
+  <!-- CIUDADES -->
+  <div id="ciudades" class="panel">
+    <div class="section-label">Las villas ilustradas</div>
+    <div class="villa-grid">
+      <div class="villa-card">
+        <img src="ciudades/Halvar-2.png" alt="Halvar, villa del lago" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body">
+          <div class="villa-head"><span class="villa-name"><strong>Halvar</strong></span><span class="badge b-lago">lago</span></div>
+          <div class="villa-meta">~380 hab. · ed. media 52 · Sal</div>
+          <div class="villa-desc">Sin su sal, la carne se pudre en cualquier caravana. Poder estructural que nadie ejerce abiertamente.</div>
+        </div>
+      </div>
+      <div class="villa-card">
+        <img src="ciudades/Karven.png" alt="Karven, villa central" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body">
+          <div class="villa-head"><span class="villa-name"><strong>Karven</strong></span><span class="badge b-cen">central</span></div>
+          <div class="villa-meta">~290 hab. · ed. media 61 · Huertos, frutas, hierbas</div>
+          <div class="villa-desc">Florece la Pendrael en los Días Ciegos. Edad media más alta del territorio.</div>
+        </div>
+      </div>
+      <div class="villa-card">
+        <img src="ciudades/Poymel-2.png" alt="Poymel, villa central" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body">
+          <div class="villa-head"><span class="villa-name"><strong>Poymel</strong></span><span class="badge b-cen">central</span></div>
+          <div class="villa-meta">~240 hab. · ed. media 48 · Ganado tocado por el Caos</div>
+          <div class="villa-desc">Cría animales con corrupción controlada. Vida dura; una de las edades media más bajas.</div>
+        </div>
+      </div>
+      <div class="villa-card">
+        <img src="ciudades/logven.png" alt="Logven, villa central" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body">
+          <div class="villa-head"><span class="villa-name"><strong>Logven</strong></span><span class="badge b-cen">central</span></div>
+          <div class="villa-meta">~210 hab. · ed. media 63 · Archivo y memoria</div>
+          <div class="villa-desc">No produce nada material. Reconcilia el velkrai del territorio cada Ciclo. Edad media más alta: 63.</div>
+        </div>
+      </div>
+      <div class="villa-card">
+        <img src="ciudades/Litor-2.png" alt="Litor, villa de oficio" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body">
+          <div class="villa-head"><span class="villa-name"><strong>Litor</strong></span><span class="badge b-ofi">oficio</span></div>
+          <div class="villa-meta">~265 hab. · ed. media 50 · Piedra, pilones</div>
+          <div class="villa-desc">Mantiene los pilones del territorio. Sin Litor, las rutas mueren.</div>
+        </div>
+      </div>
+      <div class="villa-card">
+        <img src="ciudades/Theriv-2.png" alt="Theriv, villa de frontera" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body">
+          <div class="villa-head"><span class="villa-name"><strong>Theriv</strong></span><span class="badge b-fro">frontera</span></div>
+          <div class="villa-meta">~220 hab. · ed. media 44 · Caza, rutas</div>
+          <div class="villa-desc">Sin Vethkar fijo. Alta densidad de -dren entre la juventud. Controla rutas del oeste.</div>
+        </div>
+      </div>
+      <div class="villa-card">
+        <img src="ciudades/Ksilven-2.png" alt="Ksilnar, villa de frontera" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body">
+          <div class="villa-head"><span class="villa-name"><strong>Ksilnar</strong></span><span class="badge b-fro">frontera</span></div>
+          <div class="villa-meta">~195 hab. · ed. media 41 · Madera de selva</div>
+          <div class="villa-desc">Sin Vethkar fijo. La más joven en edad media. Selva agreste con alta presencia del Caos.</div>
+        </div>
+      </div>
+    </div>
+    <p class="note" style="margin-top:10px">Sin ilustración todavía: Ikhmar, Siteth, Ydral, Kalvek e Hisven. Datos completos en la pestaña Aldeas.</p>
+
+    <div class="section-label" style="margin-top:20px">Mapas y láminas del territorio</div>
+    <div class="map-grid">
+      <div class="map-card">
+        <img src="Las doce villas.png" alt="Mapa de las doce villas" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body"><div class="villa-meta">Las doce villas</div></div>
+      </div>
+      <div class="map-card">
+        <img src="Villas centrales.png" alt="Lámina de las villas centrales" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body"><div class="villa-meta">Villas centrales</div></div>
+      </div>
+      <div class="map-card">
+        <img src="Villas del lago.png" alt="Lámina de las villas del lago" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body"><div class="villa-meta">Villas del lago</div></div>
+      </div>
+      <div class="map-card">
+        <img src="Vila sola - Halvar.png" alt="Lámina de Halvar" loading="lazy" decoding="async" onclick="lbOpen(this)">
+        <div class="villa-body"><div class="villa-meta">Villa sola · Halvar</div></div>
+      </div>
+    </div>
+    <p class="note">Click en cualquier imagen para verla a tamaño completo.</p>
   </div>
 
   <!-- ESTACIONES -->
@@ -436,6 +540,11 @@
 
 </div>
 
+<div id="lightbox" class="lightbox" onclick="lbClose()">
+  <img src="" alt="">
+  <div class="lightbox-caption"></div>
+</div>
+
 <script>
 function show(id, btn) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -454,6 +563,17 @@ function showFromHash() {
 }
 window.addEventListener('hashchange', showFromHash);
 window.addEventListener('DOMContentLoaded', showFromHash);
+function lbOpen(img) {
+  const lb = document.getElementById('lightbox');
+  lb.querySelector('img').src = img.src;
+  lb.querySelector('img').alt = img.alt;
+  lb.querySelector('.lightbox-caption').textContent = img.alt;
+  lb.classList.add('open');
+}
+function lbClose() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') lbClose(); });
 function hToggle(row) {
   const next = row.nextElementSibling;
   if (!next || !next.classList.contains('hnote')) return;

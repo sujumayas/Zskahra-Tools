@@ -12,7 +12,7 @@ El proyecto es un conjunto de páginas HTML estáticas, sin framework ni paso de
 | **Oráculo de Clima** | `zskahra_clima_generador.html` | Genera el clima por khar para cualquier bioma del mundo. |
 | **Simulador del Tiempo** | `zskahra_tiempo_simulador.html` | Visualiza los dos soles (el Pulso Gemelo), los Ciclos y las cinco estaciones de Zskahra. |
 | **Guía del Herbalista** | `zskahra_herbalist_generador.html` | Sistema de recolección de hierbas, ingredientes y preparaciones alquímicas. |
-| **Referencia Rápida** | `zskahra_referencia.html` | Sufijos de hito, aldeas, estaciones, calendario y artefactos. Diseñado para el DJ. |
+| **Referencia Rápida** | `zskahra_referencia.html` | Sufijos de hito, aldeas, ciudades ilustradas, estaciones, calendario y artefactos. Diseñado para el DJ. |
 | **Tiempos de Viaje** | `zskahra_tiempos_de_viaje.html` | Tabla de distancias entre las doce villas en días de caravana. |
 | **Generador de Imágenes** | `zskahra_generador_imagenes.html` | Genera prompts para ilustraciones de personajes aldeanos y mellizos. |
 | **Explorador del Mundo** | `zskahra_explorer.html` | Villas, sistema social, sufijos de hito y estructura del mundo. |
@@ -38,6 +38,7 @@ python3 -m http.server
 ```
 index.html                          # Página principal con enlace a todas las herramientas
 zskahra_*.html                      # Una página por herramienta
+ciudades/                           # Ilustraciones de las villas
 *.png                               # Mapas e imágenes de referencia del mundo
 Manual del Aldeano - Zskahra.pdf    # Documento base de lore
 netlify.toml                        # Configuración de Netlify
